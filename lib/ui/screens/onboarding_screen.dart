@@ -175,13 +175,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // 1. STYLE MONOCHROME :
-    // On ignore colorScheme.primary (le Rouge).
-    // On utilise onSurface (Noir ou Blanc) pour le contraste fort.
-    final Color monoColor = colorScheme.onSurface;
+    final Color primaryColor = colorScheme.primary;
 
-    // Couleur de fond des bulles : très subtile, basée sur le noir/blanc
-    final Color bubbleColor = monoColor.withValues(alpha: 0.03);
+    // Couleur de fond des bulles : plus dynamique avec M3
+    final Color bubbleColor = colorScheme.primaryContainer.withValues(alpha: 0.2);
+    final Color accentBubbleColor = colorScheme.secondaryContainer.withValues(alpha: 0.15);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -214,7 +212,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               height: 450,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: bubbleColor,
+                color: accentBubbleColor,
               ),
             ),
           ),
@@ -236,7 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           colorScheme,
                           textTheme,
                           isLandscape,
-                          monoColor,
+                          primaryColor,
                         );
                       }
                       return _buildOnboardingPage(
@@ -245,7 +243,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         textTheme,
                         isLandscape,
                         index == _currentIndex,
-                        monoColor,
+                        primaryColor,
                       );
                     },
                   ),
@@ -260,7 +258,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: _buildBottomNavigation(
                     isLastPage,
                     colorScheme,
-                    monoColor,
+                    primaryColor,
                   ),
                 ),
               ],
@@ -331,7 +329,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 color: active
                     ? activeColor
                     : activeColor.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
               ),
             );
           }),
@@ -431,7 +429,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               : Icon(
                   step.icon,
                   size: 100,
-                  color: monoColor.withValues(alpha: 0.8),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
         ),
       ),
@@ -453,11 +451,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         Text(
           step.title,
           textAlign: center ? TextAlign.center : TextAlign.start,
-          // Utilisation explicite du style Inter défini dans le thème
-          style: textTheme.displayMedium?.copyWith(
-            fontSize: 28, // Ajustement léger
-            height: 1.1,
+          // Utilisation du style Material 3 Headline
+          style: textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
+            letterSpacing: -0.5,
           ),
         ),
         const SizedBox(height: 16),
