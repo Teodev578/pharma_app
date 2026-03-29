@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pharma_app/ui/screens/onboarding_screen.dart';
+import 'package:pharma_app/ui/screens/welcome_screen.dart';
 
-void main() {
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+  runApp(MainApp(hasSeenOnboarding: hasSeenOnboarding));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final bool hasSeenOnboarding;
+  const MainApp({super.key, required this.hasSeenOnboarding});
 
   @override
   Widget build(BuildContext context) {
@@ -29,23 +36,11 @@ class MainApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.medical_services_outlined, size: 64, color: seedColor),
-              SizedBox(height: 16),
-              Text(
-                'Pharma App',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text('Material 3 Dynamic Themes Enabled'),
-            ],
-          ),
-        ),
-      ),
+      initialRoute: hasSeenOnboarding ? WelcomeScreen.routeName : OnboardingScreen.routeName,
+      routes: {
+        OnboardingScreen.routeName: (context) => const OnboardingScreen(),
+        WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+      },
     );
   }
 }
