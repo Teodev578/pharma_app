@@ -272,26 +272,26 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _buildBottomNavigation(
     bool isLastPage,
     ColorScheme colorScheme,
-    Color activeColor, // Couleur pour les indicateurs (onSurface)
+    Color activeColor,
   ) {
-    // On utilise les couleurs de surface pour les boutons
-    final btnBgColor = colorScheme.onSecondaryContainer;
-    final btnFgColor = colorScheme.secondaryContainer;
+    // M3 : Utilisation des couleurs primaires pour l'action principale
+    final btnBgColor = colorScheme.primary;
+    final btnFgColor = colorScheme.onPrimary;
 
     if (isLastPage) {
       return Align(
         alignment: Alignment.centerRight,
         child: FilledButton.icon(
           onPressed: _finishOnboarding,
-          icon: Icon(Icons.rocket_launch_rounded, size: 20, color: btnFgColor),
-          label: Text("Allons-y !", style: TextStyle(color: btnFgColor)),
+          icon: Icon(Icons.check_circle_rounded, size: 20, color: btnFgColor),
+          label: Text("Commencer", style: TextStyle(color: btnFgColor, fontWeight: FontWeight.bold)),
           style: FilledButton.styleFrom(
             backgroundColor: btnBgColor,
             foregroundColor: btnFgColor,
             elevation: 0,
-            minimumSize: const Size(160, 56),
+            minimumSize: const Size(180, 60),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
@@ -313,7 +313,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             "Passer",
             style: TextStyle(
               color: colorScheme.onSurface.withValues(alpha: 0.5),
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -323,8 +323,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             return AnimatedContainer(
               duration: const Duration(milliseconds: 400),
               margin: const EdgeInsets.symmetric(horizontal: 4),
-              height: 8,
-              width: active ? 24 : 8,
+              height: 10,
+              width: active ? 28 : 10,
               decoration: BoxDecoration(
                 color: active
                     ? activeColor
@@ -342,14 +342,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               curve: Curves.easeOutQuart,
             );
           },
-          icon: Icon(Icons.arrow_forward_rounded, size: 20, color: btnFgColor),
+          icon: Icon(Icons.chevron_right_rounded, size: 28, color: btnFgColor),
           style: IconButton.styleFrom(
             backgroundColor: btnBgColor,
             foregroundColor: btnFgColor,
             elevation: 0,
-            minimumSize: const Size(56, 56),
+            minimumSize: const Size(64, 64),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
