@@ -107,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         final status = await permission.request();
         if (status.isPermanentlyDenied) {
           await HapticFeedback.heavyImpact();
-          if (mounted) _showSettingsDialog();
+          if (mounted) _showSettingsDialog(permission: permission);
         } else {
           if (mounted) {
             setState(() {
@@ -126,26 +126,37 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         _isRequestingPermission = false;
       }
     } else {
-      _showSettingsDialog(isRevoking: true);
+      _showSettingsDialog(permission: permission, isRevoking: true);
     }
   }
 
-  void _showSettingsDialog({bool isRevoking = false}) {
+  void _showSettingsDialog({Permission? permission, bool isRevoking = false}) {
+    String title = "Permission requise";
+    String description = "Activez cette permission dans les paramètres pour continuer.";
+
+    if (isRevoking) {
+      title = "Désactivation";
+      description = "Pour désactiver cette permission, vous devez passer par les paramètres de l'appareil.";
+    } else if (permission == Permission.notification) {
+      title = "Notifications";
+      description = "Autorisez les notifications pour rester informé des gardes en temps réel.";
+    } else if (permission == Permission.locationWhenInUse) {
+      title = "Localisation";
+      description = "Autorisez l'accès à votre position pour trouver les pharmacies proches.";
+    }
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isRevoking ? "Désactiver" : "Permission requise"),
-        content: Text(
-          isRevoking
-              ? "Veuillez désactiver cette permission dans les paramètres."
-              : "Activez les notifications dans les paramètres pour continuer.",
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(title),
+        content: Text(description),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Annuler"),
+            child: const Text("Plus tard"),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               openAppSettings();
