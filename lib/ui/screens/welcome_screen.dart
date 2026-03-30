@@ -54,8 +54,8 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed(MapScreen.routeName);
                   },
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  label: const Text('Accéder au tableau de bord'),
+                  icon: const Icon(Icons.explore_rounded),
+                  label: const Text('Trouver une pharmacie'),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 64),
                     shape: RoundedRectangleBorder(
