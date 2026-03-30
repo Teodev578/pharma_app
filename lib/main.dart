@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pharma_app/ui/screens/onboarding_screen.dart';
 import 'package:pharma_app/ui/screens/welcome_screen.dart';
+import 'package:pharma_app/ui/screens/map_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class MainApp extends StatelessWidget {
       routes: {
         OnboardingScreen.routeName: (context) => const OnboardingScreen(),
         WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+        MapScreen.routeName: (context) => const MapScreen(),
       },
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 
 class MapScreen extends StatefulWidget {
+  static const String routeName = '/map';
   const MapScreen({super.key});
 
   @override
@@ -19,27 +21,21 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           // 1. LA CARTE EN ARRIÈRE-PLAN
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: _initialCenter,
-              initialZoom: 14.0,
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _initialCenter,
+              zoom: 14.0,
             ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.votre_nom.pharmacie_app',
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            markers: {
+              Marker(
+                markerId: const MarkerId('current_location'),
+                position: _initialCenter,
+                infoWindow: const InfoWindow(title: 'Ma Position'),
               ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: _initialCenter,
-                    width: 60,
-                    height: 60,
-                    child: _buildLocationMarker(),
-                  ),
-                ],
-              ),
-            ],
+            },
           ),
 
           // 2. BOUTONS FLOTTANTS (Map & Localisation)
@@ -48,27 +44,6 @@ class _MapScreenState extends State<MapScreen> {
           // 3. LE BOTTOM SHEET (Barre de recherche et menu)
           const SearchBottomSheet(),
         ],
-      ),
-    );
-  }
-
-  // Petit widget privé pour le point bleu de localisation
-  Widget _buildLocationMarker() {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.blue.withOpacity(0.3),
-      ),
-      child: Center(
-        child: Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.blue,
-            border: Border.all(color: Colors.white, width: 3),
-          ),
-        ),
       ),
     );
   }

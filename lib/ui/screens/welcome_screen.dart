@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharma_app/ui/screens/map_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   static const String routeName = '/welcome';
@@ -51,7 +52,7 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: 64),
                 FilledButton.icon(
                   onPressed: () {
-                    // Start main app logic here
+                    Navigator.of(context).pushReplacementNamed(MapScreen.routeName);
                   },
                   icon: const Icon(Icons.arrow_forward_rounded),
                   label: const Text('Accéder au tableau de bord'),
