@@ -5,44 +5,55 @@ class CustomSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
-        height: 50,
+        height: 56, // Hauteur standard M3 SearchBar
         decoration: BoxDecoration(
-          color: const Color(0xFF2C2C2E),
-          borderRadius: BorderRadius.circular(25),
+          color: colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(28),
         ),
         child: Row(
           children: [
             const SizedBox(width: 16),
-            Icon(Icons.search, color: Colors.grey[400]),
+            Icon(Icons.search, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
-                style: const TextStyle(color: Colors.white),
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   hintText: "Rechercher une pharmacie...",
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   border: InputBorder.none,
                 ),
               ),
             ),
-            Icon(Icons.mic, color: Colors.grey[400]),
-            const SizedBox(width: 12),
-            const CircleAvatar(
-              radius: 16,
-              backgroundColor: Color(0xFF8E8E93),
-              child: Text(
-                "FK",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+            IconButton(
+              icon: Icon(Icons.mic, color: colorScheme.onSurfaceVariant),
+              onPressed: () {},
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.blueGrey,
+                child: Text(
+                  "FK",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
           ],
         ),
       ),

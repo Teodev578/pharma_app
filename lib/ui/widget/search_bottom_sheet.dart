@@ -8,6 +8,9 @@ class SearchBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.15,
       minChildSize: 0.15,
@@ -16,11 +19,15 @@ class SearchBottomSheet extends StatelessWidget {
       snapSizes: const [0.15, 0.5, 0.9],
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1C1C1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHigh,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
-              BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 2),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
             ],
           ),
           child: CustomScrollView(
@@ -29,17 +36,17 @@ class SearchBottomSheet extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    const SizedBox(height: 8),
-                    // Indicateur de drag
+                    const SizedBox(height: 12),
+                    // Indicateur de drag M3
                     Container(
-                      width: 40,
-                      height: 5,
+                      width: 32,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[600],
-                        borderRadius: BorderRadius.circular(10),
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     const CustomSearchBar(),
                   ],
                 ),
@@ -54,10 +61,9 @@ class SearchBottomSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         "Lieux",
-                        style: TextStyle(
-                          fontSize: 18,
+                        style: textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -83,23 +89,22 @@ class SearchBottomSheet extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 32),
-                      const Text(
+                      Text(
                         "Récents",
-                        style: TextStyle(
-                          fontSize: 18,
+                        style: textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      RecentTile(
+                      const RecentTile(
                         title: "Pharmacie Conseil",
                         subtitle: "Bolou Kpeta • Ouvert jusqu'à 22h",
                       ),
-                      RecentTile(
+                      const RecentTile(
                         title: "Pharmacie de la Nation",
                         subtitle: "Avenue PYA • Garde aujourd'hui",
                       ),
-                      RecentTile(
+                      const RecentTile(
                         title: "Pharmacie du Grand Marché",
                         subtitle: "Assigamé • Ouvert 24/7",
                       ),

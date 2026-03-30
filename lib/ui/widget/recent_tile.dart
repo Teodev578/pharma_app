@@ -8,15 +8,29 @@ class RecentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: const CircleAvatar(
-        backgroundColor: Colors.redAccent,
-        child: Icon(Icons.local_pharmacy, color: Colors.white),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(Icons.local_pharmacy, color: colorScheme.primary, size: 24),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
-      trailing: const Icon(Icons.more_horiz, color: Colors.grey),
+      title: Text(
+        title,
+        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+      ),
+      trailing: Icon(Icons.chevron_right, color: colorScheme.outline),
+      onTap: () {},
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pharma_app/ui/screens/map_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -51,8 +52,12 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 64),
                 FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed(MapScreen.routeName);
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('hasSeenWelcome', true);
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacementNamed(MapScreen.routeName);
+                    }
                   },
                   icon: const Icon(Icons.explore_rounded),
                   label: const Text('Trouver une pharmacie'),

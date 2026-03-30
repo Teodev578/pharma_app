@@ -8,12 +8,21 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
-  runApp(MainApp(hasSeenOnboarding: hasSeenOnboarding));
+  final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+  runApp(MainApp(
+    hasSeenOnboarding: hasSeenOnboarding,
+    hasSeenWelcome: hasSeenWelcome,
+  ));
 }
 
 class MainApp extends StatelessWidget {
   final bool hasSeenOnboarding;
-  const MainApp({super.key, required this.hasSeenOnboarding});
+  final bool hasSeenWelcome;
+  const MainApp({
+    super.key,
+    required this.hasSeenOnboarding,
+    required this.hasSeenWelcome,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +46,11 @@ class MainApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: hasSeenOnboarding ? WelcomeScreen.routeName : OnboardingScreen.routeName,
+      initialRoute: !hasSeenOnboarding
+          ? OnboardingScreen.routeName
+          : !hasSeenWelcome
+              ? WelcomeScreen.routeName
+              : MapScreen.routeName,
       routes: {
         OnboardingScreen.routeName: (context) => const OnboardingScreen(),
         WelcomeScreen.routeName: (context) => const WelcomeScreen(),
