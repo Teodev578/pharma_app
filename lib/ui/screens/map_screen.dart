@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Ajouté pour le contrôle des barres système
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -62,9 +62,9 @@ class _MapScreenState extends State<MapScreen> {
       if (response.statusCode == 200) {
         prefs.setString(cacheKey, response.body);
         if (mounted) {
-          setState(() {
-            _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body));
-          });
+          setState(
+            () => _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body)),
+          );
         }
       }
     } catch (e) {
@@ -84,28 +84,25 @@ class _MapScreenState extends State<MapScreen> {
     final colorScheme = theme.colorScheme;
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    // Harmonisation parfaite de la couleur de fond
     final bgColor = isDarkMode ? colorScheme.surface : const Color(0xFFF2F4F5);
 
-    // CONFIGURATION DU LOOK "FULL SCREEN" (EDGE-TO-EDGE)
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // Rend le haut transparent
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: isDarkMode
             ? Brightness.light
             : Brightness.dark,
-        systemNavigationBarColor: Colors.transparent, // Rend le bas transparent
+        systemNavigationBarColor: Colors.transparent,
         systemNavigationBarIconBrightness: isDarkMode
             ? Brightness.light
             : Brightness.dark,
       ),
       child: Scaffold(
         backgroundColor: bgColor,
-        // Ces deux propriétés permettent à la map de remplir tout l'écran
         extendBodyBehindAppBar: true,
         extendBody: true,
         body: Stack(
-          fit: StackFit.expand, // Force le Stack à prendre tout l'espace
+          fit: StackFit.expand,
           children: [
             FlutterMap(
               mapController: _mapController,
@@ -113,8 +110,15 @@ class _MapScreenState extends State<MapScreen> {
                 backgroundColor: bgColor,
                 initialCenter: _initialCenter,
                 initialZoom: 15.0,
-                minZoom: 4.0,
+                minZoom: 3.0,
                 maxZoom: 20.0,
+                // --- EMPECHE LE SCROLL DANS LE VIDE ---
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: LatLngBounds(
+                    const LatLng(-85.06, -180.0),
+                    const LatLng(85.06, 180.0),
+                  ),
+                ),
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
@@ -164,7 +168,6 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
-            // UI : Boutons flottants (Utilisation de SafeArea pour ne pas coller à l'encoche)
             SafeArea(
               child: Align(
                 alignment: Alignment.topRight,
@@ -175,7 +178,6 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-            // UI : Bottom Sheet
             const SearchBottomSheet(),
           ],
         ),
