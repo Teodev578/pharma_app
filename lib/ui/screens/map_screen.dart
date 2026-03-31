@@ -8,7 +8,6 @@ import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
-// Tes imports originaux
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 
@@ -24,7 +23,6 @@ class _MapScreenState extends State<MapScreen> {
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
 
-  // VOTRE CLÉ MAPTILER
   final String mapTilerKey = 'VOTRE_CLE_API_MAPTILER_ICI';
 
   vtr.Theme? _mapTheme;
@@ -87,7 +85,6 @@ class _MapScreenState extends State<MapScreen> {
     final colorScheme = theme.colorScheme;
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    // Background harmonisé avec Material 3 Surface
     final bgColor = isDarkMode ? colorScheme.surface : const Color(0xFFF2F4F5);
 
     return Scaffold(
@@ -100,13 +97,16 @@ class _MapScreenState extends State<MapScreen> {
               backgroundColor: bgColor,
               initialCenter: _initialCenter,
               initialZoom: 15.0,
-              maxZoom: 22.0,
+              // --- LIMITES DE ZOOM ---
+              minZoom:
+                  4.0, // Empêche de trop dé-zoomer (vue pays/continent max)
+              maxZoom: 20.0, // Limite le zoom avant pour garder de la netteté
+              // -----------------------
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all,
               ),
             ),
             children: [
-              // --- COUCHE VECTORIELLE ---
               if (_mapTheme != null)
                 _wrapWithLayerFilter(
                   isDarkMode,
@@ -121,7 +121,6 @@ class _MapScreenState extends State<MapScreen> {
                     }),
                   ),
                 )
-              // --- COUCHE DE SECOURS ---
               else
                 _wrapWithLayerFilter(
                   isDarkMode,
@@ -133,20 +132,15 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-              // --- POSITION DE L'UTILISATEUR (Style Material 3) ---
               CurrentLocationLayer(
                 alignPositionStream: const Stream.empty(),
                 style: LocationMarkerStyle(
-                  marker: DefaultLocationMarker(
-                    color: colorScheme
-                        .primary, // Utilise la couleur d'accent du thème
-                  ),
+                  marker: DefaultLocationMarker(color: colorScheme.primary),
                   markerSize: const Size(20, 20),
                   accuracyCircleColor: colorScheme.primary.withOpacity(0.1),
                 ),
               ),
 
-              // --- MARQUEURS PHARMACIES ---
               MarkerLayer(
                 markers: [
                   _buildPharmacyMarker(context, _initialCenter),
@@ -157,7 +151,6 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
 
-          // BOUTONS FLOTTANTS (Positionnés avec une SafeArea pour éviter les encoches)
           SafeArea(
             child: Align(
               alignment: Alignment.topRight,
@@ -168,7 +161,6 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          // BOTTOM SHEET (RECHERCHE)
           const SearchBottomSheet(),
         ],
       ),
@@ -184,7 +176,6 @@ class _MapScreenState extends State<MapScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Ombre diffuse Material 3
           Container(
             width: 32,
             height: 32,
@@ -199,12 +190,10 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
-          // Conteneur du Marqueur
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              // Utilisation des couleurs de conteneur M3
               color: colorScheme.primaryContainer,
               shape: BoxShape.circle,
               border: Border.all(color: colorScheme.surface, width: 3),
