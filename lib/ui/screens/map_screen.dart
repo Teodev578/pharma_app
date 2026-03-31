@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Ajouté pour le contrôle des barres système
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -22,7 +23,6 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
-
   final String mapTilerKey = 'VOTRE_CLE_API_MAPTILER_ICI';
 
   vtr.Theme? _mapTheme;
@@ -32,7 +32,6 @@ class _MapScreenState extends State<MapScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final currentBrightness = Theme.of(context).brightness;
-
     if (_lastBrightness != currentBrightness) {
       _lastBrightness = currentBrightness;
       _loadVectorMapTheme(currentBrightness);
@@ -85,91 +84,107 @@ class _MapScreenState extends State<MapScreen> {
     final colorScheme = theme.colorScheme;
     final isDarkMode = theme.brightness == Brightness.dark;
 
+    // Harmonisation parfaite de la couleur de fond
     final bgColor = isDarkMode ? colorScheme.surface : const Color(0xFFF2F4F5);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: Stack(
-        children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              backgroundColor: bgColor,
-              initialCenter: _initialCenter,
-              initialZoom: 15.0,
-              // --- LIMITES DE ZOOM ---
-              minZoom:
-                  4.0, // Empêche de trop dé-zoomer (vue pays/continent max)
-              maxZoom: 20.0, // Limite le zoom avant pour garder de la netteté
-              // -----------------------
-              interactionOptions: const InteractionOptions(
-                flags: InteractiveFlag.all,
+    // CONFIGURATION DU LOOK "FULL SCREEN" (EDGE-TO-EDGE)
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Rend le haut transparent
+        statusBarIconBrightness: isDarkMode
+            ? Brightness.light
+            : Brightness.dark,
+        systemNavigationBarColor: Colors.transparent, // Rend le bas transparent
+        systemNavigationBarIconBrightness: isDarkMode
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        // Ces deux propriétés permettent à la map de remplir tout l'écran
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        body: Stack(
+          fit: StackFit.expand, // Force le Stack à prendre tout l'espace
+          children: [
+            FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                backgroundColor: bgColor,
+                initialCenter: _initialCenter,
+                initialZoom: 15.0,
+                minZoom: 4.0,
+                maxZoom: 20.0,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.all,
+                ),
               ),
-            ),
-            children: [
-              if (_mapTheme != null)
-                _wrapWithLayerFilter(
-                  isDarkMode,
-                  VectorTileLayer(
-                    theme: _mapTheme!,
-                    tileProviders: TileProviders({
-                      'openmaptiles': NetworkVectorTileProvider(
-                        urlTemplate:
-                            'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-                        maximumZoom: 14,
-                      ),
-                    }),
+              children: [
+                if (_mapTheme != null)
+                  _wrapWithLayerFilter(
+                    isDarkMode,
+                    VectorTileLayer(
+                      theme: _mapTheme!,
+                      tileProviders: TileProviders({
+                        'openmaptiles': NetworkVectorTileProvider(
+                          urlTemplate:
+                              'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
+                          maximumZoom: 14,
+                        ),
+                      }),
+                    ),
+                  )
+                else
+                  _wrapWithLayerFilter(
+                    isDarkMode,
+                    TileLayer(
+                      urlTemplate: isDarkMode
+                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                    ),
                   ),
-                )
-              else
-                _wrapWithLayerFilter(
-                  isDarkMode,
-                  TileLayer(
-                    urlTemplate: isDarkMode
-                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                    subdomains: const ['a', 'b', 'c', 'd'],
+
+                CurrentLocationLayer(
+                  alignPositionStream: const Stream.empty(),
+                  style: LocationMarkerStyle(
+                    marker: DefaultLocationMarker(color: colorScheme.primary),
+                    markerSize: const Size(20, 20),
+                    accuracyCircleColor: colorScheme.primary.withOpacity(0.1),
                   ),
                 ),
 
-              CurrentLocationLayer(
-                alignPositionStream: const Stream.empty(),
-                style: LocationMarkerStyle(
-                  marker: DefaultLocationMarker(color: colorScheme.primary),
-                  markerSize: const Size(20, 20),
-                  accuracyCircleColor: colorScheme.primary.withOpacity(0.1),
+                MarkerLayer(
+                  markers: [
+                    _buildPharmacyMarker(context, _initialCenter),
+                    _buildPharmacyMarker(context, const LatLng(6.145, 1.220)),
+                    _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
+                  ],
+                ),
+              ],
+            ),
+
+            // UI : Boutons flottants (Utilisation de SafeArea pour ne pas coller à l'encoche)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16, right: 16),
+                  child: FloatingMapButtons(mapController: _mapController),
                 ),
               ),
-
-              MarkerLayer(
-                markers: [
-                  _buildPharmacyMarker(context, _initialCenter),
-                  _buildPharmacyMarker(context, const LatLng(6.145, 1.220)),
-                  _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
-                ],
-              ),
-            ],
-          ),
-
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16, right: 16),
-                child: FloatingMapButtons(mapController: _mapController),
-              ),
             ),
-          ),
 
-          const SearchBottomSheet(),
-        ],
+            // UI : Bottom Sheet
+            const SearchBottomSheet(),
+          ],
+        ),
       ),
     );
   }
 
   Marker _buildPharmacyMarker(BuildContext context, LatLng point) {
     final colorScheme = Theme.of(context).colorScheme;
-
     return Marker(
       point: point,
       alignment: Alignment.center,
