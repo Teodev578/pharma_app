@@ -99,7 +99,9 @@ class _MapScreenState extends State<MapScreen> {
 
     // Couleur de fond de la carte le temps qu'elle charge (Gris foncé ou Gris clair)
     final bgColor = isDarkMode
-        ? const Color(0xFF1E1E1E)
+        ? const Color(
+            0xFF212121,
+          ) // Un gris légèrement plus clair que le noir pur
         : const Color(0xFFF2F4F5);
 
     return Scaffold(
@@ -120,26 +122,32 @@ class _MapScreenState extends State<MapScreen> {
             children: [
               // --- COUCHE VECTORIELLE (Si chargée avec succès) ---
               if (_mapTheme != null)
-                VectorTileLayer(
-                  theme: _mapTheme!,
-                  tileProviders: TileProviders({
-                    'openmaptiles': NetworkVectorTileProvider(
-                      urlTemplate:
-                          'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-                      maximumZoom: 14,
-                    ),
-                  }),
+                _wrapWithLayerFilter(
+                  isDarkMode,
+                  VectorTileLayer(
+                    theme: _mapTheme!,
+                    tileProviders: TileProviders({
+                      'openmaptiles': NetworkVectorTileProvider(
+                        urlTemplate:
+                            'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
+                        maximumZoom: 14,
+                      ),
+                    }),
+                  ),
                 )
               // --- COUCHE DE SECOURS (Si le vectoriel échoue ou charge) ---
               else
-                TileLayer(
-                  // Utilise CartoDB Dark en mode sombre (très beau, pas de flash blanc)
-                  urlTemplate: isDarkMode
-                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                  subdomains: const ['a', 'b', 'c', 'd'],
-                  userAgentPackageName: 'com.pharma_app.app',
-                  retinaMode: true,
+                _wrapWithLayerFilter(
+                  isDarkMode,
+                  TileLayer(
+                    // Utilise CartoDB Dark en mode sombre
+                    urlTemplate: isDarkMode
+                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                    subdomains: const ['a', 'b', 'c', 'd'],
+                    userAgentPackageName: 'com.pharma_app.app',
+                    retinaMode: true,
+                  ),
                 ),
 
               // --- POSITION DE L'UTILISATEUR ---
@@ -207,6 +215,20 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Applique un filtre pour éclaircir les tuiles de la map en mode sombre
+  Widget _wrapWithLayerFilter(bool isDarkMode, Widget child) {
+    if (!isDarkMode) return child;
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix([
+        1.1, 0, 0, 0, 20, // Augmente légèrement la luminosité
+        0, 1.1, 0, 0, 20,
+        0, 0, 1.1, 0, 20,
+        0, 0, 0, 1, 0,
+      ]),
+      child: child,
     );
   }
 }
