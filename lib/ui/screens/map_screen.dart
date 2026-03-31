@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-
+import 'dart:async';
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 
@@ -27,6 +27,15 @@ class _MapScreenState extends State<MapScreen> {
 
   vtr.Theme? _mapTheme;
   Brightness? _lastBrightness;
+
+  // Controller pour forcer le recentrage sur la position actuelle (envoie le niveau de zoom souhaité)
+  late final StreamController<double?> _alignController;
+
+  @override
+  void initState() {
+    super.initState();
+    _alignController = StreamController<double?>.broadcast();
+  }
 
   @override
   void didChangeDependencies() {
@@ -75,6 +84,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     _mapController.dispose();
+    _alignController.close();
     super.dispose();
   }
 
@@ -89,41 +99,45 @@ class _MapScreenState extends State<MapScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDarkMode
-            ? Brightness.light
-            : Brightness.dark,
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
         systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: isDarkMode
-            ? Brightness.light
-            : Brightness.dark,
+        systemNavigationBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
       ),
+      // AnnotatedRegion permet de personnaliser la barre d'état (status bar) et la barre de navigation du système
       child: Scaffold(
+        // Fond de l'écran, s'adapte au mode sombre/clair
         backgroundColor: bgColor,
+        // Étendre le corps derrière l'AppBar et la barre de navigation pour un effet immersif
         extendBodyBehindAppBar: true,
         extendBody: true,
+        // Utilisation d'un Stack pour superposer la carte, les boutons et la barre de recherche
         body: Stack(
           fit: StackFit.expand,
           children: [
+            // FlutterMap est le composant principal pour afficher la carte
             FlutterMap(
               mapController: _mapController,
+              // Configuration initiale de la carte
               options: MapOptions(
                 backgroundColor: bgColor,
-                initialCenter: _initialCenter,
+                initialCenter: _initialCenter, // Centre la carte sur Lomé par défaut
                 initialZoom: 15.0,
                 minZoom: 3.0,
                 maxZoom: 20.0,
-                // --- EMPECHE LE SCROLL DANS LE VIDE ---
+                // Empêche de scroller à l'infini en dehors de la carte du monde
                 cameraConstraint: CameraConstraint.contain(
                   bounds: LatLngBounds(
                     const LatLng(-85.06, -180.0),
                     const LatLng(85.06, 180.0),
                   ),
                 ),
+                // Active toutes les interactions (zoom, rotation, drag)
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
               ),
               children: [
+                // Couche de tuiles vectorielles (MapTiler) pour une carte plus précise et fluide
                 if (_mapTheme != null)
                   _wrapWithLayerFilter(
                     isDarkMode,
@@ -138,6 +152,7 @@ class _MapScreenState extends State<MapScreen> {
                       }),
                     ),
                   )
+                // Solution de repli (fallback) avec des tuiles raster (CartoDB)
                 else
                   _wrapWithLayerFilter(
                     isDarkMode,
@@ -149,8 +164,10 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
 
+                // Couche affichant la position actuelle de l'utilisateur (point bleu)
                 CurrentLocationLayer(
-                  alignPositionStream: const Stream.empty(),
+                  alignPositionStream: _alignController.stream,
+                  alignPositionOnUpdate: AlignOnUpdate.never, // N'aligne que quand on le demande
                   style: LocationMarkerStyle(
                     marker: DefaultLocationMarker(color: colorScheme.primary),
                     markerSize: const Size(20, 20),
@@ -158,6 +175,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
+                // Couche affichant les marqueurs des pharmacies
                 MarkerLayer(
                   markers: [
                     _buildPharmacyMarker(context, _initialCenter),
@@ -168,16 +186,22 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
+            // SafeArea empêche les boutons d'être cachés par l'encoche (notch) du téléphone
             SafeArea(
               child: Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16, right: 16),
-                  child: FloatingMapButtons(mapController: _mapController),
+                  // Nos boutons d'action customisés (Zoom +, Zoom -, Ma position)
+                  child: FloatingMapButtons(
+                    mapController: _mapController,
+                    onMyLocationPressed: () => _alignController.add(15.0),
+                  ),
                 ),
               ),
             ),
 
+            // Barre de recherche rétractable en bas de l'écran
             const SearchBottomSheet(),
           ],
         ),
@@ -185,6 +209,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  // Méthode pour construire l'apparence personnalisée d'un marqueur de pharmacie
   Marker _buildPharmacyMarker(BuildContext context, LatLng point) {
     final colorScheme = Theme.of(context).colorScheme;
     return Marker(
@@ -226,6 +251,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  // Filtre de couleur pour améliorer le rendu visuel en mode sombre
   Widget _wrapWithLayerFilter(bool isDarkMode, Widget child) {
     if (!isDarkMode) return child;
     return ColorFiltered(

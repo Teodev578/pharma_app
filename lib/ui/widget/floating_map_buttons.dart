@@ -1,43 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 
+// Widget regroupant les boutons flottants de contrôle de la carte (Zoom, Position, etc.)
 class FloatingMapButtons extends StatelessWidget {
+  // Le contrôleur permet de manipuler la carte (bouger, zoomer) depuis l'extérieur du widget FlutterMap
   final MapController mapController;
+  // Callback déclenché quand on appuie sur le bouton de localisation
+  final VoidCallback onMyLocationPressed;
 
-  const FloatingMapButtons({super.key, required this.mapController});
+  const FloatingMapButtons({
+    super.key,
+    required this.mapController,
+    required this.onMyLocationPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Bouton pour changer de calque ou de vue (Prévu pour une future version)
         _buildButton(context, Icons.layers_outlined, () {
           // Action changer de vue (implémentation future)
         }),
         const SizedBox(height: 8),
+        // Bouton Zoom + (rapproche la caméra)
         _buildButton(context, Icons.add, () {
           final zoom = mapController.camera.zoom + 1;
           mapController.move(mapController.camera.center, zoom);
         }),
         const SizedBox(height: 2),
+        // Bouton Zoom - (éloigne la caméra)
         _buildButton(context, Icons.remove, () {
           final zoom = mapController.camera.zoom - 1;
           mapController.move(mapController.camera.center, zoom);
         }),
         const SizedBox(height: 8),
+        // Bouton "Ma position" : Recentre la carte sur la position réelle de l'utilisateur
         _buildButton(
           context,
           Icons.my_location,
-          () {
-            // Centre sur la position initiale (Lomé)
-            mapController.move(const LatLng(6.137, 1.212), 15.0);
-          },
-          isPrimary: true,
+          onMyLocationPressed, // Utilise le callback fourni pour recentrer
+          isPrimary: true, // Couleur plus vive pour le bouton principal
         ),
       ],
     );
   }
 
+  // Helper pour construire un bouton circulaire stylisé
   Widget _buildButton(
     BuildContext context,
     IconData icon,
