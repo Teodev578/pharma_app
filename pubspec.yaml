@@ -13,8 +13,14 @@ dependencies:
   permission_handler: ^12.0.1
   shared_preferences: ^2.5.5
   connectivity_plus: ^7.0.0
-  flutter_map: ^8.2.2
   latlong2: ^0.9.1
+  http: ^1.2.0
+
+  # PACKAGES CARTOGRAPHIE (Compatibles avec flutter_map v8)
+  flutter_map: ^8.2.2
+  vector_map_tiles: ^9.0.0-beta.8             
+  vector_tile_renderer: ^6.0.0         
+  flutter_map_location_marker: ^10.2.0
 
 dev_dependencies:
   flutter_test:

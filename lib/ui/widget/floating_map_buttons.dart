@@ -27,7 +27,7 @@ class FloatingMapButtons extends StatelessWidget {
   Widget _buildButton(IconData icon, VoidCallback onPressed) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E).withOpacity(0.9),
+        color: const Color(0xFF1C1C1E).withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
       ),
