@@ -19,37 +19,52 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  // Coordonnées initiales (Lomé)
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
 
-  // Clé API MapTiler (à remplacer par la vôtre)
   final String mapTilerKey = 'VOTRE_CLE_API_MAPTILER_ICI';
 
-  // Thème de la carte vectorielle
+  // Mettez ici l'ID de la carte que vous avez créée sur MapTiler Cloud
+  final String myCustomDarkMapId =
+      'VOTRE_ID_DE_CARTE_CUSTOM_ICI'; // ex: '5f9a-xyz-...'
+
   vtr.Theme? _mapTheme;
+  Brightness? _lastBrightness;
 
   @override
-  void initState() {
-    super.initState();
-    _loadVectorMapTheme();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentBrightness = Theme.of(context).brightness;
+
+    if (_lastBrightness != currentBrightness) {
+      _lastBrightness = currentBrightness;
+      _loadVectorMapTheme(currentBrightness);
+    }
   }
 
-  // Fonction pour charger le style visuel de la carte depuis MapTiler
-  Future<void> _loadVectorMapTheme() async {
+  Future<void> _loadVectorMapTheme(Brightness brightness) async {
     try {
+      // SI MODE SOMBRE -> Utilise votre style personnalisé très contrasté
+      // SI MODE CLAIR -> Utilise le style de base clair
+      final styleId = brightness == Brightness.dark
+          ? myCustomDarkMapId // <-- Votre style néon/nuit créé sur MapTiler
+          : 'streets-v2'; // <-- Style clair classique
+
       final styleUri = Uri.parse(
-        'https://api.maptiler.com/maps/streets-v2/style.json?key=$mapTilerKey',
+        'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
       );
+
       final response = await http.get(styleUri);
 
       if (response.statusCode == 200) {
-        setState(() {
-          _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body));
-        });
+        if (mounted) {
+          setState(() {
+            _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body));
+          });
+        }
       }
     } catch (e) {
-      debugPrint("Erreur lors du chargement du thème vectoriel: $e");
+      debugPrint("Erreur de chargement du thème vectoriel: $e");
     }
   }
 
@@ -61,19 +76,25 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? const Color(0xFF101418)
+          : Colors.white, // Fond raccord avec la map
       body: Stack(
         children: [
-          // 1. LA CARTE
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
               initialCenter: _initialCenter,
-              initialZoom: 14.0,
+              initialZoom: 15.0,
               maxZoom: 22.0,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.all,
+              ),
             ),
             children: [
-              // --- COUCHE DE FOND (Vectoriel ou Raster) ---
               if (_mapTheme != null)
                 VectorTileLayer(
                   theme: _mapTheme!,
@@ -87,13 +108,16 @@ class _MapScreenState extends State<MapScreen> {
                 )
               else
                 TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate: isDarkMode
+                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                  subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.pharma_app.app',
+                  retinaMode: true,
                 ),
 
-              // --- COUCHE : POSITION DE L'UTILISATEUR (Point bleu) ---
               CurrentLocationLayer(
-                alignPositionStream: const Stream.empty(), // Empêche le recentrage auto au début
+                alignPositionStream: const Stream.empty(),
                 style: const LocationMarkerStyle(
                   marker: DefaultLocationMarker(color: Colors.blueAccent),
                   markerSize: Size(20, 20),
@@ -101,34 +125,62 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
 
-              // --- COUCHE : MARQUEURS (Pharmacies) ---
               MarkerLayer(
                 markers: [
-                  Marker(
-                    point: _initialCenter,
-                    width: 40,
-                    height: 40,
-                    child: const Icon(
-                      Icons.local_pharmacy,
-                      color: Colors.red,
-                      size: 40,
-                    ),
-                  ),
+                  _buildPharmacyMarker(_initialCenter),
+                  _buildPharmacyMarker(const LatLng(6.145, 1.220)),
+                  _buildPharmacyMarker(const LatLng(6.132, 1.205)),
                 ],
               ),
             ],
           ),
 
-          // 2. BOUTONS FLOTTANTS (Map & Localisation)
           Positioned(
             top: 50,
             right: 16,
             child: FloatingMapButtons(mapController: _mapController),
           ),
 
-          // 3. LE BOTTOM SHEET (Barre de recherche et menu)
           const SearchBottomSheet(),
         ],
+      ),
+    );
+  }
+
+  Marker _buildPharmacyMarker(LatLng point) {
+    return Marker(
+      point: point,
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: 50,
+        height: 50,
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.green.shade600,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
+              ), // Bordure un peu plus fine
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: 0.5,
+                  ), // Ombre plus marquée
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(8),
+            child: const Icon(
+              Icons.local_pharmacy,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
