@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class FloatingMapButtons extends StatelessWidget {
-  const FloatingMapButtons({super.key});
+  final MapController mapController;
+
+  const FloatingMapButtons({super.key, required this.mapController});
 
   @override
   Widget build(BuildContext context) {
@@ -9,10 +13,12 @@ class FloatingMapButtons extends StatelessWidget {
       children: [
         _buildButton(Icons.map, () {
           // Action changer de vue (satellite, etc.)
+          // Note: flutter_map tile layers can be swapped.
         }),
         const SizedBox(height: 8),
         _buildButton(Icons.near_me, () {
-          // Action centrer sur l'utilisateur
+          // Action centrer sur Lomé (en attendant la géolocalisation réelle)
+          mapController.move(const LatLng(6.137, 1.212), 14.0);
         }),
       ],
     );
@@ -32,3 +38,4 @@ class FloatingMapButtons extends StatelessWidget {
     );
   }
 }
+
