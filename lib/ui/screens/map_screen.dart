@@ -8,6 +8,7 @@ import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
+// Tes imports originaux
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 
@@ -41,46 +42,33 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _loadVectorMapTheme(Brightness brightness) async {
-    // On utilise les styles intégrés de MapTiler qui marchent à 100%
-    // "basic-v2-dark" donne un effet nuit très lisible avec des rues bleutées.
     final styleId = brightness == Brightness.dark
         ? 'basic-v2-dark'
         : 'streets-v2';
-
-    // J'ai changé le nom de la clé pour vider l'ancien cache défectueux
     final cacheKey = 'map_style_v3_$styleId';
 
     try {
       final prefs = await SharedPreferences.getInstance();
       final cachedJson = prefs.getString(cacheKey);
 
-      // 1. Essai de chargement depuis le cache
-      if (cachedJson != null) {
-        if (mounted) {
-          setState(() {
-            _mapTheme = vtr.ThemeReader().read(jsonDecode(cachedJson));
-          });
-        }
+      if (cachedJson != null && mounted) {
+        setState(() {
+          _mapTheme = vtr.ThemeReader().read(jsonDecode(cachedJson));
+        });
       }
 
-      // 2. Téléchargement depuis MapTiler
       final styleUri = Uri.parse(
         'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
       );
       final response = await http.get(styleUri);
 
       if (response.statusCode == 200) {
-        prefs.setString(cacheKey, response.body); // Sauvegarde en cache
-
-        if (cachedJson == null && mounted) {
+        prefs.setString(cacheKey, response.body);
+        if (mounted) {
           setState(() {
             _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body));
           });
         }
-      } else {
-        debugPrint(
-          "Erreur MapTiler: ${response.statusCode} - ${response.body}",
-        );
       }
     } catch (e) {
       debugPrint("Erreur critique chargement thème: $e");
@@ -95,14 +83,12 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
-    // Couleur de fond de la carte le temps qu'elle charge (Gris foncé ou Gris clair)
-    final bgColor = isDarkMode
-        ? const Color(
-            0xFF212121,
-          ) // Un gris légèrement plus clair que le noir pur
-        : const Color(0xFFF2F4F5);
+    // Background harmonisé avec Material 3 Surface
+    final bgColor = isDarkMode ? colorScheme.surface : const Color(0xFFF2F4F5);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -111,7 +97,7 @@ class _MapScreenState extends State<MapScreen> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              backgroundColor: bgColor, // Empêche le flash blanc au lancement
+              backgroundColor: bgColor,
               initialCenter: _initialCenter,
               initialZoom: 15.0,
               maxZoom: 22.0,
@@ -120,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
             children: [
-              // --- COUCHE VECTORIELLE (Si chargée avec succès) ---
+              // --- COUCHE VECTORIELLE ---
               if (_mapTheme != null)
                 _wrapWithLayerFilter(
                   isDarkMode,
@@ -135,98 +121,129 @@ class _MapScreenState extends State<MapScreen> {
                     }),
                   ),
                 )
-              // --- COUCHE DE SECOURS (Si le vectoriel échoue ou charge) ---
+              // --- COUCHE DE SECOURS ---
               else
                 _wrapWithLayerFilter(
                   isDarkMode,
                   TileLayer(
-                    // Utilise CartoDB Dark en mode sombre
                     urlTemplate: isDarkMode
                         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                     subdomains: const ['a', 'b', 'c', 'd'],
-                    userAgentPackageName: 'com.pharma_app.app',
-                    retinaMode: true,
                   ),
                 ),
 
-              // --- POSITION DE L'UTILISATEUR ---
+              // --- POSITION DE L'UTILISATEUR (Style Material 3) ---
               CurrentLocationLayer(
                 alignPositionStream: const Stream.empty(),
-                style: const LocationMarkerStyle(
-                  marker: DefaultLocationMarker(color: Colors.blueAccent),
-                  markerSize: Size(20, 20),
-                  showAccuracyCircle: true,
+                style: LocationMarkerStyle(
+                  marker: DefaultLocationMarker(
+                    color: colorScheme
+                        .primary, // Utilise la couleur d'accent du thème
+                  ),
+                  markerSize: const Size(20, 20),
+                  accuracyCircleColor: colorScheme.primary.withOpacity(0.1),
                 ),
               ),
 
               // --- MARQUEURS PHARMACIES ---
               MarkerLayer(
                 markers: [
-                  _buildPharmacyMarker(_initialCenter),
-                  _buildPharmacyMarker(const LatLng(6.145, 1.220)),
-                  _buildPharmacyMarker(const LatLng(6.132, 1.205)),
+                  _buildPharmacyMarker(context, _initialCenter),
+                  _buildPharmacyMarker(context, const LatLng(6.145, 1.220)),
+                  _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
                 ],
               ),
             ],
           ),
 
-          // BOUTONS FLOTTANTS
-          Positioned(
-            top: 50,
-            right: 16,
-            child: FloatingMapButtons(mapController: _mapController),
+          // BOUTONS FLOTTANTS (Positionnés avec une SafeArea pour éviter les encoches)
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, right: 16),
+                child: FloatingMapButtons(mapController: _mapController),
+              ),
+            ),
           ),
 
-          // BOTTOM SHEET
+          // BOTTOM SHEET (RECHERCHE)
           const SearchBottomSheet(),
         ],
       ),
     );
   }
 
-  Marker _buildPharmacyMarker(LatLng point) {
+  Marker _buildPharmacyMarker(BuildContext context, LatLng point) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Marker(
       point: point,
       alignment: Alignment.center,
-      child: SizedBox(
-        width: 50,
-        height: 50,
-        child: Center(
-          child: Container(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Ombre diffuse Material 3
+          Container(
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: Colors.green.shade600,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 8,
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(8),
-            child: const Icon(
+          ),
+          // Conteneur du Marqueur
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              // Utilisation des couleurs de conteneur M3
+              color: colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+              border: Border.all(color: colorScheme.surface, width: 3),
+            ),
+            child: Icon(
               Icons.local_pharmacy,
-              color: Colors.white,
+              color: colorScheme.onPrimaryContainer,
               size: 20,
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  /// Applique un filtre pour éclaircir les tuiles de la map en mode sombre
   Widget _wrapWithLayerFilter(bool isDarkMode, Widget child) {
     if (!isDarkMode) return child;
     return ColorFiltered(
       colorFilter: const ColorFilter.matrix([
-        1.1, 0, 0, 0, 20, // Augmente légèrement la luminosité
-        0, 1.1, 0, 0, 20,
-        0, 0, 1.1, 0, 20,
-        0, 0, 0, 1, 0,
+        1.05,
+        0,
+        0,
+        0,
+        10,
+        0,
+        1.05,
+        0,
+        0,
+        10,
+        0,
+        0,
+        1.05,
+        0,
+        10,
+        0,
+        0,
+        0,
+        1,
+        0,
       ]),
       child: child,
     );
