@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
@@ -22,11 +23,8 @@ class _MapScreenState extends State<MapScreen> {
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
 
+  // VOTRE CLÉ MAPTILER
   final String mapTilerKey = 'VOTRE_CLE_API_MAPTILER_ICI';
-
-  // Mettez ici l'ID de la carte que vous avez créée sur MapTiler Cloud
-  final String myCustomDarkMapId =
-      'VOTRE_ID_DE_CARTE_CUSTOM_ICI'; // ex: '5f9a-xyz-...'
 
   vtr.Theme? _mapTheme;
   Brightness? _lastBrightness;
@@ -43,28 +41,49 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _loadVectorMapTheme(Brightness brightness) async {
-    try {
-      // SI MODE SOMBRE -> Utilise votre style personnalisé très contrasté
-      // SI MODE CLAIR -> Utilise le style de base clair
-      final styleId = brightness == Brightness.dark
-          ? myCustomDarkMapId // <-- Votre style néon/nuit créé sur MapTiler
-          : 'streets-v2'; // <-- Style clair classique
+    // On utilise les styles intégrés de MapTiler qui marchent à 100%
+    // "basic-v2-dark" donne un effet nuit très lisible avec des rues bleutées.
+    final styleId = brightness == Brightness.dark
+        ? 'basic-v2-dark'
+        : 'streets-v2';
 
+    // J'ai changé le nom de la clé pour vider l'ancien cache défectueux
+    final cacheKey = 'map_style_v3_$styleId';
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedJson = prefs.getString(cacheKey);
+
+      // 1. Essai de chargement depuis le cache
+      if (cachedJson != null) {
+        if (mounted) {
+          setState(() {
+            _mapTheme = vtr.ThemeReader().read(jsonDecode(cachedJson));
+          });
+        }
+      }
+
+      // 2. Téléchargement depuis MapTiler
       final styleUri = Uri.parse(
         'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
       );
-
       final response = await http.get(styleUri);
 
       if (response.statusCode == 200) {
-        if (mounted) {
+        prefs.setString(cacheKey, response.body); // Sauvegarde en cache
+
+        if (cachedJson == null && mounted) {
           setState(() {
             _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body));
           });
         }
+      } else {
+        debugPrint(
+          "Erreur MapTiler: ${response.statusCode} - ${response.body}",
+        );
       }
     } catch (e) {
-      debugPrint("Erreur de chargement du thème vectoriel: $e");
+      debugPrint("Erreur critique chargement thème: $e");
     }
   }
 
@@ -78,15 +97,19 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    // Couleur de fond de la carte le temps qu'elle charge (Gris foncé ou Gris clair)
+    final bgColor = isDarkMode
+        ? const Color(0xFF1E1E1E)
+        : const Color(0xFFF2F4F5);
+
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color(0xFF101418)
-          : Colors.white, // Fond raccord avec la map
+      backgroundColor: bgColor,
       body: Stack(
         children: [
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
+              backgroundColor: bgColor, // Empêche le flash blanc au lancement
               initialCenter: _initialCenter,
               initialZoom: 15.0,
               maxZoom: 22.0,
@@ -95,6 +118,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
             children: [
+              // --- COUCHE VECTORIELLE (Si chargée avec succès) ---
               if (_mapTheme != null)
                 VectorTileLayer(
                   theme: _mapTheme!,
@@ -106,8 +130,10 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   }),
                 )
+              // --- COUCHE DE SECOURS (Si le vectoriel échoue ou charge) ---
               else
                 TileLayer(
+                  // Utilise CartoDB Dark en mode sombre (très beau, pas de flash blanc)
                   urlTemplate: isDarkMode
                       ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                       : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -116,6 +142,7 @@ class _MapScreenState extends State<MapScreen> {
                   retinaMode: true,
                 ),
 
+              // --- POSITION DE L'UTILISATEUR ---
               CurrentLocationLayer(
                 alignPositionStream: const Stream.empty(),
                 style: const LocationMarkerStyle(
@@ -125,6 +152,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
 
+              // --- MARQUEURS PHARMACIES ---
               MarkerLayer(
                 markers: [
                   _buildPharmacyMarker(_initialCenter),
@@ -135,12 +163,14 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
 
+          // BOUTONS FLOTTANTS
           Positioned(
             top: 50,
             right: 16,
             child: FloatingMapButtons(mapController: _mapController),
           ),
 
+          // BOTTOM SHEET
           const SearchBottomSheet(),
         ],
       ),
@@ -159,15 +189,10 @@ class _MapScreenState extends State<MapScreen> {
             decoration: BoxDecoration(
               color: Colors.green.shade600,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ), // Bordure un peu plus fine
+              border: Border.all(color: Colors.white, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: 0.5,
-                  ), // Ombre plus marquée
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
