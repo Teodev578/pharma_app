@@ -40,40 +40,62 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final currentBrightness = Theme.of(context).brightness;
+    final theme = Theme.of(context);
+    final currentBrightness = theme.brightness;
+    final isDarkMode = currentBrightness == Brightness.dark;
+    final bgColor = isDarkMode ? theme.colorScheme.surface : const Color(0xFFF2F4F5);
+
     if (_lastBrightness != currentBrightness) {
       _lastBrightness = currentBrightness;
-      _loadVectorMapTheme(currentBrightness);
+      _loadVectorMapTheme(currentBrightness, bgColor);
     }
   }
 
-  Future<void> _loadVectorMapTheme(Brightness brightness) async {
+  Future<void> _loadVectorMapTheme(Brightness brightness, Color bgColor) async {
     final styleId = brightness == Brightness.dark
-        ? 'basic-v2-dark'
+        ? 'streets-v2-dark'
         : 'streets-v2';
-    final cacheKey = 'map_style_v3_$styleId';
+    // On sauvegarde le style brut non-modifié dans le cache
+    final cacheKey = 'map_style_v3_raw_$styleId';
 
     try {
       final prefs = await SharedPreferences.getInstance();
+      String rawJsonStr = '';
+      
       final cachedJson = prefs.getString(cacheKey);
-
-      if (cachedJson != null && mounted) {
-        setState(() {
-          _mapTheme = vtr.ThemeReader().read(jsonDecode(cachedJson));
-        });
+      if (cachedJson != null) {
+        rawJsonStr = cachedJson;
+      } else {
+        final styleUri = Uri.parse(
+          'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
+        );
+        final response = await http.get(styleUri);
+        if (response.statusCode == 200) {
+          rawJsonStr = response.body;
+          prefs.setString(cacheKey, rawJsonStr);
+        }
       }
 
-      final styleUri = Uri.parse(
-        'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
-      );
-      final response = await http.get(styleUri);
+      if (rawJsonStr.isNotEmpty) {
+        final Map<String, dynamic> jsonStyle = jsonDecode(rawJsonStr);
+        
+        // --- INJECTION MAGIQUE MATERIAL 3 ---
+        // On récupère la couleur hexadécimale du fond actuel (sans l'alpha)
+        final bgHex = '#${bgColor.value.toRadixString(16).substring(2, 8).toUpperCase()}';
+        
+        if (jsonStyle.containsKey('layers')) {
+          for (var layer in jsonStyle['layers']) {
+            if (layer['type'] == 'background') {
+              layer['paint'] ??= {};
+              layer['paint']['background-color'] = bgHex;
+            }
+          }
+        }
 
-      if (response.statusCode == 200) {
-        prefs.setString(cacheKey, response.body);
         if (mounted) {
-          setState(
-            () => _mapTheme = vtr.ThemeReader().read(jsonDecode(response.body)),
-          );
+          setState(() {
+            _mapTheme = vtr.ThemeReader().read(jsonStyle);
+          });
         }
       }
     } catch (e) {
@@ -140,34 +162,28 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 // Couche de tuiles vectorielles (MapTiler) pour une carte plus précise et fluide
                 if (_mapTheme != null)
-                  _wrapWithLayerFilter(
-                    isDarkMode,
-                    VectorTileLayer(
-                      theme: _mapTheme!,
-                      tileProviders: TileProviders({
-                        'openmaptiles': MemoryCacheVectorTileProvider(
-                          maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
-                          delegate: NetworkVectorTileProvider(
-                            urlTemplate:
-                                'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-                            maximumZoom: 14,
-                          ),
+                  VectorTileLayer(
+                    theme: _mapTheme!,
+                    tileProviders: TileProviders({
+                      'openmaptiles': MemoryCacheVectorTileProvider(
+                        maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
+                        delegate: NetworkVectorTileProvider(
+                          urlTemplate:
+                              'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
+                          maximumZoom: 14,
                         ),
-                      }),
-                    ),
+                      ),
+                    }),
                   )
                 // Solution de repli (fallback) avec des tuiles raster (CartoDB)
                 else
-                  _wrapWithLayerFilter(
-                    isDarkMode,
-                    TileLayer(
-                      urlTemplate: isDarkMode
-                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                      subdomains: const ['a', 'b', 'c', 'd'],
-                      keepBuffer: 3, // Conserve plus de tuiles en RAM autour de la zone vue
-                      panBuffer: 2,  // Pré-charge les tuiles proches pour un pan ultra rapide
-                    ),
+                  TileLayer(
+                    urlTemplate: isDarkMode
+                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                    subdomains: const ['a', 'b', 'c', 'd'],
+                    keepBuffer: 3, // Conserve plus de tuiles en RAM autour de la zone vue
+                    panBuffer: 2,  // Pré-charge les tuiles proches pour un pan ultra rapide
                   ),
 
                 // Couche affichant la position actuelle de l'utilisateur (point bleu + direction)
@@ -260,36 +276,6 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  // Filtre de couleur pour améliorer le rendu visuel en mode sombre
-  Widget _wrapWithLayerFilter(bool isDarkMode, Widget child) {
-    if (!isDarkMode) return child;
-    return ColorFiltered(
-      colorFilter: const ColorFilter.matrix([
-        1.05,
-        0,
-        0,
-        0,
-        10,
-        0,
-        1.05,
-        0,
-        0,
-        10,
-        0,
-        0,
-        1.05,
-        0,
-        10,
-        0,
-        0,
-        0,
-        1,
-        0,
-      ]),
-      child: child,
     );
   }
 }
