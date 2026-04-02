@@ -135,6 +135,7 @@ class _MapScreenState extends State<MapScreen> {
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
+                keepAlive: true,
               ),
               children: [
                 // Couche de tuiles vectorielles (MapTiler) pour une carte plus précise et fluide
@@ -144,10 +145,13 @@ class _MapScreenState extends State<MapScreen> {
                     VectorTileLayer(
                       theme: _mapTheme!,
                       tileProviders: TileProviders({
-                        'openmaptiles': NetworkVectorTileProvider(
-                          urlTemplate:
-                              'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-                          maximumZoom: 14,
+                        'openmaptiles': MemoryCacheVectorTileProvider(
+                          maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
+                          delegate: NetworkVectorTileProvider(
+                            urlTemplate:
+                                'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
+                            maximumZoom: 14,
+                          ),
                         ),
                       }),
                     ),
@@ -161,6 +165,8 @@ class _MapScreenState extends State<MapScreen> {
                           ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                           : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                       subdomains: const ['a', 'b', 'c', 'd'],
+                      keepBuffer: 3, // Conserve plus de tuiles en RAM autour de la zone vue
+                      panBuffer: 2,  // Pré-charge les tuiles proches pour un pan ultra rapide
                     ),
                   ),
 
