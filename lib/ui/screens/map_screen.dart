@@ -23,7 +23,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
-  final String mapTilerKey = 'VOTRE_CLE_API_MAPTILER_ICI';
+  final String mapTilerKey = 'pg76rH7Ad8bNzkP7pnwf';
 
   vtr.Theme? _mapTheme;
   Brightness? _lastBrightness;
@@ -43,7 +43,9 @@ class _MapScreenState extends State<MapScreen> {
     final theme = Theme.of(context);
     final currentBrightness = theme.brightness;
     final isDarkMode = currentBrightness == Brightness.dark;
-    final bgColor = isDarkMode ? theme.colorScheme.surface : const Color(0xFFF2F4F5);
+    final bgColor = isDarkMode
+        ? theme.colorScheme.surface
+        : const Color(0xFFF2F4F5);
 
     if (_lastBrightness != currentBrightness) {
       _lastBrightness = currentBrightness;
@@ -61,7 +63,7 @@ class _MapScreenState extends State<MapScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       String rawJsonStr = '';
-      
+
       final cachedJson = prefs.getString(cacheKey);
       if (cachedJson != null) {
         rawJsonStr = cachedJson;
@@ -78,11 +80,12 @@ class _MapScreenState extends State<MapScreen> {
 
       if (rawJsonStr.isNotEmpty) {
         final Map<String, dynamic> jsonStyle = jsonDecode(rawJsonStr);
-        
+
         // --- INJECTION MAGIQUE MATERIAL 3 ---
         // On récupère la couleur hexadécimale du fond actuel (sans l'alpha)
-        final bgHex = '#${bgColor.value.toRadixString(16).substring(2, 8).toUpperCase()}';
-        
+        final bgHex =
+            '#${bgColor.value.toRadixString(16).substring(2, 8).toUpperCase()}';
+
         if (jsonStyle.containsKey('layers')) {
           for (var layer in jsonStyle['layers']) {
             if (layer['type'] == 'background') {
@@ -121,9 +124,13 @@ class _MapScreenState extends State<MapScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: isDarkMode
+            ? Brightness.light
+            : Brightness.dark,
         systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: isDarkMode
+            ? Brightness.light
+            : Brightness.dark,
       ),
       // AnnotatedRegion permet de personnaliser la barre d'état (status bar) et la barre de navigation du système
       child: Scaffold(
@@ -142,7 +149,8 @@ class _MapScreenState extends State<MapScreen> {
               // Configuration initiale de la carte
               options: MapOptions(
                 backgroundColor: bgColor,
-                initialCenter: _initialCenter, // Centre la carte sur Lomé par défaut
+                initialCenter:
+                    _initialCenter, // Centre la carte sur Lomé par défaut
                 initialZoom: 15.0,
                 minZoom: 3.0,
                 maxZoom: 20.0,
@@ -165,7 +173,7 @@ class _MapScreenState extends State<MapScreen> {
                   VectorTileLayer(
                     theme: _mapTheme!,
                     tileProviders: TileProviders({
-                      'openmaptiles': MemoryCacheVectorTileProvider(
+                      'maptiler_planet': MemoryCacheVectorTileProvider(
                         maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
                         delegate: NetworkVectorTileProvider(
                           urlTemplate:
@@ -182,16 +190,21 @@ class _MapScreenState extends State<MapScreen> {
                         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                     subdomains: const ['a', 'b', 'c', 'd'],
-                    keepBuffer: 3, // Conserve plus de tuiles en RAM autour de la zone vue
-                    panBuffer: 2,  // Pré-charge les tuiles proches pour un pan ultra rapide
+                    keepBuffer:
+                        3, // Conserve plus de tuiles en RAM autour de la zone vue
+                    panBuffer:
+                        2, // Pré-charge les tuiles proches pour un pan ultra rapide
                   ),
 
                 // Couche affichant la position actuelle de l'utilisateur (point bleu + direction)
                 CurrentLocationLayer(
                   alignPositionStream: _alignController.stream,
-                  alignPositionOnUpdate: AlignOnUpdate.never, // N'aligne que quand on le demande
-                  alignDirectionOnUpdate: AlignOnUpdate.never, 
-                  alignPositionAnimationDuration: const Duration(milliseconds: 1200),
+                  alignPositionOnUpdate:
+                      AlignOnUpdate.never, // N'aligne que quand on le demande
+                  alignDirectionOnUpdate: AlignOnUpdate.never,
+                  alignPositionAnimationDuration: const Duration(
+                    milliseconds: 1200,
+                  ),
                   alignPositionAnimationCurve: Curves.easeInOutCubic,
                   style: LocationMarkerStyle(
                     showHeadingSector: true,
@@ -203,12 +216,20 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-                // Couche affichant les marqueurs des pharmacies
+                // Couche affichant les marqueurs (pharmacies, hôpitaux, écoles)
                 MarkerLayer(
                   markers: [
+                    // Pharmacies
                     _buildPharmacyMarker(context, _initialCenter),
                     _buildPharmacyMarker(context, const LatLng(6.145, 1.220)),
                     _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
+
+                    // Hôpitaux (exemples)
+                    _buildHospitalMarker(context, const LatLng(6.135, 1.215)),
+                    _buildHospitalMarker(context, const LatLng(6.140, 1.210)),
+
+                    // Écoles (exemples)
+                    _buildSchoolMarker(context, const LatLng(6.138, 1.218)),
                   ],
                 ),
 
@@ -233,6 +254,40 @@ class _MapScreenState extends State<MapScreen> {
             const SearchBottomSheet(),
           ],
         ),
+      ),
+    );
+  }
+
+  Marker _buildHospitalMarker(BuildContext context, LatLng point) {
+    return Marker(
+      point: point,
+      alignment: Alignment.center,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.red.shade100,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.red, width: 2),
+        ),
+        child: const Icon(Icons.local_hospital, color: Colors.red, size: 20),
+      ),
+    );
+  }
+
+  Marker _buildSchoolMarker(BuildContext context, LatLng point) {
+    return Marker(
+      point: point,
+      alignment: Alignment.center,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.blue.shade100,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.blue, width: 2),
+        ),
+        child: const Icon(Icons.school, color: Colors.blue, size: 20),
       ),
     );
   }
