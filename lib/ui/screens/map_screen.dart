@@ -164,11 +164,15 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
 
-                // Couche affichant la position actuelle de l'utilisateur (point bleu)
+                // Couche affichant la position actuelle de l'utilisateur (point bleu + direction)
                 CurrentLocationLayer(
                   alignPositionStream: _alignController.stream,
                   alignPositionOnUpdate: AlignOnUpdate.never, // N'aligne que quand on le demande
+                  alignDirectionOnUpdate: AlignOnUpdate.never, 
                   style: LocationMarkerStyle(
+                    showHeadingSector: true,
+                    headingSectorColor: colorScheme.primary.withOpacity(0.4),
+                    headingSectorRadius: 60,
                     marker: DefaultLocationMarker(color: colorScheme.primary),
                     markerSize: const Size(20, 20),
                     accuracyCircleColor: colorScheme.primary.withOpacity(0.1),
@@ -183,22 +187,22 @@ class _MapScreenState extends State<MapScreen> {
                     _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
                   ],
                 ),
-              ],
-            ),
 
-            // SafeArea empêche les boutons d'être cachés par l'encoche (notch) du téléphone
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16, right: 16),
-                  // Nos boutons d'action customisés (Zoom +, Zoom -, Ma position)
-                  child: FloatingMapButtons(
-                    mapController: _mapController,
-                    onMyLocationPressed: () => _alignController.add(15.0),
+                // SafeArea pour les boutons flottants, insérée dans le FlutterMap pour avoir accès au MapCamera
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16, right: 16),
+                      // Nos boutons d'action customisés (Zoom +, Zoom -, Ma position)
+                      child: FloatingMapButtons(
+                        mapController: _mapController,
+                        onMyLocationPressed: () => _alignController.add(15.0),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
 
             // Barre de recherche rétractable en bas de l'écran
