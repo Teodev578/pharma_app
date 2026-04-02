@@ -175,6 +175,8 @@ class _MapScreenState extends State<MapScreen> {
                   alignPositionStream: _alignController.stream,
                   alignPositionOnUpdate: AlignOnUpdate.never, // N'aligne que quand on le demande
                   alignDirectionOnUpdate: AlignOnUpdate.never, 
+                  alignPositionAnimationDuration: const Duration(milliseconds: 1200),
+                  alignPositionAnimationCurve: Curves.easeInOutCubic,
                   style: LocationMarkerStyle(
                     showHeadingSector: true,
                     headingSectorColor: colorScheme.primary.withOpacity(0.4),
