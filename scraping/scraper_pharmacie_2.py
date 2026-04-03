@@ -74,5 +74,34 @@ def test_scraper():
         else:
             print("Bouton horaires non trouvé pour cette pharmacie.")
             
+        # Recherche du lien itinéraire (Google Maps ou page du site)
+        lien_map = el.find(lambda tag: tag.has_attr('class') and 'reset-button' in tag.get('class') and 'group' in tag.get('class'))
+        if lien_map:
+            if lien_map.has_attr('href'):
+                url_map = lien_map['href']
+                if url_map.startswith('/'):
+                    url_map = "https://www.goafricaonline.com" + url_map
+                print(f"Lien Itinéraire : {url_map}")
+            elif lien_map.has_attr('data-url'):
+                print(f"Lien Itinéraire (data-url) : {lien_map['data-url']}")
+            else:
+                import base64
+                if lien_map.has_attr('data-cypher-link'):
+                    cypher = lien_map['data-cypher-link']
+                    try:
+                        # Le site obfusque le lien avec "_goafrica_" et en inversant la chaine base64
+                        if '_goafrica_' in cypher:
+                            cypher_part = cypher.split('_goafrica_')[1]
+                            decoded = base64.b64decode(cypher_part[::-1] + '==').decode('utf-8', errors='ignore')
+                            print(f"Lien Itinéraire (Google Maps) : {decoded}")
+                        else:
+                            print(f"Lien Itinéraire (cypher non reconnu) : {cypher}")
+                    except Exception as e:
+                        print(f"Erreur de décodage du lien itinéraire : {e} pour la valeur {cypher}")
+                else:
+                    print(f"Lien Itinéraire : tag '{lien_map.name}' trouvé mais sans attribut 'href' ! Voici les attributs disponibles : {list(lien_map.attrs.keys())}")
+        else:
+            print(f"Lien Itinéraire : non trouvé (aucune balise contenant 'reset-button' n'a été vue dans 'el')")
+            
 if __name__ == "__main__":
     test_scraper()
