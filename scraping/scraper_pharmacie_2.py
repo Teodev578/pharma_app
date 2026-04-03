@@ -72,6 +72,10 @@ def scraper_goafricaonline():
                  nom_tag = el.find(['h2','h3','h4'])
             nom = nom_tag.text.strip() if nom_tag else "Nom inconnu"
             
+            # Ne pas enregistrer les pharmacies sans nom défini
+            if nom == "Nom inconnu" or not nom:
+                continue
+            
             # Téléphone : on cherche un tag a avec href="tel:..."
             tel_tag = el.find('a', href=lambda href: href and href.startswith('tel:'))
             telephone = tel_tag['href'].replace('tel:', '').strip() if tel_tag else ""
