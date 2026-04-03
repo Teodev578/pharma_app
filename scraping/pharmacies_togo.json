@@ -1,0 +1,1190 @@
+[
+    {
+        "nom": "Pharmacie  AEROPORT",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822262122",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  AEROPORT",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822262122",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  AMITIE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870256257",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  AMITIE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870256257",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  BE KPEHENOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870452503",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  BE KPEHENOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870452503",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  BIEN-ETRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870542907",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  BIEN-ETRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870542907",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  CONFIANCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870157846",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  CONFIANCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870157846",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DE L'UNION",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822277174",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DE L'UNION",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822277174",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DE LA VICTOIRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870457492",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DE LA VICTOIRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870457492",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DU GROUPE C",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22899982087",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  DU GROUPE C",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22899982087",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  LA COLOMBE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871888484",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  LA COLOMBE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871888484",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  LAVOISIER JESPA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870795656",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  LAVOISIER JESPA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870795656",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  NOVA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890014182",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  NOVA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890014182",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  SEGBE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892594935",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  SEGBE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892594935",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  SOTOUBOUA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie  SOTOUBOUA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie 2000",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896379424",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie 2000",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896379424",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie 3E ARRONDISSEMENT",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822215227",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie 3E ARRONDISSEMENT",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822215227",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie A DIEU LA GLOIRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893263600",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie A DIEU LA GLOIRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893263600",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ABRAHAM",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892259983",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ABRAHAM",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892259983",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ACTUELLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890614644",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ACTUELLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890614644",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADIDOGOME",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891057821",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADIDOGOME",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891057821",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADJOLOLO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22897938659",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADJOLOLO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22897938659",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADONAI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822500405",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADONAI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822500405",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADOUNI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870393939",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ADOUNI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870393939",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGBEGNIGAN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870200000",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGBEGNIGAN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870200000",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGBONOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGBONOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGOENVIVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891610262",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGOENVIVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891610262",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22899716060",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AGOU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22899716060",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AJP-ABOLAVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890413402",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AJP-ABOLAVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890413402",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AKODESSEWA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AKODESSEWA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AKOFA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870499628",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AKOFA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870499628",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AL HAYAT",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AL HAYAT",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ALTA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870084646",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ALTA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870084646",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AMEN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890885588",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AMEN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890885588",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AMESSIAME-BE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822214774",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AMESSIAME-BE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822214774",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ANFOIN",
+        "description": "Pharmacie d'office",
+        "telephone": "+22890519475",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ANFOIN",
+        "description": "Pharmacie d'office",
+        "telephone": "+22890519475",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOLLON",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893504255",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOLLON",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893504255",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOTHEKA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870443333",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOTHEKA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870443333",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOU ANTOINE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie APOU ANTOINE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ARC-EN-CIEL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870425000",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ARC-EN-CIEL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870425000",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ASSURANCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893087676",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ASSURANCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893087676",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ATLANTIQUE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie ATLANTIQUE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AUREOLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870709898",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AUREOLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870709898",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AURORE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871007575",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AURORE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871007575",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AVE MARIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822223301",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AVE MARIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822223301",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AVEPOZO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893017351",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AVEPOZO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893017351",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AZUR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890494456",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie AZUR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890494456",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BA-AYETA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22897726969",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BA-AYETA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22897726969",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAGUIDA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870424777",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAGUIDA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870424777",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAH",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890557959",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAH",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890557959",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAKOE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BAKOE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BEL AIR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822210321",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BEL AIR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822210321",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BELIEVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BELIEVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BENEDICTA AURORA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BENEDICTA AURORA",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BESDA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870426825",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BESDA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870426825",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BETANIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896801011",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BETANIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896801011",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BETHEL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822252370",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BETHEL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822252370",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BIOVA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870231923",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BIOVA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870231923",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON PASTEUR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891434484",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON PASTEUR",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891434484",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON SAMARITAIN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822214530",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON SAMARITAIN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822214530",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON SECOURS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870457674",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BON SECOURS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870457674",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BONTE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822507431",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie BONTE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822507431",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CAMPUS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800885",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CAMPUS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800885",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHARITE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822251260",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHARITE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822251260",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHÂTEAU D'EAU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800888",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHÂTEAU D'EAU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800888",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHRIST ROI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822274666",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CHRIST ROI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822274666",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CITRUS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800903",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CITRUS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800903",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CLEMENCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870193535",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CLEMENCE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870193535",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CONSEIL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893109292",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CONSEIL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893109292",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CRISTAL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822209091",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie CRISTAL",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822209091",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DAFEANNE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892624444",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DAFEANNE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22892624444",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DAPAONG",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DAPAONG",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de DAVIE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871764444",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de DAVIE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871764444",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de L' EDEN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870421398",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de L' EDEN",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870421398",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE L'AVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE L'AVE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE LA  CITE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822250125",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE LA  CITE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822250125",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de LA GARE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870794401",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie de LA GARE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870794401",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE LA MARINA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891019691",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DE LA MARINA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891019691",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DELALI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893645372",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DELALI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893645372",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DENIS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893084640",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DENIS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893084640",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DEO GRATIAS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896285713",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DEO GRATIAS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896285713",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES  ETOILES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822218847",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES  ETOILES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822218847",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie des  LACS",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie des  LACS",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES APOTRES",
+        "description": "Pharmacie d'officine",
+        "telephone": "22870453805",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES APOTRES",
+        "description": "Pharmacie d'officine",
+        "telephone": "22870453805",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ECOLES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822517575",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ECOLES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22822517575",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES LILAS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896165589",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES LILAS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896165589",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES OLIVIERS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800950",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES OLIVIERS",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800950",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ORCHIDEES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893431049",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ORCHIDEES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893431049",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ROSES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800962",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES ROSES",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22896800962",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES VERTS PATURAGES",
+        "description": "Non renseigné",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DES VERTS PATURAGES",
+        "description": "Non renseigné",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIEUDONNE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870448459",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIEUDONNE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870448459",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIFEZI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890705566",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIFEZI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890705566",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIVINA GRACIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893839100",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DIVINA GRACIA",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893839100",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DJIDJOLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893939927",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DJIDJOLE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22893939927",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DODJI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870291677",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DODJI",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870291677",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DONGOYO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890206221",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DONGOYO",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890206221",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU BOULEVARD",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890892849",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU BOULEVARD",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22890892849",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU CENTRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891038383",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU CENTRE",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22891038383",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU GRAND MARCHE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU GRAND MARCHE",
+        "description": "Pharmacie d'officine",
+        "telephone": "Non renseigné",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU GRAND PLATEAU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870533481",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie DU GRAND PLATEAU",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22870533481",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie du LAC",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871536565",
+        "est_de_garde": false
+    },
+    {
+        "nom": "Pharmacie du LAC",
+        "description": "Pharmacie d'officine",
+        "telephone": "+22871536565",
+        "est_de_garde": false
+    }
+]
