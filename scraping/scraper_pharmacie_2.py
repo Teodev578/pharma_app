@@ -4,6 +4,7 @@ import json
 import base64
 import time
 import re
+import geoloc_google_maps
 
 def extraire_horaires(bouton):
     for attr_name, attr_value in bouton.attrs.items():
@@ -161,3 +162,5 @@ def scraper_goafricaonline():
 
 if __name__ == "__main__":
     scraper_goafricaonline()
+    print("\n--- Lancement de l'étape de géolocalisation fine via Google Maps ---")
+    geoloc_google_maps.main()
