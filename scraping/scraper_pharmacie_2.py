@@ -87,6 +87,13 @@ def scraper_goafricaonline():
             statut = btn_horaires.text.strip().split()[0] if btn_horaires else "Inconnu"
             horaires = extraire_horaires(btn_horaires) if btn_horaires else []
             
+            # Adresse (via la classe flex flex-auto)
+            adresse_tag = el.find(lambda tag: tag.has_attr('class') and 'flex' in tag.get('class') and 'flex-auto' in tag.get('class'))
+            adresse = ""
+            if adresse_tag:
+                # Nettoyer et conserver les sauts de ligne pour un beau formatage
+                adresse = '\n'.join([ligne.strip() for ligne in adresse_tag.text.splitlines() if ligne.strip()])
+
             # Lien Itinéraire Google Maps
             lien_map = el.find(lambda tag: tag.has_attr('class') and 'reset-button' in tag.get('class') and 'group' in tag.get('class'))
             url_map = ""
@@ -102,6 +109,7 @@ def scraper_goafricaonline():
             pharmacie = {
                 "nom": nom,
                 "statut_actuel": statut,
+                "adresse": adresse,
                 "telephone": telephone,
                 "itineraire_google_maps": url_map,
                 "horaires_ouverture": horaires,
