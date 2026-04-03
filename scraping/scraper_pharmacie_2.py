@@ -112,8 +112,7 @@ def scraper_goafricaonline():
                 "adresse": adresse,
                 "telephone": telephone,
                 "itineraire_google_maps": url_map,
-                "horaires_ouverture": horaires,
-                "texte_brut_complet": text_brut
+                "horaires_ouverture": horaires
             }
             
             toutes_les_pharmacies.append(pharmacie)
