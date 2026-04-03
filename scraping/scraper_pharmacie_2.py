@@ -111,6 +111,8 @@ def scraper_goafricaonline():
             # Lien Itinéraire Google Maps
             lien_map = el.find(lambda tag: tag.has_attr('class') and 'reset-button' in tag.get('class') and 'group' in tag.get('class'))
             url_map = ""
+            latitude = None
+            longitude = None
             if lien_map and lien_map.has_attr('data-cypher-link'):
                 cypher = lien_map['data-cypher-link']
                 try:
@@ -120,12 +122,24 @@ def scraper_goafricaonline():
                 except Exception:
                     url_map = cypher
                     
+                # Extraction des coordonnées géographiques
+                if url_map and "daddr=" in url_map:
+                    try:
+                        coords = url_map.split("daddr=")[1].split(",")
+                        if len(coords) >= 2:
+                            latitude = float(coords[0])
+                            longitude = float(coords[1])
+                    except Exception:
+                        pass
+
             pharmacie = {
                 "nom": nom,
                 "statut_actuel": statut,
                 "adresse": adresse,
                 "telephone": telephone,
                 "itineraire_google_maps": url_map,
+                "latitude": latitude,
+                "longitude": longitude,
                 "horaires_ouverture": horaires
             }
             
