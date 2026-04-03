@@ -37,8 +37,9 @@ def scraper_goafricaonline():
     }
     
     toutes_les_pharmacies = []
+    noms_vus = set() # Pour éviter les doublons
     page_num = 1
-    max_pages = 20 # Limite de sécurité au cas où
+    max_pages = 50 # Limite de sécurité augmentée
 
     print("Début du scraping sur GoAfricaOnline...")
 
@@ -62,6 +63,8 @@ def scraper_goafricaonline():
             
         print(f"  -> {len(elements)} pharmacies trouvées sur cette page.")
         
+        nouveaux_elements_page = 0
+        
         for el in elements:
             # Texte brut global
             text_brut = ' '.join(el.text.split())
@@ -75,6 +78,13 @@ def scraper_goafricaonline():
             # Ne pas enregistrer les pharmacies sans nom défini
             if nom == "Nom inconnu" or not nom:
                 continue
+                
+            # Éviter absolument d'enregistrer des doublons (si le site boucle sur la page 1)
+            if nom in noms_vus:
+                continue
+                
+            noms_vus.add(nom)
+            nouveaux_elements_page += 1
             
             # Téléphone : on cherche un tag a avec href="tel:..."
             tel_tag = el.find('a', href=lambda href: href and href.startswith('tel:'))
@@ -120,6 +130,10 @@ def scraper_goafricaonline():
             }
             
             toutes_les_pharmacies.append(pharmacie)
+
+        if nouveaux_elements_page == 0:
+            print("Aucune nouvelle pharmacie trouvée sur cette page, on a atteint la limite de pagination.")
+            break
 
         page_num += 1
         time.sleep(1) # Petite pause pour ne pas surcharger le serveur
