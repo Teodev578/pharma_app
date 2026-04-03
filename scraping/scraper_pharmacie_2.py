@@ -1,21 +1,17 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import base64
+import time
+import re
 
 def extraire_horaires(bouton):
-    # On cherche dans tous les attributs de l'élément car on ne connaît pas 
-    # le nom exact de l'attribut (ça peut être data-controller ou une valeur de data-...)
     for attr_name, attr_value in bouton.attrs.items():
         if isinstance(attr_value, str) and 'popoverClass' in attr_value:
             try:
-                # Le contenu de cet attribut est un JSON
                 data = json.loads(attr_value)
-                
-                # Le code HTML du tableau se trouve dans la clé 'content'
                 content_html = data.get('content', '')
                 content_soup = BeautifulSoup(content_html, 'html.parser')
-                
-                # On parse le tableau HTML
                 rows = content_soup.find_all('tr')
                 horaires = []
                 for row in rows:
@@ -23,85 +19,106 @@ def extraire_horaires(bouton):
                     if len(cols) >= 2:
                         jour = ' '.join(cols[0].text.split())
                         heure = ' '.join(cols[1].text.split())
-                        horaires.append(f"{jour} : {heure}")
+                        horaires.append({
+                            "jour": jour,
+                            "heure": heure
+                        })
                 return horaires
-            except Exception as e:
-                return [f"Erreur de parsing des horaires : {e}"]
-    return ["Données d'horaires non trouvées dans les attributs"]
+            except Exception:
+                pass
+    return []
 
-def test_scraper():
-    url = "https://www.goafricaonline.com/tg/annuaire/pharmacies"
+def scraper_goafricaonline():
+    base_url = "https://www.goafricaonline.com/tg/annuaire/pharmacies"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
     }
     
-    print(f"Fetching {url}... extraction des horaires en cours.")
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # On identifie les blocs correspondant à chaque pharmacie
-    elements = soup.find_all(lambda tag: tag.has_attr('class') and 'flex' in tag.get('class') and 'w-full' in tag.get('class'))
-    
-    for i, el in enumerate(elements[:3]): # Test rapide sur 3 pharmacies
-        print(f"\n--- Pharmacie {i+1} ---")
+    toutes_les_pharmacies = []
+    page_num = 1
+    max_pages = 20 # Limite de sécurité au cas où
+
+    print("Début du scraping sur GoAfricaOnline...")
+
+    while page_num <= max_pages:
+        # La plupart des sites utilisent ?p= ou ?page= pour la pagination
+        # GoAfricaOnline utilise souvent ?p=
+        url = f"{base_url}?p={page_num}" if page_num > 1 else base_url
+        print(f"Scraping de la page {page_num} : {url}")
         
-        # Récupération du texte brut complet (comme dans la première version)
-        text_brut = ' '.join(el.text.split())
-        # On affiche tout le texte ou juste le début (ici je mets tout pour vous montrer qu'on a bien tout récupéré)
-        print(f"Texte brut : {text_brut}\n")
-        
-        # Essai de récupération du nom
-        nom_tag = el.find('a', class_=lambda c: c and 'text-' in c)
-        if not nom_tag:
-             nom_tag = el.find(['h2','h3','h4'])
-        nom = nom_tag.text.strip() if nom_tag else "Nom inconnu"
-        print(f"Nom : {nom}")
-        
-        # Trouver l'élément ("bouton") contenant les classes pour le popover.
-        # Il peut être vert (bg-green-100) s'il est ouvert, ou un autre style s'il est fermé (ex: bg-red-100)
-        btn_horaires = el.find(lambda tag: tag.has_attr('class') and ('bg-green-100' in tag.get('class') or 'bg-red-100' in tag.get('class') or 'bg-gray-100' in tag.get('class')))
-        
-        if btn_horaires:
-            statut = btn_horaires.text.strip().split()[0] # Ex: "Ouvert" ou "Fermé"
-            print(f"Statut actuel : {statut}")
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            print(f"Erreur HTTP {response.status_code}. Arrêt de la pagination.")
+            break
             
-            horaires = extraire_horaires(btn_horaires)
-            print("Horaires d'ouverture :")
-            for h in horaires:
-                print(f"  {h}")
-        else:
-            print("Bouton horaires non trouvé pour cette pharmacie.")
+        soup = BeautifulSoup(response.text, 'html.parser')
+        elements = soup.find_all(lambda tag: tag.has_attr('class') and 'flex' in tag.get('class') and 'w-full' in tag.get('class'))
+        
+        if not elements:
+            print("Plus aucune pharmacie trouvée sur cette page. Fin du scraping.")
+            break
             
-        # Recherche du lien itinéraire (Google Maps ou page du site)
-        lien_map = el.find(lambda tag: tag.has_attr('class') and 'reset-button' in tag.get('class') and 'group' in tag.get('class'))
-        if lien_map:
-            if lien_map.has_attr('href'):
-                url_map = lien_map['href']
-                if url_map.startswith('/'):
-                    url_map = "https://www.goafricaonline.com" + url_map
-                print(f"Lien Itinéraire : {url_map}")
-            elif lien_map.has_attr('data-url'):
-                print(f"Lien Itinéraire (data-url) : {lien_map['data-url']}")
-            else:
-                import base64
-                if lien_map.has_attr('data-cypher-link'):
-                    cypher = lien_map['data-cypher-link']
-                    try:
-                        # Le site obfusque le lien avec "_goafrica_" et en inversant la chaine base64
-                        if '_goafrica_' in cypher:
-                            cypher_part = cypher.split('_goafrica_')[1]
-                            decoded = base64.b64decode(cypher_part[::-1] + '==').decode('utf-8', errors='ignore')
-                            print(f"Lien Itinéraire (Google Maps) : {decoded}")
-                        else:
-                            print(f"Lien Itinéraire (cypher non reconnu) : {cypher}")
-                    except Exception as e:
-                        print(f"Erreur de décodage du lien itinéraire : {e} pour la valeur {cypher}")
-                else:
-                    print(f"Lien Itinéraire : tag '{lien_map.name}' trouvé mais sans attribut 'href' ! Voici les attributs disponibles : {list(lien_map.attrs.keys())}")
-        else:
-            print(f"Lien Itinéraire : non trouvé (aucune balise contenant 'reset-button' n'a été vue dans 'el')")
+        print(f"  -> {len(elements)} pharmacies trouvées sur cette page.")
+        
+        for el in elements:
+            # Texte brut global
+            text_brut = ' '.join(el.text.split())
             
+            # Nom
+            nom_tag = el.find('a', class_=lambda c: c and 'text-' in c)
+            if not nom_tag:
+                 nom_tag = el.find(['h2','h3','h4'])
+            nom = nom_tag.text.strip() if nom_tag else "Nom inconnu"
+            
+            # Téléphone : on cherche un tag a avec href="tel:..."
+            tel_tag = el.find('a', href=lambda href: href and href.startswith('tel:'))
+            telephone = tel_tag['href'].replace('tel:', '').strip() if tel_tag else ""
+            
+            # Si le téléphone n'est pas trouvé dans un lien cliquable, on essaie via le texte brut
+            if not telephone:
+                match_tel = re.search(r'Tel\s*:\s*([\+\d\s\(\)]+)', text_brut)
+                if match_tel:
+                    telephone = match_tel.group(1).strip()
+            
+            # Horaires et Statut
+            btn_horaires = el.find(lambda tag: tag.has_attr('class') and ('bg-green-100' in tag.get('class') or 'bg-red-100' in tag.get('class') or 'bg-gray-100' in tag.get('class')))
+            statut = btn_horaires.text.strip().split()[0] if btn_horaires else "Inconnu"
+            horaires = extraire_horaires(btn_horaires) if btn_horaires else []
+            
+            # Lien Itinéraire Google Maps
+            lien_map = el.find(lambda tag: tag.has_attr('class') and 'reset-button' in tag.get('class') and 'group' in tag.get('class'))
+            url_map = ""
+            if lien_map and lien_map.has_attr('data-cypher-link'):
+                cypher = lien_map['data-cypher-link']
+                try:
+                    if '_goafrica_' in cypher:
+                        cypher_part = cypher.split('_goafrica_')[1]
+                        url_map = base64.b64decode(cypher_part[::-1] + '==').decode('utf-8', errors='ignore')
+                except Exception:
+                    url_map = cypher
+                    
+            pharmacie = {
+                "nom": nom,
+                "statut_actuel": statut,
+                "telephone": telephone,
+                "itineraire_google_maps": url_map,
+                "horaires_ouverture": horaires,
+                "texte_brut_complet": text_brut
+            }
+            
+            toutes_les_pharmacies.append(pharmacie)
+
+        page_num += 1
+        time.sleep(1) # Petite pause pour ne pas surcharger le serveur
+
+    # Sauvegarder dans un fichier JSON
+    fichier_sortie = 'pharmacies_goafrica.json'
+    with open(fichier_sortie, 'w', encoding='utf-8') as f:
+        json.dump(toutes_les_pharmacies, f, ensure_ascii=False, indent=4)
+        
+    print(f"\nScraping terminé ! {len(toutes_les_pharmacies)} pharmacies ont été sauvegardées dans '{fichier_sortie}'")
+
 if __name__ == "__main__":
-    test_scraper()
+    scraper_goafricaonline()
