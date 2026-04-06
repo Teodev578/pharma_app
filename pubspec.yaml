@@ -16,6 +16,7 @@ dependencies:
   latlong2: ^0.9.1
   http: ^1.2.0
   firebase_core: ^3.11.0
+  supabase_flutter: ^2.8.3
 
   # PACKAGES CARTOGRAPHIE (Compatibles avec flutter_map v8)
   flutter_map: ^8.2.2

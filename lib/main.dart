@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pharma_app/ui/screens/onboarding_screen.dart';
 import 'package:pharma_app/ui/screens/welcome_screen.dart';
 import 'package:pharma_app/ui/screens/map_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://iquozfjxaiakihplymuv.supabase.co',
+    anonKey: 'sb_publishable_vhL-xeXcEyO9ubrbQM62Ng_inBeVurW',
+  );
+
   final prefs = await SharedPreferences.getInstance();
   final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
   final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;

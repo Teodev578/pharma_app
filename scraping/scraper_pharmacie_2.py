@@ -4,7 +4,18 @@ import json
 import base64
 import time
 import re
+import re
 import geoloc_google_maps
+import os
+from dotenv import load_dotenv
+from supabase import create_client, Client
+
+# --- Configuration Supabase ---
+# Chargement des variables d'environnement depuis le fichier .env
+load_dotenv()
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+# ------------------------------
 
 def extraire_horaires(bouton):
     for attr_name, attr_value in bouton.attrs.items():
@@ -28,6 +39,42 @@ def extraire_horaires(bouton):
             except Exception:
                 pass
     return []
+
+def upload_vers_supabase(pharmacies):
+    """Envoie la liste des pharmacies vers Supabase."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("\nErreur : SUPABASE_URL et SUPABASE_KEY non trouvés dans le fichier .env")
+        return
+
+    print(f"\n--- Déchargement de {len(pharmacies)} pharmacies vers Supabase ---")
+    try:
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # Préparation des données (on s'assure que les types sont corrects)
+        # Supabase/Postgres gère bien les listes/dict via JSONB
+        batch_size = 50
+        inserted_count = 0
+        
+        for i in range(0, len(pharmacies), batch_size):
+            batch = pharmacies[i:i+batch_size]
+            # On utilise .upsert() pour éviter les erreurs sur les doublons (si configuré sur la table)
+            # Sinon .insert() simple
+            try:
+                response = supabase.table("pharmacies").upsert(batch, on_conflict="nom").execute()
+                inserted_count += len(response.data)
+                print(f"  Progrès : {inserted_count}/{len(pharmacies)} synchronisées.")
+            except Exception as e_batch:
+                print(f"  Erreur lors de l'insertion d'un lot : {e_batch}")
+                # En cas d'erreur sur le lot, on essaie un par un pour ne pas tout perdre
+                for pharma in batch:
+                    try:
+                        supabase.table("pharmacies").upsert(pharma, on_conflict="nom").execute()
+                        inserted_count += 1
+                    except Exception as e_single:
+                        print(f"  Erreur pour {pharma.get('nom')} : {e_single}")
+
+    except Exception as e:
+        print(f"Erreur lors de l'initialisation du client Supabase : {e}")
 
 def scraper_goafricaonline():
     base_url = "https://www.goafricaonline.com/tg/annuaire/pharmacies"
@@ -159,6 +206,9 @@ def scraper_goafricaonline():
         json.dump(toutes_les_pharmacies, f, ensure_ascii=False, indent=4)
         
     print(f"\nScraping terminé ! {len(toutes_les_pharmacies)} pharmacies ont été sauvegardées dans '{fichier_sortie}'")
+    
+    # Synchronisation avec Supabase
+    upload_vers_supabase(toutes_les_pharmacies)
 
 if __name__ == "__main__":
     scraper_goafricaonline()
