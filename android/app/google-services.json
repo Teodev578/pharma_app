@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "637046836941",
+    "project_id": "pharma-app-be26a",
+    "storage_bucket": "pharma-app-be26a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637046836941:android:a21e995c53112d63e06384",
+        "android_client_info": {
+          "package_name": "com.example.pharma_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOwHU4uuSSHgX5NG2WTDe8sDE68b-zvmM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
