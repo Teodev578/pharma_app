@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({super.key});
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onClear;
+
+  const CustomSearchBar({
+    super.key,
+    this.controller,
+    this.onChanged,
+    this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +32,8 @@ class CustomSearchBar extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
+                controller: controller,
+                onChanged: onChanged,
                 style: textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -35,10 +46,15 @@ class CustomSearchBar extends StatelessWidget {
                 ),
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.mic, color: colorScheme.onSurfaceVariant),
-              onPressed: () {},
-            ),
+            if (controller?.text.isNotEmpty ?? false)
+              IconButton(
+                icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
+                onPressed: () {
+                  controller?.clear();
+                  if (onClear != null) onClear!();
+                  if (onChanged != null) onChanged!('');
+                },
+              ),
             const Padding(
               padding: EdgeInsets.only(right: 8.0),
               child: CircleAvatar(

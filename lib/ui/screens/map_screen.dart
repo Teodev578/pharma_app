@@ -11,6 +11,8 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'dart:async';
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
+import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/services/supabase_service.dart';
 
 class MapScreen extends StatefulWidget {
   static const String routeName = '/map';
@@ -28,6 +30,9 @@ class _MapScreenState extends State<MapScreen> {
   vtr.Theme? _mapTheme;
   Brightness? _lastBrightness;
 
+  List<Pharmacy> _pharmacies = [];
+  bool _isLoading = true;
+
   // Controller pour forcer le recentrage sur la position actuelle (envoie le niveau de zoom souhaité)
   late final StreamController<double?> _alignController;
 
@@ -35,6 +40,17 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _alignController = StreamController<double?>.broadcast();
+    _fetchPharmacies();
+  }
+
+  Future<void> _fetchPharmacies() async {
+    final pharmacies = await SupabaseService().getPharmacies();
+    if (mounted) {
+      setState(() {
+        _pharmacies = pharmacies;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -219,16 +235,16 @@ class _MapScreenState extends State<MapScreen> {
                 // Couche affichant les marqueurs (pharmacies, hôpitaux, écoles)
                 MarkerLayer(
                   markers: [
-                    // Pharmacies
-                    _buildPharmacyMarker(context, _initialCenter),
-                    _buildPharmacyMarker(context, const LatLng(6.145, 1.220)),
-                    _buildPharmacyMarker(context, const LatLng(6.132, 1.205)),
+                    // Pharmacies de la base de données
+                    ..._pharmacies.where((p) => p.latitude != null && p.longitude != null).map((p) {
+                      return _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p);
+                    }),
 
-                    // Hôpitaux (exemples)
+                    // Hôpitaux (exemples statiques)
                     _buildHospitalMarker(context, const LatLng(6.135, 1.215)),
                     _buildHospitalMarker(context, const LatLng(6.140, 1.210)),
 
-                    // Écoles (exemples)
+                    // Écoles (exemples statiques)
                     _buildSchoolMarker(context, const LatLng(6.138, 1.218)),
                   ],
                 ),
@@ -251,7 +267,49 @@ class _MapScreenState extends State<MapScreen> {
             ),
 
             // Barre de recherche rétractable en bas de l'écran
-            const SearchBottomSheet(),
+            SearchBottomSheet(
+              pharmacies: _pharmacies,
+              onPharmacySelected: (pharmacy) {
+                if (pharmacy.latitude != null && pharmacy.longitude != null) {
+                  _mapController.move(
+                    LatLng(pharmacy.latitude!, pharmacy.longitude!),
+                    16.0,
+                  );
+                  _showPharmacyDetails(context, pharmacy);
+                }
+              },
+            ),
+
+            // Indicateur de chargement
+            if (_isLoading)
+              Positioned(
+                top: 100,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Card(
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            "Chargement des pharmacies...",
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -293,44 +351,125 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Méthode pour construire l'apparence personnalisée d'un marqueur de pharmacie
-  Marker _buildPharmacyMarker(BuildContext context, LatLng point) {
+  Marker _buildPharmacyMarker(BuildContext context, LatLng point, [Pharmacy? pharmacy]) {
     final colorScheme = Theme.of(context).colorScheme;
     return Marker(
       point: point,
       alignment: Alignment.center,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+      child: GestureDetector(
+        onTap: () {
+          if (pharmacy != null) {
+            _showPharmacyDetails(context, pharmacy);
+          }
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
-              shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.surface, width: 3),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: pharmacy?.statutActuel == 'Ouvert' ? Colors.green.shade100 : Colors.red.shade100,
+                shape: BoxShape.circle,
+                border: Border.all(color: colorScheme.surface, width: 3),
+              ),
+              child: Icon(
+                Icons.local_pharmacy,
+                color: pharmacy?.statutActuel == 'Ouvert' ? Colors.green : Colors.red,
+                size: 20,
+              ),
             ),
-            child: Icon(
-              Icons.local_pharmacy,
-              color: colorScheme.onPrimaryContainer,
-              size: 20,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showPharmacyDetails(BuildContext context, Pharmacy pharmacy) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      pharmacy.nom,
+                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  if (pharmacy.statutActuel != null && pharmacy.statutActuel!.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: pharmacy.statutActuel == 'Ouvert' ? Colors.green.shade100 : Colors.red.shade100,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        pharmacy.statutActuel!,
+                        style: TextStyle(
+                          color: pharmacy.statutActuel == 'Ouvert' ? Colors.green.shade700 : Colors.red.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (pharmacy.adresse != null)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.location_on_outlined),
+                  title: Text(pharmacy.adresse!),
+                ),
+              if (pharmacy.telephone != null && pharmacy.telephone!.isNotEmpty)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.phone_outlined),
+                  title: Text(pharmacy.telephone!),
+                ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    // Action pour itinéraire
+                  },
+                  icon: const Icon(Icons.directions_outlined),
+                  label: const Text("Itinéraire"),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
     );
   }
 }

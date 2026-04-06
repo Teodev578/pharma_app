@@ -9610,8 +9610,8 @@
         "adresse": "BP. 4274MaritimeLomé - Togo",
         "telephone": "+228 22 21 65 15",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "latitude": 6.1756574,
+        "longitude": 1.1997415,
         "horaires_ouverture": []
     },
     {
@@ -9981,8 +9981,8 @@
         "adresse": "Bè AklassouMaritimeLomé - Togo",
         "telephone": "+228 22 20 90 91",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "latitude": 6.1472946,
+        "longitude": 1.2489329,
         "horaires_ouverture": []
     },
     {
@@ -10305,7 +10305,7 @@
         "telephone": "+228 22 48 19 69",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
         "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "longitude": 1.2253621,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -10480,8 +10480,8 @@
         "adresse": "BP. 8519MaritimeLomé - Togo",
         "telephone": "+228 22 50 30 55",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "latitude": 6.2337015,
+        "longitude": 1.1097774,
         "horaires_ouverture": []
     },
     {
@@ -10490,8 +10490,8 @@
         "adresse": "BP. 10040MaritimeLomé - Togo",
         "telephone": "+228 22 51 87 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "latitude": 6.2061762,
+        "longitude": 1.0100655,
         "horaires_ouverture": []
     },
     {
@@ -10715,8 +10715,8 @@
         "adresse": "05 BP. 02MaritimeLomé - Togo",
         "telephone": "+228 22 51 63 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "latitude": 6.1591206,
+        "longitude": 1.21309,
         "horaires_ouverture": []
     },
     {
@@ -10726,7 +10726,7 @@
         "telephone": "+228 22 26 76 51",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
         "latitude": 6.1256983,
-        "longitude": 1.22536,
+        "longitude": 1.1893132,
         "horaires_ouverture": []
     }
 ]

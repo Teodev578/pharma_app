@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class RecentTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
-  const RecentTile({super.key, required this.title, required this.subtitle});
+  const RecentTile({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +36,7 @@ class RecentTile extends StatelessWidget {
         style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
       ),
       trailing: Icon(Icons.chevron_right, color: colorScheme.outline),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
