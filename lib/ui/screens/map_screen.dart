@@ -141,8 +141,13 @@ class _MapScreenState extends State<MapScreen> {
       if (mounted) {
         final userLatLng = LatLng(position.latitude, position.longitude);
         setState(() => _userPosition = userLatLng);
-        // Recentrage caméra programmatique (fonctionne même si la carte est déjà rendue)
-        _mapController.move(userLatLng, 15.0);
+
+        // FIX RACE CONDITION : _mapController.move() peut crasher si FlutterMap
+        // n'est pas encore attaché au premier frame. On attend le prochain frame
+        // rendu avant d'interagir avec le contrôleur.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _mapController.move(userLatLng, 15.0);
+        });
       }
     } catch (e) {
       debugPrint('Impossible de récupérer la position GPS : $e');
@@ -277,8 +282,11 @@ class _MapScreenState extends State<MapScreen> {
       }
 
       if (rawJsonStr.isNotEmpty && mounted) {
+        // FIX : padLeft(8, '0') garantit 8 caractères même pour les couleurs
+        // dont la valeur hex serait courte (ex: noir pur 0xFF000000).
+        // Sans ce padding, .substring(2, 8) lèverait un RangeError.
         final bgHex =
-            '#${bgColor.value.toRadixString(16).substring(2, 8).toUpperCase()}';
+            '#${bgColor.value.toRadixString(16).padLeft(8, '0').substring(2, 8).toUpperCase()}';
 
         // EXECUTION HORS DU THREAD PRINCIPAL
         final decodedTheme = await compute(_parseVectorTheme, {
@@ -489,6 +497,11 @@ class _MapScreenState extends State<MapScreen> {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
     final colorScheme = Theme.of(context).colorScheme;
 
+    // FIX VALUEKEY : On utilise lat+lon comme identifiant unique stable.
+    // Utiliser pharmacy.nom créait des doublons de clés si deux pharmacies
+    // portaient le même nom ou si nom était une chaîne vide.
+    final stableKey = ValueKey('marker_${point.latitude}_${point.longitude}');
+
     return Marker(
       point: point, // Coordonnées GPS immuables
       width: 44,
@@ -502,13 +515,10 @@ class _MapScreenState extends State<MapScreen> {
       // RÈGLE CRITIQUE : Le GestureDetector doit être HORS du RepaintBoundary.
       // S'il était à l'intérieur, chaque tap (et chaque changement d'état du
       // recognizer) invaliderait le cache GPU, annulant totalement l'optimisation.
-      //
-      // La ValueKey stable garantit que Flutter retrouve le nœud en cache sans
-      // recréer l'objet lorsque le widget se reconstruit (ex: changement de thème).
       child: GestureDetector(
         onTap: () => _showPharmacyDetails(context, pharmacy),
         child: RepaintBoundary(
-          key: ValueKey('marker_${pharmacy.nom}_${point.latitude}_${point.longitude}'),
+          key: stableKey,
           child: Container(
             decoration: BoxDecoration(
               color: isOpen ? Colors.green.shade100 : Colors.red.shade100,
@@ -556,7 +566,27 @@ class _MapScreenState extends State<MapScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
-                  onPressed: () {},
+                  // FIX : Le bouton Itinéraire ouvrait Google Maps sans rien faire.
+                  // On utilise maintenant l'URL Google Maps de la pharmacie si disponible,
+                  // sinon on construit une URL de navigation par coordonnées GPS.
+                  onPressed: () {
+                    final url = pharmacy.itineraireGoogleMaps?.isNotEmpty == true
+                        ? pharmacy.itineraireGoogleMaps!
+                        : (pharmacy.latitude != null && pharmacy.longitude != null
+                            ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
+                            : null);
+                    if (url != null) {
+                      // On copie l'URL dans le presse-papier en attendant url_launcher
+                      // (ajouter url_launcher dans pubspec.yaml pour lancer directement)
+                      Clipboard.setData(ClipboardData(text: url));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Lien copié — collez-le dans Google Maps'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.directions),
                   label: const Text("Itinéraire"),
                 ),

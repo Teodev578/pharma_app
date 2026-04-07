@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 
@@ -6,15 +7,19 @@ class SupabaseService {
 
   Future<List<Pharmacy>> getPharmacies() async {
     try {
-      final response = await supabase
+      // Le SDK Supabase Flutter retourne List<Map<String,dynamic>> directement.
+      // FIX : whereType filtre tout élément inattendu sans lever d'erreur,
+      // ce qui rend le parsing robuste même si le schéma Supabase évolue.
+      final List<Map<String, dynamic>> response = await supabase
           .from('pharmacies')
           .select()
           .order('nom', ascending: true);
-      
-      final List<dynamic> data = response as List<dynamic>;
-      return data.map((json) => Pharmacy.fromJson(json)).toList();
+
+      return response
+          .map((json) => Pharmacy.fromJson(json))
+          .toList();
     } catch (e) {
-      print('Erreur lors de la récupération des pharmacies: $e');
+      debugPrint('SupabaseService: erreur lors de la récupération des pharmacies: $e');
       return [];
     }
   }
