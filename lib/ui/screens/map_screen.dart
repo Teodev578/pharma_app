@@ -36,10 +36,26 @@ class _MapScreenState extends State<MapScreen> {
   // Controller pour forcer le recentrage sur la position actuelle (envoie le niveau de zoom souhaité)
   late final StreamController<double?> _alignController;
 
+  // Optimisation Performances : On pré-initialise le TileProvider pour éviter de le recréer au build
+  late final TileProviders _tileProviders;
+
   @override
   void initState() {
     super.initState();
     _alignController = StreamController<double?>.broadcast();
+    
+    // Initialisation du provider de tuiles vectorielles (cache mémoire partagé)
+    _tileProviders = TileProviders({
+      'maptiler_planet': MemoryCacheVectorTileProvider(
+        maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
+        delegate: NetworkVectorTileProvider(
+          urlTemplate:
+              'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
+          maximumZoom: 14,
+        ),
+      ),
+    });
+
     _fetchPharmacies();
   }
 
@@ -188,16 +204,7 @@ class _MapScreenState extends State<MapScreen> {
                 if (_mapTheme != null)
                   VectorTileLayer(
                     theme: _mapTheme!,
-                    tileProviders: TileProviders({
-                      'maptiler_planet': MemoryCacheVectorTileProvider(
-                        maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
-                        delegate: NetworkVectorTileProvider(
-                          urlTemplate:
-                              'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-                          maximumZoom: 14,
-                        ),
-                      ),
-                    }),
+                    tileProviders: _tileProviders,
                   )
                 // Solution de repli (fallback) avec des tuiles raster (CartoDB)
                 else
@@ -239,13 +246,6 @@ class _MapScreenState extends State<MapScreen> {
                     ..._pharmacies.where((p) => p.latitude != null && p.longitude != null).map((p) {
                       return _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p);
                     }),
-
-                    // Hôpitaux (exemples statiques)
-                    _buildHospitalMarker(context, const LatLng(6.135, 1.215)),
-                    _buildHospitalMarker(context, const LatLng(6.140, 1.210)),
-
-                    // Écoles (exemples statiques)
-                    _buildSchoolMarker(context, const LatLng(6.138, 1.218)),
                   ],
                 ),
 
@@ -316,84 +316,35 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Marker _buildHospitalMarker(BuildContext context, LatLng point) {
-    return Marker(
-      point: point,
-      alignment: Alignment.center,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.red.shade100,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.red, width: 2),
-        ),
-        child: const Icon(Icons.local_hospital, color: Colors.red, size: 20),
-      ),
-    );
-  }
 
-  Marker _buildSchoolMarker(BuildContext context, LatLng point) {
-    return Marker(
-      point: point,
-      alignment: Alignment.center,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.blue.shade100,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.blue, width: 2),
-        ),
-        child: const Icon(Icons.school, color: Colors.blue, size: 20),
-      ),
-    );
-  }
-
-  // Méthode pour construire l'apparence personnalisée d'un marqueur de pharmacie
+  // Méthode optimisée pour construire l'apparence d'un marqueur de pharmacie
   Marker _buildPharmacyMarker(BuildContext context, LatLng point, [Pharmacy? pharmacy]) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isOpen = pharmacy?.statutActuel == 'Ouvert';
+    
     return Marker(
       point: point,
       alignment: Alignment.center,
+      width: 44,
+      height: 44,
       child: GestureDetector(
         onTap: () {
           if (pharmacy != null) {
             _showPharmacyDetails(context, pharmacy);
           }
         },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: pharmacy?.statutActuel == 'Ouvert' ? Colors.green.shade100 : Colors.red.shade100,
-                shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.surface, width: 3),
-              ),
-              child: Icon(
-                Icons.local_pharmacy,
-                color: pharmacy?.statutActuel == 'Ouvert' ? Colors.green : Colors.red,
-                size: 20,
-              ),
-            ),
-          ],
+        child: Container(
+          decoration: BoxDecoration(
+            color: isOpen ? Colors.green.shade100 : Colors.red.shade100,
+            shape: BoxShape.circle,
+            border: Border.all(color: colorScheme.surface, width: 3),
+            // On a supprimé l'ombre complexe (BoxShadow) ici pour gagner en fluidité
+          ),
+          child: Icon(
+            Icons.local_pharmacy,
+            color: isOpen ? Colors.green : Colors.red,
+            size: 20,
+          ),
         ),
       ),
     );

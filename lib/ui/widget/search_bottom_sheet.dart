@@ -147,11 +147,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // On garde quelques exemples ou on pourrait mettre les vrais récents ici plus tard
-                        const RecentTile(
-                          title: "Pharmacie de la Nation",
-                          subtitle: "Lomé • Ouvert",
-                        ),
+                        // On pourra mettre les vrais récents ici plus tard
                       ],
                     ),
                   ),
