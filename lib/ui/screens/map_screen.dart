@@ -19,8 +19,12 @@ import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'package:pharma_app/services/supabase_service.dart';
 
-/// FONCTION GLOBALE : Exécutée dans un thread séparé (Isolate)
-/// pour décoder le JSON du thème sans faire ramer l'UI.
+/// FONCTION GLOBALE POUR ISOLATE (THREAD SÉPARÉ)
+/// Flutter tourne par défaut sur 1 seul thread (le Main/UI thread).
+/// S'il doit décoder un gros fichier JSON lourd (le style de la carte MapTiler), l'écran va se figer ("jank").
+/// VTR (Vector Tile Renderer) demande un certain temps pour décoder son thème (plusieurs dizaines de ms).
+/// En passant par la fonction `compute`, ce travail complexe sera réalisé sur un "Isolate" (Un nouveau coeur/thread).
+/// ATTENTION : Cette méthode doit être absolument globale (en dehors d'une classe) afin que Flutter puisse la paraléliser de façon autonome.
 Future<vtr.Theme> _parseVectorTheme(Map<String, dynamic> params) async {
   final String jsonStr = params['jsonStr'];
   final String bgHex = params['bgHex'];
@@ -46,21 +50,35 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  // Configuration
+  // --- CONSTANTES ET CONFIGURATIONS ---
+  // Le centre de la carte lors de l'ouverture de l'application (latitude et longitude).
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
+  
+  // Ce contrôleur nous permet de "conduire" la carte de façon programmatique (ex: forcer un déplacement de caméra).
   final MapController _mapController = MapController();
+  
+  // Clé d'API (obligatoire pour récupérer les tuiles PBF de chez MapTiler)
   final String mapTilerKey = 'pg76rH7Ad8bNzkP7pnwf';
 
-  // State
+  // --- VARIABLES D'ÉTAT (UI ET CACHE) ---
+  // Theme contient les couleurs, routes, et libellés décodés. Sans thème complet, la carte ne rend pas les chemins.
   vtr.Theme? _mapTheme;
+  
+  // Stocke l'ancienne luminosité pour vérifier à chaque draw si on a changé de thème Android/iOS (Clair => Sombre).
   Brightness? _lastBrightness;
+  
+  // Variables boolean de Chargement (Indispensable pour le loader UI discret et la parade anti-freeze initial).
   bool _isLoadingPharmacies = true;
   bool _isThemeLoading = false;
 
+  // Variables stockant nos données de base (Modèle Supabase), et nos widgets affichables de carte (Markers).
   List<Pharmacy> _pharmacies = [];
-  List<Marker> _cachedMarkers = [];
+  List<Marker> _cachedMarkers = []; // Les marqueurs pré-calculés, pour éviter la reconstruction native pendant chaque scroll !
 
+  // Ce StreamController sert de "pont" : il émet un événement vers le CurrentLocationLayer pour l'aligner sans devoir passer par des setState().
   late final StreamController<double?> _alignController;
+  
+  // L'architecte des tuiles : gère le réseau, la queue de download et le cache mémoire des fragments de carte (.pbf).
   late final TileProviders _tileProviders;
 
   @override
@@ -68,14 +86,17 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _alignController = StreamController<double?>.broadcast();
 
-    // Initialisation unique des providers (Cache RAM de 50MB)
+    // EXTRÊMEMENT IMPORTANT : Initialisation *unique* du Cache Mémoire Vectoriel.
+    // Cette configuration alloue généreusement un maximum de 50 MB de RAM pour conserver la ville scannée au chaud.
+    // Les tuiles PBF (Protocolbuffer Binary Format) sont des fichiers compressés qui retiennent une incroyable densité d'immeubles et de rues.
+    // Plus le maxSizeBytes est grand, moins le composant Delegate refera de ping réseaux sur maptiler.com (Gain datas pour l'utilisateur !).
     _tileProviders = TileProviders({
       'maptiler_planet': MemoryCacheVectorTileProvider(
         maxSizeBytes: 50 * 1024 * 1024,
         delegate: NetworkVectorTileProvider(
           urlTemplate:
               'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
-          maximumZoom: 14,
+          maximumZoom: 14, // On s'arrête de requêter du nouveau polygone après x14 (ensuite on fait de l'agrandissement d'image pur pour éviter de douiller l'API).
         ),
       ),
     });
@@ -83,33 +104,43 @@ class _MapScreenState extends State<MapScreen> {
     _fetchPharmacies();
   }
 
-  /// Chargement des données depuis Supabase
+  /// FETCH PHARMACIES :
+  /// Se connecte à Supabase, télécharge la liste de données brutes, et enregistre en mémoire.
   Future<void> _fetchPharmacies() async {
     try {
       final pharmacies = await SupabaseService().getPharmacies();
+      
+      // Mettre toujours 'mounted' avant 'setState' (Vérifie si la Map n'a pas été fermée entre-temps par une nav).
       if (mounted) {
         setState(() {
           _pharmacies = pharmacies;
-          // NE PAS générer les marqueurs immédiatement pour éviter un goulot d'étranglement CPU (Jank)
-          // On laisse le temps à la carte vectorielle (très lourde) de finir son premier rendu.
+          // TRICK DE PERFORMANCE (STAGGERED LOADING) : 
+          // On obtient nos propriétés, mais OUI on fait expressément de NE PAS parser les marqueurs tout de suite !
+          // Le VectorTileLayer au même moment est en train de réclamer tout le CPU pour décoder et projeter les PBF de MapTiler. 
+          // Si on déclenchait _updateMarkers() massivement ici, on taperait le thread principal -> lag épouvantable.
         });
 
-        // Délai intentionnel (Staggered Loading)
+        // On gèle intentionnellement la naissance des clusters de 600ms pour laisser la Map charger dans le vide.
         await Future.delayed(const Duration(milliseconds: 600));
+        
         if (mounted) {
-          _updateMarkers();
+          _updateMarkers(); // Lancement différé !
         }
       }
     } catch (e) {
       debugPrint("Erreur Supabase: $e");
+      // Faceback d'erreur : enlever les loaders pour libérer la Map
       if (mounted) setState(() => _isLoadingPharmacies = false);
     }
   }
 
-  /// Génère ou met à jour la liste des marqueurs (appelé si data ou thème change)
+  /// CRÉATION DES MARQUEURS :
+  /// Transforme de pures Data (latitude/longitude) en véritables widgets "Marker" FlutterMap prêts à clouer.
   void _updateMarkers() {
     final newMarkers = _pharmacies
+        // Ligne vitale : ignorer catégoriquement toute pharmacie qui n'aurait pas été géolocalisée
         .where((p) => p.latitude != null && p.longitude != null)
+        // La fonction .map itérative bâtit chaque Marker physique un par un.
         .map(
           (p) => _buildPharmacyMarker(
             context,
@@ -117,34 +148,44 @@ class _MapScreenState extends State<MapScreen> {
             p,
           ),
         )
-        .toList();
+        .toList(); // Finalise l'Itérable en Liste d'objet natif
 
     if (mounted) {
       setState(() {
+        // En poussant "newMarkers" vers _cachedMarkers, on "débloque" la porte affichant le Layer de Clusters 
         _cachedMarkers = newMarkers;
+        // Permet au "Loader Overlay Central" du dessus de la carte de disparaitre de l'écran.
         _isLoadingPharmacies = false;
       });
     }
   }
 
   @override
+  /// EVENT DE SYSTÈME (didChangeDependencies) : 
+  /// S'exécute quand l'InheritedWidget système subit une modification profonde (comme le Dark mode trigger par le Control Center de l'OS).
   void didChangeDependencies() {
     super.didChangeDependencies();
     final theme = Theme.of(context);
 
-    // On ne recharge le thème que si la luminosité change (Clair <-> Sombre)
+    // TECHNIQUE : N'exécuter que si on a RÉELLEMENT changé de mode lumineux.
+    // Cela empêche un re-chargement complet involontaire de la carte si l'utilisateur quitte provisoirement l'app pour aller lire un SMS.
     if (_lastBrightness != theme.brightness) {
       _lastBrightness = theme.brightness;
 
+      // Déduction de notre fameuse Hexadécimale d'arrière plan (sur lequel viendra peindre MapTiler ses parcs, mers, etc).
       final bgColor = theme.brightness == Brightness.dark
           ? theme.colorScheme.surface
           : const Color(0xFFF2F4F5);
 
+      // Envoie la couleur du système injecter le JSON
       _loadVectorMapTheme(theme.brightness, bgColor);
 
-      // On rafraîchit les marqueurs pour qu'ils prennent les couleurs du nouveau thème
+      // On s'assure de rafraichir aussi la couleur des bordures de nos *Marqueurs* UI.
+      // Le theme.colorScheme de la bordure du marqueur s'invaliderait pas de lui-même car il est listé statique dans un cache.
       if (_pharmacies.isNotEmpty) {
-        setState(() => _isLoadingPharmacies = true);
+        setState(() => _isLoadingPharmacies = true); // Affiche le spinner "optimisation…"
+        
+        // Un micro-délai (400ms) pour laisser les couleurs et fonts OS se rafraîchir en priorité
         Future.delayed(const Duration(milliseconds: 400), () {
           if (mounted) _updateMarkers();
         });
@@ -245,37 +286,44 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
               children: [
-                // 1. CARTE (VECTEUR)
+                // ================= COUCHES DE LA CARTE (Z-Index / Ordre de projection vectorielle) =================
+                
+                // COUCHE N°1 : FOND DE CARTE (VECTORIELLE)
+                // Rend les plans, bâtiments, océans en format dessin SVG-like redimensionnable à l'infini (Sans pixelisation).
                 if (_mapTheme != null)
                   VectorTileLayer(
                     theme: _mapTheme!,
                     tileProviders: _tileProviders,
                   ),
 
-                // 2. POSITION UTILISATEUR
+                // COUCHE N°2 : POSITION UTILISATEUR LITTÉRALE (Point bleu et Cône de vue directionnel)
                 CurrentLocationLayer(
-                  alignPositionStream: _alignController.stream,
+                  alignPositionStream: _alignController.stream, // Écoute notre bouton flottant sans forcer de rebuild général
                   style: LocationMarkerStyle(
                     marker: DefaultLocationMarker(
-                      color: theme.colorScheme.primary,
+                      color: theme.colorScheme.primary, // Cible le BLEU ou COULEUR PRINCIPALE de votre charte graphique
                     ),
                     markerSize: const Size(20, 20),
                   ),
                 ),
 
-                // 3. MARQUEURS PHARMACIES (CLUSTERING)
+                // COUCHE N°3 : MARQUEURS PHARMACIES "CLUSTERS" (Boules agglomérées intelligentes)
+                // Conditions cumulatives : S'affichent uniquement SI pharmacies converties + Aucun delay/loading artificiel n'est de rigueur (Delay de 600ms au boot ok !).
                 if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
                   Builder(
                     builder: (context) {
+                      // HACK CRUCIAL :  En introduisant un "Builder", on confie un nouveau Context localisé pour MapCamera.of().
+                      // C'est requis par "MarkerClusterLayer" qui doit fouiller les parents à la recherche du "FlutterMap" engine.
                       return MarkerClusterLayer(
                         mapController: _mapController,
-                        mapCamera: MapCamera.of(context),
+                        mapCamera: MapCamera.of(context), 
                         options: MarkerClusterLayerOptions(
-                          markers: _cachedMarkers,
+                          markers: _cachedMarkers, // Récupération brute du Cache qu'on a mis en place => 0 perte de frame
                           size: const Size(44, 44),
-                          maxClusterRadius: 45,
+                          // maxClusterRadius dicte l'aimant magnétique : au bout de 45 pixels, les sphères se scindent pour révéler chaque pharmacie
+                          maxClusterRadius: 45, 
                           builder: (context, markers) =>
-                              _buildClusterWidget(markers.length),
+                              _buildClusterWidget(markers.length), // Génère le badge chiffré "6" / "2"
                         ),
                       );
                     },
@@ -370,7 +418,8 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  // Construction d'un marqueur individuel optimisé
+  /// CONSTRUCTION D'UN MARQUEUR INDIVIDUEL COMPLET
+  /// Fabrique un "bouton punaise géographique" complet combinant widget, logique et position.
   Marker _buildPharmacyMarker(
     BuildContext context,
     LatLng point,
@@ -380,16 +429,19 @@ class _MapScreenState extends State<MapScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Marker(
-      point: point,
+      point: point, // Coordonnées GPS immuables
       width: 44,
       height: 44,
+      // OPTIMISATION ABSOLUE : `RepaintBoundary` (Limite logicielle de redessinage)
+      // Lors d'un drag, Flutter tente de "rafraîchir" les couleurs/shadows de façon intemestive au fil des ms.
+      // Cette balise instruit au moteur Skia/Impeller : "Ce container est désormais inerte ; mets le en cache image et dessine le plat." 
+      // Cette unique ligne donne un boost de FPS démentiel quand on scrolle par dessus la ville avec tous ces noeuds graphiques :
       child: RepaintBoundary(
-        // CRUCIAL pour la fluidité
         child: GestureDetector(
-          onTap: () => _showPharmacyDetails(context, pharmacy),
+          onTap: () => _showPharmacyDetails(context, pharmacy), // Modal interactif
           child: Container(
             decoration: BoxDecoration(
-              color: isOpen ? Colors.green.shade100 : Colors.red.shade100,
+              color: isOpen ? Colors.green.shade100 : Colors.red.shade100, // Background teinte en Statut (V/R)
               shape: BoxShape.circle,
               border: Border.all(color: colorScheme.surface, width: 3),
             ),
