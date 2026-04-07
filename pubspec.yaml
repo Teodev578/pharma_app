@@ -25,6 +25,7 @@ dependencies:
   flutter_map_location_marker: ^10.2.0
   flutter_map_marker_cluster: ^8.2.2
   path_provider: ^2.1.5
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:
