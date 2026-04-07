@@ -241,49 +241,54 @@ class _MapScreenState extends State<MapScreen> {
                 ),
 
                 // Couche affichant les marqueurs avec Clustering (Regroupement automatique)
-                MarkerClusterLayer(
-                  // Passer explicitement le contrôleur et la caméra depuis la v8
-                  mapController: _mapController,
-                  mapCamera: _mapController.camera,
-                  options: MarkerClusterLayerOptions(
-                    markers: _pharmacies.where((p) => p.latitude != null && p.longitude != null).map((p) {
-                      return _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p);
-                    }).toList(),
-                    // Taille des cercles de cluster
-                    size: const Size(44, 44),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(50),
-                    maxClusterRadius: 45,
-                    // Permet de zoomer sur le cluster quand on tape dessus
-                    onClusterTap: (cluster) {
-                      _mapController.move(cluster.bounds.center, _mapController.camera.zoom + 2);
-                    },
-                    builder: (context, markers) {
-                      final colorScheme = Theme.of(context).colorScheme;
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                Builder(
+                  builder: (context) {
+                    // On utilise MapCamera.of(context) qui est disponible pour les enfants de FlutterMap
+                    // Cela évite d'utiliser _mapController.camera avant que le widget ne soit rendu.
+                    return MarkerClusterLayer(
+                      mapController: _mapController,
+                      mapCamera: MapCamera.of(context),
+                      options: MarkerClusterLayerOptions(
+                        markers: _pharmacies.where((p) => p.latitude != null && p.longitude != null).map((p) {
+                          return _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p);
+                        }).toList(),
+                        // Taille des cercles de cluster
+                        size: const Size(44, 44),
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(50),
+                        maxClusterRadius: 45,
+                        // Permet de zoomer sur le cluster quand on tape dessus
+                        onClusterTap: (cluster) {
+                          _mapController.move(cluster.bounds.center, _mapController.camera.zoom + 2);
+                        },
+                        builder: (context, markers) {
+                          final colorScheme = Theme.of(context).colorScheme;
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            markers.length.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                            child: Center(
+                              child: Text(
+                                markers.length.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
 
                 // SafeArea pour les boutons flottants, insérée dans le FlutterMap pour avoir accès au MapCamera
