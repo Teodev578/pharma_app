@@ -32,6 +32,7 @@ class _MapScreenState extends State<MapScreen> {
   Brightness? _lastBrightness;
 
   List<Pharmacy> _pharmacies = [];
+  List<Marker> _cachedMarkers = [];
   bool _isLoading = true;
 
   // Controller pour forcer le recentrage sur la position actuelle (envoie le niveau de zoom souhaité)
@@ -48,7 +49,7 @@ class _MapScreenState extends State<MapScreen> {
     // Initialisation du provider de tuiles vectorielles (cache mémoire partagé)
     _tileProviders = TileProviders({
       'maptiler_planet': MemoryCacheVectorTileProvider(
-        maxSizeBytes: 15 * 1024 * 1024, // 15 MB de cache RAM
+        maxSizeBytes: 50 * 1024 * 1024, // 50 MB de cache RAM (augmenté pour optimisation)
         delegate: NetworkVectorTileProvider(
           urlTemplate:
               'https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=$mapTilerKey',
@@ -65,6 +66,10 @@ class _MapScreenState extends State<MapScreen> {
     if (mounted) {
       setState(() {
         _pharmacies = pharmacies;
+        _cachedMarkers = _pharmacies
+            .where((p) => p.latitude != null && p.longitude != null)
+            .map((p) => _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p))
+            .toList();
         _isLoading = false;
       });
     }
@@ -206,19 +211,8 @@ class _MapScreenState extends State<MapScreen> {
                   VectorTileLayer(
                     theme: _mapTheme!,
                     tileProviders: _tileProviders,
-                  )
-                // Solution de repli (fallback) avec des tuiles raster (CartoDB)
-                else
-                  TileLayer(
-                    urlTemplate: isDarkMode
-                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                    subdomains: const ['a', 'b', 'c', 'd'],
-                    keepBuffer:
-                        3, // Conserve plus de tuiles en RAM autour de la zone vue
-                    panBuffer:
-                        2, // Pré-charge les tuiles proches pour un pan ultra rapide
                   ),
+                // Le fallback Raster a été désactivé pour éviter d'épuiser la RAM avec deux moteurs de rendu.
 
                 // Couche affichant la position actuelle de l'utilisateur (point bleu + direction)
                 CurrentLocationLayer(
@@ -249,9 +243,7 @@ class _MapScreenState extends State<MapScreen> {
                       mapController: _mapController,
                       mapCamera: MapCamera.of(context),
                       options: MarkerClusterLayerOptions(
-                        markers: _pharmacies.where((p) => p.latitude != null && p.longitude != null).map((p) {
-                          return _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p);
-                        }).toList(),
+                        markers: _cachedMarkers,
                         // Taille des cercles de cluster
                         size: const Size(44, 44),
                         alignment: Alignment.center,
@@ -267,11 +259,11 @@ class _MapScreenState extends State<MapScreen> {
                             decoration: BoxDecoration(
                               color: colorScheme.primary,
                               shape: BoxShape.circle,
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Color(0x33000000), // Colors.black.withOpacity(0.2)
                                   blurRadius: 8,
-                                  offset: const Offset(0, 3),
+                                  offset: Offset(0, 3),
                                 ),
                               ],
                             ),
