@@ -50,6 +50,17 @@ def upload_vers_supabase(pharmacies):
     try:
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
         
+        # --- NOUVEAUTÉ : Suppression de toutes les pharmacies existantes ---
+        print("  Nettoyage de la table 'pharmacies'...")
+        try:
+            # On utilise une condition toujours vraie pour supprimer toutes les lignes
+            # Par exemple : nom n'est pas vide (ou id structurellement)
+            supabase.table("pharmacies").delete().neq("nom", "X").execute()
+            print("  Table nettoyée avec succès.")
+        except Exception as e_del:
+            print(f"  Avertissement lors du nettoyage : {e_del}")
+        # ------------------------------------------------------------------
+
         # Préparation des données (on s'assure que les types sont corrects)
         # Supabase/Postgres gère bien les listes/dict via JSONB
         batch_size = 50
@@ -207,10 +218,24 @@ def scraper_goafricaonline():
         
     print(f"\nScraping terminé ! {len(toutes_les_pharmacies)} pharmacies ont été sauvegardées dans '{fichier_sortie}'")
     
-    # Synchronisation avec Supabase
-    upload_vers_supabase(toutes_les_pharmacies)
+    # La synchronisation est maintenant gérée dans le bloc main après la géolocalisation
 
 if __name__ == "__main__":
+    # 1. Scraping initial
     scraper_goafricaonline()
-    print("\n--- Lancement de l'étape de géolocalisation fine via Google Maps ---")
+    
+    # 2. Réajustement de la localisation via Google Maps
+    print("\n--- Lancement de l'étape de réajustement de la localisation via Google Maps ---")
     geoloc_google_maps.main()
+    
+    # 3. Chargement des données finales et envoi vers Supabase
+    fichier_json = 'pharmacies_goafrica.json'
+    if os.path.exists(fichier_json):
+        print(f"\nChargement des données ajustées depuis {fichier_json}...")
+        with open(fichier_json, 'r', encoding='utf-8') as f:
+            pharmacies_finales = json.load(f)
+        
+        # Envoi final vers Supabase (avec suppression préalable des anciennes données)
+        upload_vers_supabase(pharmacies_finales)
+    else:
+        print(f"Erreur : le fichier {fichier_json} est introuvable après le scraping.")

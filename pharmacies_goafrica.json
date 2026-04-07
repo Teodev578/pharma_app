@@ -1,7 +1,7 @@
 [
     {
         "nom": "PHARMACIE AGOENYIVE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route Nationale N°1, à côté de l'Église catholique Marie-ThéotokosAgoènyivé - BP 20464Lomé - Togo",
         "telephone": "+228 22 25 83 38",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22570556,1.2107",
@@ -40,7 +40,7 @@
     },
     {
         "nom": "PHARMACIE DU 3e ARRONDISSEMENT",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "219, Boulevard du 13 janvier à côté de l'immeuble Fiata, Golfe 4Lomé - Togo",
         "telephone": "+228 22 21 52 27",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.135169,1.232",
@@ -79,7 +79,7 @@
     },
     {
         "nom": "PHARMACIE MAËLYS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1620, Bd. Malfakassa, non loin du Lycée St Michel, en face de NETADIBè Kpota - BP 604Lomé - Togo",
         "telephone": "+228 22 27 60 19",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16795556,1.2754",
@@ -118,7 +118,7 @@
     },
     {
         "nom": "PHARMACIE 2000",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd Malfakassa non loin de station Totale du MarchéBP 61194Lomé - Togo",
         "telephone": "+228 22 70 85 87",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16405556,1.2",
@@ -206,7 +206,7 @@
     },
     {
         "nom": "PHARMACIE DES ORCHIDEES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Près du carrefour Léo 2000Agoè Téléssou - 02 BP 20715Lomé - Togo",
         "telephone": "+228 93 43 10 49",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21132222,1.1771",
@@ -245,7 +245,7 @@
     },
     {
         "nom": "PHARMACIE FIDELIA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue des passages des boeufs, à coté IFGIAkodésséwaLomé - Togo",
         "telephone": "+228 96 09 73 38",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16652778,1.2665",
@@ -284,7 +284,7 @@
     },
     {
         "nom": "PHARMACIE LA GRACE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route Nationale N° 1, en face du terrain de sport Agoé Nyivé, à côté de l'hôtel SaharaAgoènyivé - 01 BP 440Lomé - Togo",
         "telephone": "+228 22 25 91 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21955556,1.2090",
@@ -323,7 +323,7 @@
     },
     {
         "nom": "PHARMACIE LE BON SAMARITAIN BJV",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin de l’hôpital de BèBè Pa de Souza - BP 616Lomé - Togo",
         "telephone": "+228 22 21 45 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13998056,1.2466",
@@ -372,7 +372,7 @@
     },
     {
         "nom": "PHARMACIE DE GBOSSIME",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "376, Bd. de la Kara, non loin du marchéGbossimé - 08 BP 80859Lomé - Togo",
         "telephone": "+228 22 22 50 50",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.159532,1.205",
@@ -411,12 +411,12 @@
     },
     {
         "nom": "A DIEU LA GLOIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "23BP23MaritimeLomé - Togo",
         "telephone": "+228 93 26 36 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1810923,
-        "longitude": 1.2040972,
+        "latitude": 6.1338688,
+        "longitude": 1.2181186,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -464,8 +464,8 @@
         "adresse": "BP. 20519MaritimeLomé - Togo",
         "telephone": "+228 22 26 03 20",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.1893132,
+        "latitude": 6.148693,
+        "longitude": 1.1661401,
         "horaires_ouverture": []
     },
     {
@@ -513,13 +513,13 @@
         "adresse": "Non loin de la Pharmacie Raoudha, Hédzranawoé07 BP 13976Lomé - Togo",
         "telephone": "+228 22 61 58 41",
         "itineraire_google_maps": "",
-        "latitude": 6.1352871,
-        "longitude": 1.0761125,
+        "latitude": 6.1897814,
+        "longitude": 1.201894,
         "horaires_ouverture": []
     },
     {
         "nom": "Cameg-Togo Quartier Tokoin Hopital",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "202Bd des Armees, Hopital 08 BP 8349 - TokoinMaritimeLomé - Togo",
         "telephone": "+228 22 22 26 94",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1465189,1.20639",
@@ -582,8 +582,8 @@
         "adresse": "-BP: 96Sotouboua - Togo",
         "telephone": "+228 90 27 17 63",
         "itineraire_google_maps": "",
-        "latitude": 6.2039284,
-        "longitude": 1.1923213,
+        "latitude": 6.1943057,
+        "longitude": 1.1680675,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -617,7 +617,7 @@
     },
     {
         "nom": "DEPOT PHARMACEUTIQUE AGOE-LOGOPE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Zanguéra, Près du CEG KoshiganAgoè Kossigan I - 13BP244Lomé - Togo",
         "telephone": "+228 22 51 70 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23530556,1.1833",
@@ -670,8 +670,8 @@
         "adresse": "BP. 7951MaritimeLomé - Togo",
         "telephone": "+228 22 25 41 07",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.2157404,
-        "longitude": 1.0282597,
+        "latitude": 6.1256983,
+        "longitude": 1.22536,
         "horaires_ouverture": []
     },
     {
@@ -680,13 +680,13 @@
         "adresse": "BP. 2847MaritimeLomé - Togo",
         "telephone": "+228 22 21 52 27",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1352038,
-        "longitude": 1.2323631,
+        "latitude": 6.1352666,
+        "longitude": 1.2281849,
         "horaires_ouverture": []
     },
     {
         "nom": "Depot pharmacie agbodrafo",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "N2MaritimeLomé - Togo",
         "telephone": "+228 22 38 02 03",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1522326,1.29034",
@@ -774,7 +774,7 @@
     },
     {
         "nom": "ENERGIA PROMOTION TOGO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue sun city-vakpo, non loin de la station d'essence, avédji sun city24 BP 32 LoméLomé - Togo",
         "telephone": "+228 22 51 58 27",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20316667,1.1712",
@@ -837,8 +837,8 @@
         "adresse": "",
         "telephone": "",
         "itineraire_google_maps": "",
-        "latitude": null,
-        "longitude": null,
+        "latitude": 6.1823217,
+        "longitude": 1.2466907,
         "horaires_ouverture": []
     },
     {
@@ -882,7 +882,7 @@
     },
     {
         "nom": "GAG PHARMA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue en face de l’ancienne COOPED/AD, 2ème maison à étage, à droite avant l’Eglise PentecôteKodjoviakopéLomé - Togo",
         "telephone": "+228 90 67 70 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12586389,1.2075",
@@ -921,7 +921,7 @@
     },
     {
         "nom": "HOTEL MAWUNYO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Voie du grand contournement, face à HaojueAgoè Sogbossito - 19 BP 247Lomé - Togo",
         "telephone": "+228 70 42 34 64",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.25486111,1.1712",
@@ -1009,7 +1009,7 @@
     },
     {
         "nom": "PARMACIE EL NOUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route alinka près de l'EPP Alinka, Agoè alinkaLomé - Togo",
         "telephone": "+228 97 79 93 74",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.28,1.1",
@@ -1058,7 +1058,7 @@
     },
     {
         "nom": "PHARMACIE ABRAHAM",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Zanguéra, non loin du Camp GP, KossiganAgoè Logopé - 05 BP 812Lomé - Togo",
         "telephone": "+228 22 50 10 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.234725,1.175",
@@ -1097,7 +1097,7 @@
     },
     {
         "nom": "PHARMACIE ACTUELLE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route douane-Ségbé, face station YATT & COAdidogomé - BP 1226 loméLomé - Togo",
         "telephone": "+228 22 51 11 72",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19175,1.1465",
@@ -1136,7 +1136,7 @@
     },
     {
         "nom": "PHARMACIE ADIDOGOME",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. du 30 Août, face à la banque BSIC et au Camp du 2eme RIAdidogomé - 04 BP 224 LoméLomé - Togo",
         "telephone": "+228 22 51 18 91",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18508333,1.1663",
@@ -1175,7 +1175,7 @@
     },
     {
         "nom": "PHARMACIE ADJOLOLO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue de la charité, non loin de l'école française - NyekonakopeNyékonakpoè Adjololo - BP 4235Lomé - Togo",
         "telephone": "+228 22 21 05 13",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12618056,1.2011",
@@ -1214,7 +1214,7 @@
     },
     {
         "nom": "PHARMACIE ADONAI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route National N°1, face agence Togocel d'Agoniévé, à côté de Fil o ParcAgoènyivé - BP 31003Lomé - Togo",
         "telephone": "+228 22 50 04 05",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23194444,1.2106",
@@ -1253,7 +1253,7 @@
     },
     {
         "nom": "PHARMACIE ADOUNI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "A 500 mètres du carrefour AISEDAdidogomé - 15 BP 226 Lomé 15Lomé - Togo",
         "telephone": "+228 70 39 39 39",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2185,1.14886",
@@ -1292,7 +1292,7 @@
     },
     {
         "nom": "PHARMACIE AGBALEPEDOGAN GROUPE C",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "323 Rue de la fraternité, à côté de l’EPP Agbalepedogan groupe CAgbalépédoganLomé - Togo",
         "telephone": "+228 99 98 20 87",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18802778,1.1951",
@@ -1331,7 +1331,7 @@
     },
     {
         "nom": "PHARMACIE AGBEGNIGAN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la libération, près de Bamaco - TokoinTokoin RamcoLomé - Togo",
         "telephone": "+228 70 20 00 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14705556,1.2",
@@ -1409,7 +1409,7 @@
     },
     {
         "nom": "PHARMACIE AKOFA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "2030, Av. Maman N'danida, près de la station TOTALAmoutiévé - BP 514 loméLomé - Togo",
         "telephone": "+228 22 40 66 68",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14319444,1.2298",
@@ -1448,7 +1448,7 @@
     },
     {
         "nom": "PHARMACIE ALTA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route Mission Tove, face à CCL, Agoé AnonkuiMaritimeLomé - Togo",
         "telephone": "+228 70 08 46 46",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24291667,1.1865",
@@ -1487,7 +1487,7 @@
     },
     {
         "nom": "PHARMACIE AMEN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Kladjémé, à côté de l'Eglise CatholiqueAdétikopéLomé - Togo",
         "telephone": "+228 90 88 55 88",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.32019444,1.2234",
@@ -1526,7 +1526,7 @@
     },
     {
         "nom": "PHARMACIE AMESSIAME",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1558, Bd. Félix Houphouët-Boigny, près du Marché de Bè, à côté des feux tricolores - AmoutiveBè Pa de Souza - BP 61720Lomé - Togo",
         "telephone": "+228 22 21 49 74",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14354722,1.2442",
@@ -1565,7 +1565,7 @@
     },
     {
         "nom": "PHARMACIE APOLLON",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin du Complexe Scolaire MAKAFUIAmadahomé - 08 BP 80507Lomé - Togo",
         "telephone": "+228 22 31 01 07",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20283333,1.1",
@@ -1604,7 +1604,7 @@
     },
     {
         "nom": "PHARMACIE APOTHEKA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "5122, Bd. Jean Paul II, face siège Fédération Togolaise de FootballKégué - 03 BP 31124Lomé - Togo",
         "telephone": "+228 70 44 33 33",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19558333,1.2",
@@ -1682,7 +1682,7 @@
     },
     {
         "nom": "PHARMACIE ARC-EN-CIEL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route vakpo, non loin du carrefour MargotAgoè Téléssou - 05 BP 670Lomé - Togo",
         "telephone": "+228 22 42 50 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21202778,1.1673",
@@ -1721,7 +1721,7 @@
     },
     {
         "nom": "PHARMACIE ASSURANCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de la Nationale N° 1 non loin du marché d’AdétikopéAdétikopé - 10 BP 10019 LoméLomé - Togo",
         "telephone": "+228 96 82 76 76",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.32197222,1.2175",
@@ -1760,7 +1760,7 @@
     },
     {
         "nom": "PHARMACIE AUREOLE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Carrefour de l'école primaire du camp GPAgoè DaliméLomé - Togo",
         "telephone": "+228 22 55 96 43",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23192482,1.1687",
@@ -1799,7 +1799,7 @@
     },
     {
         "nom": "PHARMACIE AURORE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Lankouvi, non loin de l'école de la Divine providenceYokoèLomé - Togo",
         "telephone": "+228 71 00 75 75",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17330765,1.1311",
@@ -1838,7 +1838,7 @@
     },
     {
         "nom": "PHARMACIE AVE MARIA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av de la victoire, face école des sages femmesTokoin Hôpital - BP 80283Lomé - Togo",
         "telephone": "+228 99 03 20 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14402778,1.2060",
@@ -1877,7 +1877,7 @@
     },
     {
         "nom": "PHARMACIE AVEPOZO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route Nationale N°2, A 600m du Restaurant Alice, En face du Frigo Sea FoodAvépozo - 04 BP 353Lomé - Togo",
         "telephone": "+228 22 27 04 86",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16974444,1.3453",
@@ -1916,7 +1916,7 @@
     },
     {
         "nom": "PHARMACIE AZUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin du carrefour Obena, Apédokoè-GbomaméLomé - Togo",
         "telephone": "+228 92 80 53 26",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20038889,1.1321",
@@ -1965,7 +1965,7 @@
     },
     {
         "nom": "PHARMACIE BAGUIDA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rte Baguida-DévégBaguida - BP 60767Lomé - Togo",
         "telephone": "+228 22 35 47 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1701,1.32581",
@@ -2004,9 +2004,9 @@
     },
     {
         "nom": "PHARMACIE BAH",
-        "statut_actuel": "Fermé",
-        "adresse": "2481, Bd. du Zio, Face EPP HédzranawoéHédzranawoé - 08 BP 20519 LoméLomé - Togo",
-        "telephone": "+228 22 36 90 75",
+        "statut_actuel": "Ouvert",
+        "adresse": "73, Bd. du Zio, Face EPP HédzranawoéHédzranawoé - BP 20519 LoméLomé - Togo",
+        "telephone": "+228 22 26 03 20",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18708333,1.2376",
         "latitude": 6.18708333,
         "longitude": 1.2376,
@@ -2053,7 +2053,7 @@
     },
     {
         "nom": "PHARMACIE BEL AIR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1, Rue du Commerce, non loin de l'Hôtel Palm BeachAdawlato - BP 13115Lomé - Togo",
         "telephone": "+228 22 21 03 21",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12340278,1.2232",
@@ -2102,7 +2102,7 @@
     },
     {
         "nom": "PHARMACIE BESDA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. 30 Août, Non loin de ANANIS et FilsAdidogomé - 04 BP 604 LoméLomé - Togo",
         "telephone": "+228 22 51 05 29",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19580556,1.1542",
@@ -2141,7 +2141,7 @@
     },
     {
         "nom": "PHARMACIE BETANIA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue SITO, non loin de la salle des Témoins de Jehovah - TotsiviGblinkomé - 18 BP 341 Lomé AvédjiLomé - Togo",
         "telephone": "+228 70 43 89 40",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19388889,1.1797",
@@ -2180,7 +2180,7 @@
     },
     {
         "nom": "PHARMACIE BETHEL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du 30 Août, face agence sanlamAflao-Soviépé - BP 1238Lomé - Togo",
         "telephone": "+228 22 41 30 48",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17563889,1.1808",
@@ -2219,7 +2219,7 @@
     },
     {
         "nom": "PHARMACIE BIEN-ETRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du Haho, non loin de CIB-INTA, en face de la mairie Suprême Chin HaiHédzranawoé - BP 2933Lomé - Togo",
         "telephone": "+228 22 26 45 16",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17969444,1.2390",
@@ -2258,7 +2258,7 @@
     },
     {
         "nom": "PHARMACIE BIOVA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Félix Houphouet Boigny, Rnon loin de la clinique BarouetGbényédji - 06 BP 61347Lomé - Togo",
         "telephone": "+228 70 23 19 23",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15094444,1.2605",
@@ -2297,7 +2297,7 @@
     },
     {
         "nom": "PHARMACIE BON PASTEUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "40, Av. de la Libération, Non loin de la Cms Sainte BAKHITAAssivito - BP 13485 loméLomé - Togo",
         "telephone": "+228 22 21 13 67",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12909444,1.2243",
@@ -2336,7 +2336,7 @@
     },
     {
         "nom": "PHARMACIE BON SECOURS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue de l'Est Mono à côté de GlobalTokoin Cassablanca - BP 8526Lomé - Togo",
         "telephone": "+228 70 45 76 74",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15372222,1.2036",
@@ -2375,7 +2375,7 @@
     },
     {
         "nom": "PHARMACIE CAMPUS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd de la Kara, à côté de UTBTokoin DoumassésséLomé - Togo",
         "telephone": "+228 93 38 08 84",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16283333,1.2133",
@@ -2414,7 +2414,7 @@
     },
     {
         "nom": "PHARMACIE CHINOISE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "En face du CampAdidogomé - s/c BP 1222Lomé - Togo",
         "telephone": "+228 92 11 33 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18651667,1.1647",
@@ -2453,7 +2453,7 @@
     },
     {
         "nom": "PHARMACIE CHRIST ROI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Haute tension, face Fucec KagoméKagomé - BP 1409 LoméLomé - Togo",
         "telephone": "+228 22 27 46 66",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16985,1.3006",
@@ -2492,7 +2492,7 @@
     },
     {
         "nom": "PHARMACIE CITRUS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Yayrakomé Sur Le Grand ContournementAttiégouLomé - Togo",
         "telephone": "+228 22 57 32 32",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20008333,1.2636",
@@ -2531,7 +2531,7 @@
     },
     {
         "nom": "PHARMACIE CLEMENCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Sur la route de la CEET, à droite de l'école la sourceAgoè RéserveLomé - Togo",
         "telephone": "+228 70 19 35 35",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22002778,1.1994",
@@ -2570,12 +2570,12 @@
     },
     {
         "nom": "PHARMACIE COMMUNAUTAIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Derrière l'Eglise Catholique, En face de l'Ecole Primaire de KlikaméBè KlikaméLomé - Togo",
         "telephone": "+228 90 32 71 81",
         "itineraire_google_maps": "",
-        "latitude": 6.2151566,
-        "longitude": 1.1718729,
+        "latitude": 6.2180714,
+        "longitude": 1.0772733,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -2609,7 +2609,7 @@
     },
     {
         "nom": "PHARMACIE CONSEIL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route douane segbe, au carrefour Sagbado LogotéSagbadoLomé - Togo",
         "telephone": "+228 93 10 92 92",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19413889,1.1288",
@@ -2648,7 +2648,7 @@
     },
     {
         "nom": "PHARMACIE CRISTAL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "2214, Bd. Félix Houphouet Boigny, face EPP Bè AklassouBè Houvémé - 05 BP 216Lomé - Togo",
         "telephone": "+228 22 20 90 91",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.147325,1.248938",
@@ -2687,7 +2687,7 @@
     },
     {
         "nom": "PHARMACIE D'AKODESSEWA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Mobutu Séssé Séko, non loin du feux tricolores akodessewaMaritime - BP 1814 loméLomé - Togo",
         "telephone": "+228 22 27 45 75",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15319444,1.2673",
@@ -2736,7 +2736,7 @@
     },
     {
         "nom": "PHARMACIE DAFEANNE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin de Pater volontasAgoè SogbossitoLomé - Togo",
         "telephone": "+228 92 62 44 44",
         "itineraire_google_maps": "",
@@ -2775,7 +2775,7 @@
     },
     {
         "nom": "PHARMACIE DE KODJOVIAKOPE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1112, Av. de Duisburg, Non loin du Feux Rouge - KodjoviakopeKodjoviakopé - BP 3697Lomé - Togo",
         "telephone": "+228 22 21 89 90",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1217977,1.20917",
@@ -2824,7 +2824,7 @@
     },
     {
         "nom": "PHARMACIE DE L'AMITIE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "72, Av. des Hydrocarbures, non loin de la Station T-OilTokoin Soted - BP 8648Lomé - Togo",
         "telephone": "+228 22 21 74 47",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15383333,1.2228",
@@ -2863,7 +2863,7 @@
     },
     {
         "nom": "PHARMACIE DE L'EDEN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route d'Aného, face Cité BaguidaBaguida - 03 BP 3295 Lomé 03Lomé - Togo",
         "telephone": "+228 22 27 53 55",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16131111,1.3156",
@@ -2902,7 +2902,7 @@
     },
     {
         "nom": "PHARMACIE DE L'ESPERANCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Joseph Strauss, Rue de I'Ogou, en face du Lycée FrançaisNyékonakpoé - BP 719Lomé - Togo",
         "telephone": "+228 22 21 01 28",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13047222,1.1968",
@@ -2941,7 +2941,7 @@
     },
     {
         "nom": "PHARMACIE DE L'ESPOIR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Derrière la MairieKara - BP 443Kara - Togo",
         "telephone": "+228 26 60 14 15",
         "itineraire_google_maps": "https://maps.google.com?daddr=9.54712632,1.1892",
@@ -2990,7 +2990,7 @@
     },
     {
         "nom": "PHARMACIE DE L'UNION",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. de l'oti face au rond point kpota cimétièreBè Kpota - 01 BP 2735Lomé - Togo",
         "telephone": "+228 22 27 71 64",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16038889,1.2",
@@ -3029,7 +3029,7 @@
     },
     {
         "nom": "PHARMACIE DE LA CHARITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route d'Assiyéyé, non loin de CEG Agoé CentreAgoè Assiyéyé - BP 7856Lomé - Togo",
         "telephone": "+228 22 25 12 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22566667,1.2049",
@@ -3068,7 +3068,7 @@
     },
     {
         "nom": "PHARMACIE DE LA CITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du 30 Août, face à la LONATO, Cité Maman N'danidaAvénou - BP 8461Lomé - Togo",
         "telephone": "+228 22 25 01 25",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1713,1.19008",
@@ -3107,7 +3107,7 @@
     },
     {
         "nom": "PHARMACIE DE LA CONFIANCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la Chance, face GTAAgbalépédo - BP 8574Lomé - Togo",
         "telephone": "+228 70 15 78 46",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.191509,1.208355",
@@ -3146,7 +3146,7 @@
     },
     {
         "nom": "PHARMACIE DE LA GARE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "En face du Grand MarchéPlateaux - BP 290Kpalimé - Togo",
         "telephone": "+228 24 41 01 20",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.90690795,0.6339",
@@ -3185,7 +3185,7 @@
     },
     {
         "nom": "PHARMACIE DE LA LIBERATION",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "199, Av. de la Libération, Angle Rue Warani, à côté de l'OPSTokoin Ramco - BP 12045Lomé - Togo",
         "telephone": "+228 22 22 25 25",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1536,1.21719",
@@ -3224,7 +3224,7 @@
     },
     {
         "nom": "PHARMACIE DE LA MAIRIE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "39, Av. Nicolas Grunitzky, face à la MairieNyékonakpoé - BP 3295Lomé - Togo",
         "telephone": "+228 22 21 26 39",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13126667,1.2146",
@@ -3302,7 +3302,7 @@
     },
     {
         "nom": "PHARMACIE DE LA NATION",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue livingstone, Av. de PyaTotsi - BP 81232Lomé - Togo",
         "telephone": "+228 22 25 99 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19222222,1.1909",
@@ -3341,7 +3341,7 @@
     },
     {
         "nom": "PHARMACIE DE LA PAIX",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Akei, à l'entrée sud de la caisse, residence du BéninBP 1152 loméLomé - Togo",
         "telephone": "+228 22 26 40 91",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16925,1.2259",
@@ -3380,7 +3380,7 @@
     },
     {
         "nom": "PHARMACIE DE LA PROVIDENCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "79, Bd. Jean Paul II, à côté de CECATokoin Nukafu - 01 BP 440 Lomé 01Lomé - Togo",
         "telephone": "+228 22 26 66 48",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16069444,1.2338",
@@ -3419,7 +3419,7 @@
     },
     {
         "nom": "PHARMACIE DE LA VICTOIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin des Rails, Avédji wessoméAvédji - 18 BP 278Lomé - Togo",
         "telephone": "+228 70 45 74 92",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19266389,1.1714",
@@ -3458,7 +3458,7 @@
     },
     {
         "nom": "PHARMACIE DE SEGBE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route douane-Ségbé, à côté de l'EPP SégbéLomé - Togo",
         "telephone": "+228 92 59 49 35",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19127778,1.1212",
@@ -3497,12 +3497,12 @@
     },
     {
         "nom": "PHARMACIE DE TCHAOUDJO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Place du grand Marché, ZongoBP 295Sokodé - Togo",
         "telephone": "+228 25 50 02 45",
         "itineraire_google_maps": "",
-        "latitude": null,
-        "longitude": null,
+        "latitude": 7.5866312,
+        "longitude": 1.2598478,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -3536,7 +3536,7 @@
     },
     {
         "nom": "PHARMACIE DELALI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Face Hopital District 5 - AgbalepedoganAgoè Cacavéli - 04 BP 225 Lomé 04Lomé - Togo",
         "telephone": "+228 22 34 23 96",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20779444,1.1952",
@@ -3575,7 +3575,7 @@
     },
     {
         "nom": "PHARMACIE DENIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Au carrefour KPOGBI à droiteAgoèLomé - Togo",
         "telephone": "+228 93 08 46 40",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24763889,1.1",
@@ -3614,7 +3614,7 @@
     },
     {
         "nom": "PHARMACIE DEO GRATIAS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Kpatcha, à 200mKégué - BP 1128 LoméLomé - Togo",
         "telephone": "+228 96 80 08 93",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20680125,1.2389",
@@ -3653,7 +3653,7 @@
     },
     {
         "nom": "PHARMACIE DES APOTRES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "49, Bd. Mobutu Séssé Séko, non loin de Don BoscoAkodésséwa - 18 BP 332Lomé - Togo",
         "telephone": "+228 70 45 38 05",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14608333,1.2663",
@@ -3692,7 +3692,7 @@
     },
     {
         "nom": "PHARMACIE DES ECOLES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "30 Aout face lycée techniqueAdidogomé - 04 BP 74 LoméLomé - Togo",
         "telephone": "+228 22 51 75 75",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19208056,1.1583",
@@ -3731,7 +3731,7 @@
     },
     {
         "nom": "PHARMACIE DES ETOILES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "10, Av. de la Nouvelle MarcheBP 3484Lomé - Togo",
         "telephone": "+228 22 22 45 04",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.132,1.",
@@ -3770,7 +3770,7 @@
     },
     {
         "nom": "PHARMACIE DES LILAS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "7, Bd. Jean Paul II, non loin de l'ambassade du Gabon, face du camp Lomé 2Hédzranawoé - 03 BP 31000 lomé 03Lomé - Togo",
         "telephone": "+228 22 26 29 59",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.183,1.235333",
@@ -3809,7 +3809,7 @@
     },
     {
         "nom": "PHARMACIE DES ROSES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Carrefour de l'union à coté de la station CM TélessouVakpossito - 05 BP 854Lomé - Togo",
         "telephone": "+228 22 37 38 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21891111,1.1691",
@@ -3848,7 +3848,7 @@
     },
     {
         "nom": "PHARMACIE DIEUDONNE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de l'entreprise de l'union, à côté de CAP TéléssouAgoè Téléssou - BP 7951Lomé - Togo",
         "telephone": "+228 23 38 07 44",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21575,1.1722",
@@ -3887,7 +3887,7 @@
     },
     {
         "nom": "PHARMACIE DIVINA GRACIA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Zanguéra, von face au marché, au carrefour Cool KatchéAgoè Fiovi - 13 BP 52 loméLomé - Togo",
         "telephone": "+228 22 45 79 69",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20869444,1.1993",
@@ -3926,7 +3926,7 @@
     },
     {
         "nom": "PHARMACIE DJIDJOLE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Pya, face à l'hôtel mboloaniDjidjolé - BP 8363Lomé - Togo",
         "telephone": "+228 22 25 65 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18052222,1.1955",
@@ -3965,7 +3965,7 @@
     },
     {
         "nom": "PHARMACIE DODJI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Ségbé, Immeuble Akato Plage, non loin de l'Église Catholique d'AkatoSégbéLomé - Togo",
         "telephone": "+228 70 29 16 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18769444,1.1054",
@@ -4004,7 +4004,7 @@
     },
     {
         "nom": "PHARMACIE DU BOULEVARD",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du 13 Janvier, Rue Akrowa, Face à la direction NSIA BanqueDékon - BP 1073 LoméLomé - Togo",
         "telephone": "+228 22 21 65 49",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1362,1",
@@ -4082,7 +4082,7 @@
     },
     {
         "nom": "PHARMACIE DU CENTRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "46, Rue de la Gare, à côté de la Banque Atlantique, en face du WATTAssivito - BP 373Lomé - Togo",
         "telephone": "+228 22 21 83 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12833333,1.2217",
@@ -4121,7 +4121,7 @@
     },
     {
         "nom": "PHARMACIE DU CHATEAU D'EAU",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Augustino de Souza, carrefour Bè châteauBè Château - BP 60141Lomé - Togo",
         "telephone": "+228 96 80 08 88",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13719722,1.2489",
@@ -4160,7 +4160,7 @@
     },
     {
         "nom": "PHARMACIE DU GRAND MARCHE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "27, Angle rue du Grand Marché, Av. de la Libération, non loin du CMS Sainte Bakhita01BP 376 Lomé 01Lomé - Togo",
         "telephone": "+228 22 21 26 36",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12575,1.2",
@@ -4204,12 +4204,12 @@
         "telephone": "+228 70 53 34 81",
         "itineraire_google_maps": "",
         "latitude": 6.8214851,
-        "longitude": 1.184299,
+        "longitude": 1.1820874,
         "horaires_ouverture": []
     },
     {
         "nom": "PHARMACIE DU MILLENAIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "654Q+QR6MaritimeLomé - Togo",
         "telephone": "+228 22 51 64 31",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.206914,1.189",
@@ -4248,7 +4248,7 @@
     },
     {
         "nom": "PHARMACIE DU NOUVEAU MARCHE KARA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "BP 32 KaraKaraKara - Togo",
         "telephone": "+228 93 27 77 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=9.5561244,1.19182",
@@ -4287,7 +4287,7 @@
     },
     {
         "nom": "PHARMACIE DU PEUPLE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Santigou - NoukafouTokoin Nukafu - BP 61217Lomé - Togo",
         "telephone": "+228 22 26 84 22",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1589,1.23833",
@@ -4336,7 +4336,7 @@
     },
     {
         "nom": "PHARMACIE DU PORT",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du Mono, Face hôtel SARAKAWAAblogamé - BP 12999Lomé - Togo",
         "telephone": "+228 22 27 10 78",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1382,1.26",
@@ -4375,7 +4375,7 @@
     },
     {
         "nom": "PHARMACIE DU ZIO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "National N°1, en face l’Eglise Catholique, après la station d'essenceBP 48Tsévié - Togo",
         "telephone": "+228 23 30 41 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.4277535,1.20668",
@@ -4414,7 +4414,7 @@
     },
     {
         "nom": "PHARMACIE ECLAIR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Avévonou, près du marché Ahligo - AblogameBè Ahligo - BP 3924Lomé - Togo",
         "telephone": "+228 22 22 75 11",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14249444,1.2569",
@@ -4453,7 +4453,7 @@
     },
     {
         "nom": "PHARMACIE EL SHADAI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la chance, à côté de la poste, face ESTAOAtikoumé - 22 BP 32 LoméLomé - Togo",
         "telephone": "+228 96 80 09 10",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16947222,1.2030",
@@ -4492,7 +4492,7 @@
     },
     {
         "nom": "PHARMACIE EL SHAMMAH",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Derrière la maison des jeunesAmadahoméLomé - Togo",
         "telephone": "+228 90 28 29 89",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20894444,1.1599",
@@ -4531,7 +4531,7 @@
     },
     {
         "nom": "PHARMACIE EL-NISSI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin de la base de EhomafAdidogoméLomé - Togo",
         "telephone": "+228 70 17 97 08",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21308333,1.1344",
@@ -4570,7 +4570,7 @@
     },
     {
         "nom": "PHARMACIE EL-SALI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue du 30 Aout, à 150m de Maco, en allant vers KpaliméAtilamonouLomé - Togo",
         "telephone": "+228 70 12 44 44",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22013889,1.1251",
@@ -4609,7 +4609,7 @@
     },
     {
         "nom": "PHARMACIE ELEMAWUSSI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Nationale N°1, avant PIA à droite en allant vers Tservie, adétikopé-medinaAdétikopé - 08 BP 8310 LoméLomé - Togo",
         "telephone": "+228 92 34 06 80",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.33730556,1.2070",
@@ -4648,7 +4648,7 @@
     },
     {
         "nom": "PHARMACIE ELI-BERACA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du 30 Août, en face de la poste, Imm. SIKOVICAdidogomé - 04 BP 96Lomé - Togo",
         "telephone": "+228 22 51 99 61",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.180725,1.172083",
@@ -4691,13 +4691,13 @@
         "adresse": "En face de LYATA, Carrefour Y, immeuble CIB-INTAAtakpamé - Togo",
         "telephone": "+228 71 56 00 00",
         "itineraire_google_maps": "",
-        "latitude": 7.5318591,
-        "longitude": 1.1221556,
+        "latitude": 6.8704342,
+        "longitude": 1.1410307,
         "horaires_ouverture": []
     },
     {
         "nom": "PHARMACIE EMMANUEL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "637, Av. Duisbourg, face Eglise Christ RoiKodjoviakopé - BP 12440 LoméLomé - Togo",
         "telephone": "+228 22 21 30 98",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12016667,1.2",
@@ -4736,7 +4736,7 @@
     },
     {
         "nom": "PHARMACIE EMMAUS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Mission-Tové, non loin de la Station TotalAgoè Assiyéyé - BP 20492Lomé - Togo",
         "telephone": "+228 70 40 25 40",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23593445,1.1940",
@@ -4775,7 +4775,7 @@
     },
     {
         "nom": "PHARMACIE ENOULI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue de la Gare Routière coté nord-ouestAgbalépédogan - BP 8613Lomé - Togo",
         "telephone": "+228 22 25 90 68",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20057222,1.2015",
@@ -4814,7 +4814,7 @@
     },
     {
         "nom": "PHARMACIE EPIPHANIA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Lapampa, carrefour AgbémadonAdidogomé - 04 BP 30446Lomé - Togo",
         "telephone": "+228 22 25 02 62",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18053333,1.1635",
@@ -4853,7 +4853,7 @@
     },
     {
         "nom": "PHARMACIE ESPACE VIE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue koshigan menant à l'entreprise de l'union située entre BKS2 et Fabrik briquesAgoè Logopé - BP 81538Lomé - Togo",
         "telephone": "+228 22 32 87 20",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22944444,1.1779",
@@ -4931,7 +4931,7 @@
     },
     {
         "nom": "PHARMACIE EXCELLENCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Grand contournement carrefour Seperepe juste après la passerelle allant vers SogbossitoAgoè Démakpoé - 05 BP 977Lomé - Togo",
         "telephone": "+228 93 27 95 54",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24269444,1.1981",
@@ -4980,7 +4980,7 @@
     },
     {
         "nom": "PHARMACIE FOREVER",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Avenue Kondona, non loin de garage CentralTokoin Forever - 01 BP 4884 Lomé 01Lomé - Togo",
         "telephone": "+228 91 00 29 17",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15952778,1.2263",
@@ -5019,7 +5019,7 @@
     },
     {
         "nom": "PHARMACIE GANFAT",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue. atiomé, après le carrefour Edem28 BP 215 LOME 28Lomé - Togo",
         "telephone": "+228 70 22 15 15",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23733333,1.1627",
@@ -5058,7 +5058,7 @@
     },
     {
         "nom": "PHARMACIE GBEZE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Feu rouge Novissi, Jean Paul IITokoin Novissi - BP 30035Lomé - Togo",
         "telephone": "+228 22 26 32 61",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17107778,1.2346",
@@ -5097,7 +5097,7 @@
     },
     {
         "nom": "PHARMACIE GRATITUDE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Grand contournement non loin du carrefour avinato à 100m de la clinique OASISAgoè LégbassitoLomé - Togo",
         "telephone": "+228 92 18 94 85",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2645,1.13602",
@@ -5253,7 +5253,7 @@
     },
     {
         "nom": "PHARMACIE HEDZRANAWOE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. du Grand Seminaire, non loin de l'agence Fucec TogoHédzranawoé - BP 20326Lomé - Togo",
         "telephone": "+228 96 80 09 27",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17969444,1.2",
@@ -5331,7 +5331,7 @@
     },
     {
         "nom": "PHARMACIE HOPITAL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue face à l'entrée CHU OlympiaTokoin Hôpital - BP 12045Lomé - Togo",
         "telephone": "+228 22 20 08 08",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14444444,1.2091",
@@ -5370,7 +5370,7 @@
     },
     {
         "nom": "PHARMACIE HORIZON",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "08, Bd. du 13 Janvier, à côté de Domingo, en face des Sapeurs PompiersNyékonakpoé - 08 BP 81726Lomé - Togo",
         "telephone": "+228 22 20 42 42",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12895,1.2107",
@@ -5448,7 +5448,7 @@
     },
     {
         "nom": "PHARMACIE HYGEA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Face au Lycée de BaguidaBaguidaLomé - Togo",
         "telephone": "+228 99 27 36 36",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17841667,1.3300",
@@ -5487,7 +5487,7 @@
     },
     {
         "nom": "PHARMACIE INTERNATIONALE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1180, Bd. du Haho, près du marché, non loin de Coris BankHédzranawoé - BP 1344Lomé - Togo",
         "telephone": "+228 71 00 09 09",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18322945,1.2410",
@@ -5526,7 +5526,7 @@
     },
     {
         "nom": "PHARMACIE IRIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin de CAP amadahomé allant vers les railsAmadahoméLomé - Togo",
         "telephone": "+228 91 68 48 04",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20288889,1.1612",
@@ -5565,7 +5565,7 @@
     },
     {
         "nom": "PHARMACIE ISIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd Jean Paul II, face CEMTokoin Nukafu - BP 80121Lomé - Togo",
         "telephone": "+228 70 44 83 87",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15775,1.2333",
@@ -5604,7 +5604,7 @@
     },
     {
         "nom": "PHARMACIE JAHNAP",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Pya à côté de l'EPP aflao gahliDjidjolé - BP 81221Lomé - Togo",
         "telephone": "+228 22 51 22 86",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18333333,1.1862",
@@ -5643,7 +5643,7 @@
     },
     {
         "nom": "PHARMACIE JEANNE D'ARC",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du momo, Imm Bay Marina, face à la merBéniglato - BP 1012 loméLomé - Togo",
         "telephone": "+228 22 22 08 01",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12727778,1.2358",
@@ -5682,7 +5682,7 @@
     },
     {
         "nom": "PHARMACIE JUSTINE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "291, Bd. des ArméesTokoin Habitat - 08 BP 8021Lomé - Togo",
         "telephone": "+228 22 21 00 01",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14705,1.2069",
@@ -5731,7 +5731,7 @@
     },
     {
         "nom": "PHARMACIE KEGUE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Nazod, non loin de la Station KéguéKégué - 02 BP 20600 Lomé 02Lomé - Togo",
         "telephone": "+228 22 26 04 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20947222,1.2413",
@@ -5784,8 +5784,8 @@
         "adresse": "A 100m à droite après cap, ketaoLomé - Togo",
         "telephone": "+228 70 29 03 70",
         "itineraire_google_maps": "",
-        "latitude": 6.1694423,
-        "longitude": 1.1311353,
+        "latitude": 6.1922697,
+        "longitude": 1.1825489,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -5819,7 +5819,7 @@
     },
     {
         "nom": "PHARMACIE KLOKPE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Derrière Foire, TOGO 2000AttiégouLomé - Togo",
         "telephone": "+228 96 80 10 03",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1913,1.26079",
@@ -5868,7 +5868,7 @@
     },
     {
         "nom": "PHARMACIE KOUESSAN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Jean Paul II, Face au stade de KéguéKégué - BP 80857Lomé - Togo",
         "telephone": "+228 22 52 11 90",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20355556,1.2418",
@@ -5907,12 +5907,12 @@
     },
     {
         "nom": "PHARMACIE KOZAH",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Kpinboua, face BCEAOKara - Togo",
         "telephone": "+228 26 60 61 66",
         "itineraire_google_maps": "",
-        "latitude": 9.549366,
-        "longitude": 1.189666,
+        "latitude": null,
+        "longitude": null,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -5946,7 +5946,7 @@
     },
     {
         "nom": "PHARMACIE LA BARAKA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "A côté de l'école LA BRUYÈRE non loin du camp GPAgoè Logopé - 05 BP 666Lomé - Togo",
         "telephone": "+228 90 17 49 28",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2421044,1.16860",
@@ -5985,7 +5985,7 @@
     },
     {
         "nom": "PHARMACIE LA FLAMME D'AMOUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd du Mono Près de SANOL, AgodékèLomé - Togo",
         "telephone": "+228 70 45 70 14",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17669444,1.3685",
@@ -6024,7 +6024,7 @@
     },
     {
         "nom": "PHARMACIE LA FRATERNITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "72, Bd. du Haho, Près de la Clinique St Joseph, à côté de CIB-INTAHédzranawoé - 08 BP 80326 Lomé 08Lomé - Togo",
         "telephone": "+228 22 26 81 55",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17346389,1.2410",
@@ -6063,7 +6063,7 @@
     },
     {
         "nom": "PHARMACIE LA MAIN DE DIEU",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd CEDEAO, Non loin l'église AD AssiyéyéAgoè Assiyéyé - 13 BP 523 LoméLomé - Togo",
         "telephone": "+228 93 40 21 21",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23498611,1.2003",
@@ -6102,7 +6102,7 @@
     },
     {
         "nom": "PHARMACIE LA MISERICORDE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1012, Bd. de l'Oti, non loin de la station MRSBè Kpota - BP 8223Lomé - Togo",
         "telephone": "+228 96 80 09 45",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15683333,1.2526",
@@ -6141,7 +6141,7 @@
     },
     {
         "nom": "PHARMACIE LA NOUVELLE TULIPE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Voie du grand contournement à coté de CAP ahonkpoè, agoè-légbassitoMaritime - BP 12026 LoméLomé - Togo",
         "telephone": "+228 99 47 00 70",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.26083333,1.1",
@@ -6219,7 +6219,7 @@
     },
     {
         "nom": "PHARMACIE LA PROSPERITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd Eyadema, non loin de Eda ObaTokoin Lycée - 08 BP 80272 Lomé 08Lomé - Togo",
         "telephone": "+228 70 44 86 96",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15285278,1.2294",
@@ -6268,7 +6268,7 @@
     },
     {
         "nom": "PHARMACIE LA RUCHE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Attiègou non loin de école les sAttiégouLomé - Togo",
         "telephone": "+228 91 54 16 16",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18886111,1.2554",
@@ -6307,7 +6307,7 @@
     },
     {
         "nom": "PHARMACIE LA SCHEKINAH",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Zanguéra menant à Amadenta, Carrefour EPP AmadentaLomé - Togo",
         "telephone": "+228 93 33 92 05",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24775,1.1398",
@@ -6346,7 +6346,7 @@
     },
     {
         "nom": "PHARMACIE LA TULIPE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Notre Dame des Apôtres, Non loin de Fucec de bè marchéBè Kpéhénou - BP 12026Lomé - Togo",
         "telephone": "+228 22 21 07 22",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14042222,1.2408",
@@ -6390,7 +6390,7 @@
         "telephone": "+228 24 42 01 27",
         "itineraire_google_maps": "",
         "latitude": 6.2292979,
-        "longitude": 0.0244957,
+        "longitude": 0.601278,
         "horaires_ouverture": []
     },
     {
@@ -6405,7 +6405,7 @@
     },
     {
         "nom": "PHARMACIE LAUS DEO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rte de Léo 2000, face à la Clinique Bethesda, prés de Millénium Gym CenterAdidoadin - 05 BP 21Lomé - Togo",
         "telephone": "+228 22 25 15 05",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20705556,1.1831",
@@ -6444,7 +6444,7 @@
     },
     {
         "nom": "PHARMACIE LAVOISIER",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route d’Atakpamé, Rond Point TEXACOKpalimé - Togo",
         "telephone": "+228 24 41 04 41",
         "itineraire_google_maps": "",
@@ -6493,7 +6493,7 @@
     },
     {
         "nom": "PHARMACIE LE DESTIN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route d'Aneho, Imm. ECOBANKBaguida - 01 BP 2691Lomé - Togo",
         "telephone": "+228 22 41 15 41",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16444444,1.3271",
@@ -6532,7 +6532,7 @@
     },
     {
         "nom": "PHARMACIE LE GALIEN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin de Jess HôtelAdidoadin - 05 BP 92Lomé - Togo",
         "telephone": "+228 22 51 71 71",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20124722,1.1881",
@@ -6571,7 +6571,7 @@
     },
     {
         "nom": "PHARMACIE LE JOURDAIN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Léopold Sedar Senghor, face CEG WuitiTokoin Wuiti - 03 BP 30766Lomé - Togo",
         "telephone": "+228 22 61 56 14",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16775,1.2319",
@@ -6610,7 +6610,7 @@
     },
     {
         "nom": "PHARMACIE LE PROGRES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Grand contournement, en face de EPL Universel - KanyikopeAkodésséwa Kponou - 06 BP 60986Lomé - Togo",
         "telephone": "+228 22 35 86 55",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16680556,1.2832",
@@ -6649,7 +6649,7 @@
     },
     {
         "nom": "PHARMACIE LE ROCHER",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Nationale N°1, Face hôpital Saint PelligriniAgoè ZongoLomé - Togo",
         "telephone": "+228 92 30 06 56",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24633333,1.2093",
@@ -6688,7 +6688,7 @@
     },
     {
         "nom": "PHARMACIE LE SAUVEUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de NassableBP 11Dapaong - Togo",
         "telephone": "+228 27 70 87 62",
         "itineraire_google_maps": "https://maps.google.com?daddr=10.8688249,0.2022",
@@ -6727,7 +6727,7 @@
     },
     {
         "nom": "PHARMACIE LIDDY",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Bernard Kopé, Près de la station CAP, Agoè DikaméLomé - Togo",
         "telephone": "+228 70 90 19 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24155556,1.2",
@@ -6805,7 +6805,7 @@
     },
     {
         "nom": "PHARMACIE LUMIERE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. CEDEAO, carrefour œufAgbalépédo - 01 BP 225 Lomé 01Lomé - Togo",
         "telephone": "+228 22 25 15 26",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20130556,1.1951",
@@ -6844,7 +6844,7 @@
     },
     {
         "nom": "PHARMACIE M'BA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Mission tové à 200m du CEBAgoè LégbassitoLomé - Togo",
         "telephone": "+228 70 27 81 81",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.27169444,1.1488",
@@ -6883,7 +6883,7 @@
     },
     {
         "nom": "PHARMACIE MAA-LA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "à côté de l'école la Référence, grand carrefour de DémakpoèAgoè Démakpoé - BP 81171Lomé - Togo",
         "telephone": "+228 79 78 50 50",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.24027579,1.2039",
@@ -6922,7 +6922,7 @@
     },
     {
         "nom": "PHARMACIE MADINA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Jean Paul II, située entre UTB Novissi et Togo assistanceHédzranawoéLomé - Togo",
         "telephone": "+228 99 99 78 58",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17530556,1.2342",
@@ -6961,7 +6961,7 @@
     },
     {
         "nom": "PHARMACIE MAGNIFICAT",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route la Pampa, au carrefour dans l'immeuuble du complexe scolaire les championsAdidogomé - 08 BP 81688Lomé - Togo",
         "telephone": "+228 70 44 51 59",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1795,1.15038",
@@ -7000,7 +7000,7 @@
     },
     {
         "nom": "PHARMACIE MAINA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Massalassi, près de l'Hôpital Source de vieGblinkomé - 13 BP 263Lomé - Togo",
         "telephone": "+228 70 43 65 34",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19194444,1.1774",
@@ -7039,7 +7039,7 @@
     },
     {
         "nom": "PHARMACIE MATHILDA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue des Evalas, à coté de l'ODEFAgbalépédo - 05 BP 524Lomé - Togo",
         "telephone": "+228 22 51 15 34",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18241944,1.2001",
@@ -7078,7 +7078,7 @@
     },
     {
         "nom": "PHARMACIE MAWULE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. de l'Oti, 54, Rue 117, Ront Point Gakpoto, à droite à 20m en allant vers KpotaBè Kpota - BP 4908Lomé - Togo",
         "telephone": "+228 22 27 11 21",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15295556,1.2450",
@@ -7156,7 +7156,7 @@
     },
     {
         "nom": "PHARMACIE MILLENAIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "A côté de super RAMCOAgbalépédo - 05 BP 64 Lomé 05Lomé - Togo",
         "telephone": "+228 22 51 64 31",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20688889,1.1895",
@@ -7195,7 +7195,7 @@
     },
     {
         "nom": "PHARMACIE NABINE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Non loin du bar le PlateauAgoè AnoméLomé - Togo",
         "telephone": "+228 23 21 66 15",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21806667,1.1828",
@@ -7234,7 +7234,7 @@
     },
     {
         "nom": "PHARMACIE NELLY'S",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route Sanguera Segbé, non loin du château d'eau, Kleme-AgokpanouLomé - Togo",
         "telephone": "+228 92 01 11 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21425,1.1120",
@@ -7273,7 +7273,7 @@
     },
     {
         "nom": "PHARMACIE NOTRE DAME",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue 177 HDN, En face de la Rue 158 HDN, à côté de la maison du HadjHédzranawoé - 16 BP 363 Lomé 16Lomé - Togo",
         "telephone": "+228 22 42 74 04",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18244444,1.2551",
@@ -7312,7 +7312,7 @@
     },
     {
         "nom": "PHARMACIE NOTRE DAME DE LA TRINITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "32, Bd. de la Paix, non loin de la direction de Moov AfricaSuper-Taco - BP 60154Lomé - Togo",
         "telephone": "+228 92 13 26 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15159964,1.2389",
@@ -7351,7 +7351,7 @@
     },
     {
         "nom": "PHARMACIE NOTRE DAME DE LOURDES",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. de la CEDEAO, face à Stam TogoAgoè Anomé - 05 BP 107Lomé - Togo",
         "telephone": "+228 22 55 19 64",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21319444,1.1887",
@@ -7400,7 +7400,7 @@
     },
     {
         "nom": "PHARMACIE NOUVELLE SOKODE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rte de Bassar, à côté de LANDOZBP 103Sokodé - Togo",
         "telephone": "+228 25 50 12 57",
         "itineraire_google_maps": "",
@@ -7439,7 +7439,7 @@
     },
     {
         "nom": "PHARMACIE O GRAIN D'OR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Carrefour Zorrobar, Grand contournementAhadji KpotaLomé - Togo",
         "telephone": "+228 22 70 06 90",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15905556,1.2841",
@@ -7566,7 +7566,7 @@
     },
     {
         "nom": "PHARMACIE OSSAN",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Carrefour d'Avédji, Face Imm. LimousineAvédji - BP 869Lomé - Togo",
         "telephone": "+228 70 40 44 25",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20105556,1.1807",
@@ -7605,7 +7605,7 @@
     },
     {
         "nom": "PHARMACIE OUSIA POUR LA VIE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "964, Rue Tchamba, Face à SOGEA SATOMHountigoméLomé - Togo",
         "telephone": "+228 22 61 22 25",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16891111,1.2401",
@@ -7644,7 +7644,7 @@
     },
     {
         "nom": "PHARMACIE PENIEL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "En face d'Orabank, Place du MarchéBP 32Atakpamé - Togo",
         "telephone": "+228 24 40 02 44",
         "itineraire_google_maps": "https://maps.google.com?daddr=7.54969444,1.1221",
@@ -7693,7 +7693,7 @@
     },
     {
         "nom": "PHARMACIE POPULAIRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "27, Av. Sylvanus Olympio, non loin de l'ancienne gare routièreAdawlato - BP 847Lomé - Togo",
         "telephone": "+228 22 21 47 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.12535578,1.2282",
@@ -7771,7 +7771,7 @@
     },
     {
         "nom": "PHARMACIE PRINCIPALE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Face Hôtel Loris, Yovo KopeKpoganLomé - Togo",
         "telephone": "+228 90 82 67 67",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17802778,1.3753",
@@ -7810,12 +7810,12 @@
     },
     {
         "nom": "PHARMACIE RAOUDHA",
-        "statut_actuel": "Fermé",
-        "adresse": "4205, Bd. du Zio, non loin de la foire Togo 2000 - HedjranawoeHédzranawoé - 03 BP 30153Lomé - Togo",
-        "telephone": "+228 22 61 39 39",
-        "itineraire_google_maps": "https://maps.google.com?daddr=6.19473611,1.2536",
-        "latitude": 6.19473611,
-        "longitude": 1.2536,
+        "statut_actuel": "Ouvert",
+        "adresse": "4205, Bd. du Zio, non loin de la foire Togo 2000Hédzranawoé - 03 BP 30153Lomé - Togo",
+        "telephone": "+228 96 80 09 60",
+        "itineraire_google_maps": "https://maps.google.com?daddr=6.19463678,1.2541",
+        "latitude": 6.19463678,
+        "longitude": 1.2541,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
@@ -7849,7 +7849,7 @@
     },
     {
         "nom": "PHARMACIE REGINA PACIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "-Lomé - Togo",
         "telephone": "+228 90 72 76 61",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.31919444,1.2175",
@@ -7888,7 +7888,7 @@
     },
     {
         "nom": "PHARMACIE ROBERTSON",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "31, Av. François Mitterrand non loin de la station totalNyékonakpoé - 08 BP 81670 Lomé 08Lomé - Togo",
         "telephone": "+228 22 22 28 41",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13527778,1.2111",
@@ -7927,7 +7927,7 @@
     },
     {
         "nom": "PHARMACIE SAG'BIBA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Nanégbé, à côté de la station T-OilVakpossitoLomé - Togo",
         "telephone": "+228 22 55 73 17",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22846721,1.1566",
@@ -7966,7 +7966,7 @@
     },
     {
         "nom": "PHARMACIE SAINT ANTOINE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "1048, Av. de la Libération, Près de la Poste Centrale et de la station TOTALFréau Jardin - BP 2052Lomé - Togo",
         "telephone": "+228 22 21 29 64",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1325,1.22",
@@ -8005,36 +8005,36 @@
     },
     {
         "nom": "PHARMACIE SAINT ESPRIT",
-        "statut_actuel": "Fermé",
-        "adresse": "Rue KéguéLomé - Togo",
-        "telephone": "+228 70 40 29 06",
-        "itineraire_google_maps": "https://maps.google.com?daddr=6.22175,1.2222",
-        "latitude": 6.22175,
-        "longitude": 1.2222,
+        "statut_actuel": "Ouvert",
+        "adresse": "Rte Agoé-Kégué, derrière le Lycée Agoé-EstAgoè Kétidjan - BP 1246Lomé - Togo",
+        "telephone": "+228 22 40 29 06",
+        "itineraire_google_maps": "https://maps.google.com?daddr=6.22188889,1.2214",
+        "latitude": 6.22188889,
+        "longitude": 1.2214,
         "horaires_ouverture": [
             {
                 "jour": "Lundi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 20H00"
             },
             {
                 "jour": "Mardi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 20H00"
             },
             {
                 "jour": "Mercredi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 20H00"
             },
             {
                 "jour": "Jeudi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 20H00"
             },
             {
                 "jour": "Vendredi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 20H00"
             },
             {
                 "jour": "Samedi",
-                "heure": "07H30 — 19H00"
+                "heure": "07H00 — 13H00"
             },
             {
                 "jour": "Dimanche",
@@ -8044,7 +8044,7 @@
     },
     {
         "nom": "PHARMACIE SAINT JOSEPH",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la Chance, Rue BretelleBè Klikamé - BP 13000Lomé - Togo",
         "telephone": "+228 96 80 09 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17737222,1.2050",
@@ -8083,7 +8083,7 @@
     },
     {
         "nom": "PHARMACIE SAINT KISITO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. kara, non loin du carrefour 3KAdéwi - BP 31369Lomé - Togo",
         "telephone": "+228 22 21 99 63",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16440833,1.2204",
@@ -8122,7 +8122,7 @@
     },
     {
         "nom": "PHARMACIE SAINT MICHEL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Gnassimgbé Eyadema, Quartier agoè-cacaveli, près de NSIA BanqueAgoènyivé - 05 BP 201 Lomé 05Lomé - Togo",
         "telephone": "+228 22 51 70 22",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21533333,1.2085",
@@ -8161,7 +8161,7 @@
     },
     {
         "nom": "PHARMACIE SAINT PAUL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "60, Bd. Jean Paul II, à Côté du Collège St Joseph, près de l'UNHCR, en face du terrain de footTokoin Nukafu - BP 2717Lomé - Togo",
         "telephone": "+228 96 80 09 67",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.15183333,1.2322",
@@ -8210,7 +8210,7 @@
     },
     {
         "nom": "PHARMACIE SAINT PIERRE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "89, Bd. du Haho, SagbovilleHédzranawoé - 03 BP 30717Lomé - Togo",
         "telephone": "+228 22 26 19 73",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19572477,1.2463",
@@ -8269,7 +8269,7 @@
     },
     {
         "nom": "PHARMACIE SAINTE FAMILLE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue de la Gare, AgadoméBP 504Atakpamé - Togo",
         "telephone": "+228 24 40 05 00",
         "itineraire_google_maps": "https://maps.google.com?daddr=7.88341667,1.2125",
@@ -8347,7 +8347,7 @@
     },
     {
         "nom": "PHARMACIE SAINTE RITA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue de France, face Hôtel SanaTokoin Doulassamé - BP 62033 loméLomé - Togo",
         "telephone": "+228 22 42 53 48",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13972222,1.2283",
@@ -8386,7 +8386,7 @@
     },
     {
         "nom": "PHARMACIE SALA HOUBEIDA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Koffi Panou à côté de okiss, non loin de Koffi PanouKélégouganLomé - Togo",
         "telephone": "+228 91 91 15 35",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21911111,1.2305",
@@ -8425,7 +8425,7 @@
     },
     {
         "nom": "PHARMACIE SANGUERA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Entre EPP et Lycée SangueraMaritimeSanguera - Togo",
         "telephone": "+228 22 42 80 80",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23061111,1.1170",
@@ -8503,7 +8503,7 @@
     },
     {
         "nom": "PHARMACIE SANTE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "674, Rue du Chemin de Fer, Non loin de la TDEAdawlato - 01 BP 1236Lomé - Togo",
         "telephone": "+228 70 44 91 37",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.13106111,1.2273",
@@ -8546,8 +8546,8 @@
         "adresse": "A Coté de CEG Tome, BP 557Kara - Togo",
         "telephone": "+228 26 60 11 17",
         "itineraire_google_maps": "",
-        "latitude": null,
-        "longitude": null,
+        "latitude": 7.84328,
+        "longitude": 1.200269,
         "horaires_ouverture": []
     },
     {
@@ -8591,7 +8591,7 @@
     },
     {
         "nom": "PHARMACIE SATIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route CEDEAO, en face du CEG KossiganAgoè Kossigan I - BP 8519Lomé - Togo",
         "telephone": "+228 23 38 26 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23366667,1.1818",
@@ -8630,7 +8630,7 @@
     },
     {
         "nom": "PHARMACIE SAVANA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "A côté de la cathédrale NapiéngSavanes - BP 87Dapaong - Togo",
         "telephone": "+228 27 70 80 12",
         "itineraire_google_maps": "https://maps.google.com?daddr=10.8617542,0.2049",
@@ -8669,7 +8669,7 @@
     },
     {
         "nom": "PHARMACIE SHALOM",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. Faure Gnassingbe, Non loin de l'Ancienne Direction des ImpôtsAgoè Cacavéli - 10 BP 10040Lomé - Togo",
         "telephone": "+228 22 51 87 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.217682,1.203",
@@ -8747,7 +8747,7 @@
     },
     {
         "nom": "PHARMACIE SILOE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. du 30 Août, en face de Sanol, Adidigome ApedokoéAdidogomé - 07 BP 7189Lomé - Togo",
         "telephone": "+228 90 80 26 39",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20694444,1.1409",
@@ -8786,7 +8786,7 @@
     },
     {
         "nom": "PHARMACIE SOLIDARITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route de Limousine, face à la microfinance milléniumTotsi - BP 8919Lomé - Togo",
         "telephone": "+228 22 50 37 07",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19663889,1.1867",
@@ -8825,7 +8825,7 @@
     },
     {
         "nom": "PHARMACIE SOURCE DE VIE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd. de la Victoire, face Collège Protestant, non loin de station T-OilTokoin Protestant - BP 147 LoméLomé - Togo",
         "telephone": "+228 22 20 27 59",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.14708333,1.2034",
@@ -8884,7 +8884,7 @@
     },
     {
         "nom": "PHARMACIE TCHEP'SON",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Nationale N°1 face à terminal du sahel.Agoè Zongo - 13 BP 498Lomé - Togo",
         "telephone": "+228 70 42 94 41",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.25905556,1.2",
@@ -8923,8 +8923,8 @@
     },
     {
         "nom": "PHARMACIE THERYA",
-        "statut_actuel": "Fermé",
-        "adresse": "Rue 251 HDN, Route du petit contournement, Non loin de Togo 2000 - HedjranawoeHédzranawoé - 21 BP 88Lomé - Togo",
+        "statut_actuel": "Ouvert",
+        "adresse": "Rue 251 HDN, Route du petit contournement, Non loin de Togo 2000Hédzranawoé - 21 BP 88Lomé - Togo",
         "telephone": "+228 70 44 81 77",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18996667,1.2517",
         "latitude": 6.18996667,
@@ -8972,7 +8972,7 @@
     },
     {
         "nom": "PHARMACIE UNIVERS SANTE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Bd Eyadema, face entrée CHU campusCité OUALomé - Togo",
         "telephone": "+228 22 61 81 43",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18291667,1.2",
@@ -9011,7 +9011,7 @@
     },
     {
         "nom": "PHARMACIE VERSEAU",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route d'Aného, face à Nsia BanqueBaguida - BP 60660Lomé - Togo",
         "telephone": "+228 22 27 34 53",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.16673889,1.3344",
@@ -9050,7 +9050,7 @@
     },
     {
         "nom": "PHARMACIE VERTE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la Chance, au feu rouge de Togocel, Non loin de Cabinet 3AAgbalépédo - 08 BP 81297 LOME 08Lomé - Togo",
         "telephone": "+228 91 98 50 17",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.18599722,1.2069",
@@ -9089,7 +9089,7 @@
     },
     {
         "nom": "PHARMACIE VIGUEUR",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Livingstone, non loin du marché la paix d'AgbalépédoAgbalépédo - 05 BP 02 Lomé 05Lomé - Togo",
         "telephone": "+228 22 51 63 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19264167,1.2008",
@@ -9128,7 +9128,7 @@
     },
     {
         "nom": "PHARMACIE VITA-FLORE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Zossimé, non loin du carrefour AssigoméVakpossitoLomé - Togo",
         "telephone": "+228 70 40 22 86",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.22194444,1.1651",
@@ -9167,7 +9167,7 @@
     },
     {
         "nom": "PHARMACIE VITALIS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue Amoutiévé, à côté de la Caisse, Lagos KpanouGrand Marché –Assigamé - BP 30446Lomé - Togo",
         "telephone": "+228 22 21 69 79",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.130408,1.227",
@@ -9206,7 +9206,7 @@
     },
     {
         "nom": "PHARMACIE VITAS",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "En face du MarchéAgoè Assiyéyé - 13 BP 244Lomé - Togo",
         "telephone": "+228 22 25 63 43",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21391667,1.2084",
@@ -9245,7 +9245,7 @@
     },
     {
         "nom": "PHARMACIE VOLONTAS DEI",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue sun-city, au carrefour sun-city, avédji sun-cityAvédji - 05 BP 591 LoméLomé - Togo",
         "telephone": "+228 22 36 00 95",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.20224722,1.1731",
@@ -9284,7 +9284,7 @@
     },
     {
         "nom": "PHARMACIE WASTINE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Rue . La koukouvi imm JKF à 200M du carrefour LOGOTEAdidogoméLomé - Togo",
         "telephone": "+228 70 40 10 52",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.19280556,1.2",
@@ -9362,7 +9362,7 @@
     },
     {
         "nom": "PHARMACIE YEM-BLA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. Pya Akeï, face résidence du béninTokoin Wuiti - BP 20633Lomé - Togo",
         "telephone": "+228 22 26 76 51",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1686,1.22",
@@ -9401,7 +9401,7 @@
     },
     {
         "nom": "PHARMACIE YESHNA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Près de NDEVakpossitoLomé - Togo",
         "telephone": "+228 93 51 25 73",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21983333,1.1567",
@@ -9440,7 +9440,7 @@
     },
     {
         "nom": "PHARMACIE YESHUA",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "près de NDEVakpossito - 01 Bp 254 LoméLomé - Togo",
         "telephone": "+228 93 51 25 73",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.21983333,1.1401",
@@ -9489,7 +9489,7 @@
     },
     {
         "nom": "PHARMACIE ZONGO",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Nationale N1, 100m après OrabankTogblékopé - 19 BP 15 LoméLomé - Togo",
         "telephone": "+228 70 45 23 16",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.27047222,1.2100",
@@ -9528,7 +9528,7 @@
     },
     {
         "nom": "PHARMACIE ZOPOMAHE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Sur la voie Zossimé Sanguéna, côté témoins de JéhovahLomé - Togo",
         "telephone": "+228 98 80 68 83",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.23305556,1.1193",
@@ -9616,7 +9616,7 @@
     },
     {
         "nom": "PHARMACY OF PROVIDENCE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "79,Bd Jean Paul II Nukafu 1BP 440 1 - For EverMaritimeLomé - Togo",
         "telephone": "+228 91 14 88 88",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1606805,1.23383",
@@ -9659,13 +9659,13 @@
         "adresse": "1980 Bd Jean Paul IIBP 30680 LoméLomé - Togo",
         "telephone": "+228 914 47 99",
         "itineraire_google_maps": "",
-        "latitude": null,
-        "longitude": null,
+        "latitude": 6.2081351,
+        "longitude": 1.1772847,
         "horaires_ouverture": []
     },
     {
         "nom": "Phamacie Nation",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "- - AgbalepedoganMaritimeLomé - Togo",
         "telephone": "+228 22 25 99 65",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1922419,1.19100",
@@ -9704,7 +9704,7 @@
     },
     {
         "nom": "Phamarcie Bon Samaritain",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "46QW+XP3, Unnamed Road, Rue ToldaMaritimeLomé - Togo",
         "telephone": "+228 22 21 45 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1398883,1.24650",
@@ -9743,7 +9743,7 @@
     },
     {
         "nom": "Pharmacie Agoè-Nyivé",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Eyadema, A côté de l'église catholique Marie ThéotokosMaritimeLomé - Togo",
         "telephone": "+228 22 25 83 38",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2251459,1.21056",
@@ -9782,7 +9782,7 @@
     },
     {
         "nom": "Pharmacie Amessiame Be",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "61720MaritimeLomé - Togo",
         "telephone": "+228 96 32 97 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1435303,1.24429",
@@ -9821,7 +9821,7 @@
     },
     {
         "nom": "Pharmacie Believe",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "C686+WCWMaritimeTsevie - Togo",
         "telephone": "+228 23 30 00 14",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.4173603,1.21107",
@@ -9860,7 +9860,7 @@
     },
     {
         "nom": "Pharmacie Bien Être",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "- - HedjranawoeMaritimeLomé - Togo",
         "telephone": "+228 70 34 26 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1898208,1.24348",
@@ -9899,7 +9899,7 @@
     },
     {
         "nom": "Pharmacie Bonté",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "-MaritimeLomé - Togo",
         "telephone": "+228 93 95 80 78",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1896489,1.15375",
@@ -10026,7 +10026,7 @@
     },
     {
         "nom": "Pharmacie El Sali",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "-MaritimeSanguera - Togo",
         "telephone": "+228 70 12 44 44",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2201679,1.12533",
@@ -10065,7 +10065,7 @@
     },
     {
         "nom": "Pharmacie El-Shammah",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Maison des Jeunes de LoméMaritimeLomé - Togo",
         "telephone": "+228 22 46 93 50",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2090094,1.15990",
@@ -10114,7 +10114,7 @@
     },
     {
         "nom": "Pharmacie LAFIA Kara",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "BP 500 COFAC KARAKaraKara - Togo",
         "telephone": "+228 26 60 04 34",
         "itineraire_google_maps": "https://maps.google.com?daddr=9.5475227,1.19452",
@@ -10153,7 +10153,7 @@
     },
     {
         "nom": "Pharmacie La Shékinah",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Agoè légbassitoMaritimeLomé - Togo",
         "telephone": "+228 96 40 17 17",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.2477778,1.13979",
@@ -10192,7 +10192,7 @@
     },
     {
         "nom": "Pharmacie ND TRINITE",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Av. de la PaixLomé - Togo",
         "telephone": "+228 22 47 61 03",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.151597,1.238",
@@ -10300,7 +10300,7 @@
     },
     {
         "nom": "Pharmacie d'Aneho Woezon",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Grand PopoMaritimeLomé - Togo",
         "telephone": "+228 22 48 19 69",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
@@ -10378,7 +10378,7 @@
     },
     {
         "nom": "Pharmacie du Point E",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "- - TotsiviMaritimeLomé - Togo",
         "telephone": "+228 22 51 91 71",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1813082,1.19",
@@ -10490,8 +10490,8 @@
         "adresse": "BP. 10040MaritimeLomé - Togo",
         "telephone": "+228 22 51 87 60",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.2061762,
-        "longitude": 1.0100655,
+        "latitude": 6.2136886,
+        "longitude": 1.2465722,
         "horaires_ouverture": []
     },
     {
@@ -10555,7 +10555,7 @@
     },
     {
         "nom": "TEDIS PHARMA TOGO (TPTG)",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "56FW+6HV, Rue 45 HDNMaritimeLomé - Togo",
         "telephone": "+228 91 98 42 68 87 88",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1731002,1.24643",
@@ -10594,7 +10594,7 @@
     },
     {
         "nom": "TI2A SARL",
-        "statut_actuel": "Fermé",
+        "statut_actuel": "Ouvert",
         "adresse": "Route du Marché, non loin de la station des zémidjans, marché d'AwatoméAdidogomé - 04 BP 358 Lomé 04Lomé - Togo",
         "telephone": "+228 91 31 60 31",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.17827778,1.1685",
@@ -10715,8 +10715,8 @@
         "adresse": "05 BP. 02MaritimeLomé - Togo",
         "telephone": "+228 22 51 63 30",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1591206,
-        "longitude": 1.21309,
+        "latitude": 6.192543,
+        "longitude": 1.1287202,
         "horaires_ouverture": []
     },
     {
@@ -10725,8 +10725,8 @@
         "adresse": "BP. 20633MaritimeLomé - Togo",
         "telephone": "+228 22 26 76 51",
         "itineraire_google_maps": "https://maps.google.com?daddr=6.1256983,1.22536",
-        "latitude": 6.1256983,
-        "longitude": 1.1893132,
+        "latitude": 6.1471188,
+        "longitude": 1.2247717,
         "horaires_ouverture": []
     }
 ]
