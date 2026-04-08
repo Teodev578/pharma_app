@@ -71,12 +71,18 @@ class _MapScreenState extends State<MapScreen> {
   final String mapTilerKey = 'pg76rH7Ad8bNzkP7pnwf';
 
   // --- VARIABLES D'ÉTAT (UI ET CACHE) ---
-  // Theme contient les couleurs, routes, et libellés décodés. Sans thème complet, la carte ne rend pas les chemins.
+  // OPTIM : On cache les deux thèmes (clair + sombre) dès le démarrage.
+  // Quand l'OS bascule en dark mode, on switche instantanément entre les deux
+  // sans refaire de requête réseau ni de décodage JSON.
+  vtr.Theme? _lightTheme;
+  vtr.Theme? _darkTheme;
+
+  // Thème actuellement rendu (pointe vers _lightTheme ou _darkTheme).
   vtr.Theme? _mapTheme;
-  
+
   // Stocke l'ancienne luminosité pour vérifier à chaque draw si on a changé de thème Android/iOS (Clair => Sombre).
   Brightness? _lastBrightness;
-  
+
   // Variables boolean de Chargement (Indispensable pour le loader UI discret et la parade anti-freeze initial).
   bool _isLoadingPharmacies = true;
   bool _isThemeLoading = false;
@@ -86,9 +92,14 @@ class _MapScreenState extends State<MapScreen> {
   List<Marker> _cachedMarkers = []; // Les marqueurs pré-calculés, pour éviter la reconstruction native pendant chaque scroll !
   LatLng? _userPosition;
 
+  // Une fois la carte montée, le GPS peut demander un déplacement via ce flag.
+  LatLng? _pendingMove;
+  // Indique si onMapReady a déjà été déclenché (pour les deux ordres d'arrivée GPS/carte).
+  bool _mapReady = false;
+
   // Ce StreamController sert de "pont" : il émet un événement vers le CurrentLocationLayer pour l'aligner sans devoir passer par des setState().
   late final StreamController<double?> _alignController;
-  
+
   // L'architecte des tuiles : gère le réseau, la queue de download et le cache mémoire des fragments de carte (.pbf).
   late final TileProviders _tileProviders;
 
@@ -114,6 +125,19 @@ class _MapScreenState extends State<MapScreen> {
 
     _fetchPharmacies();
     _centerOnUserLocation(); // Tente de récupérer la position GPS dès l'ouverture
+
+    // OPTIM : Pré-chargement PARALLÈLE des deux thèmes dès l'ouverture.
+    // Le switch dark/light sera instantané car les deux thèmes seront déjà
+    // disponibles en mémoire — plus aucun délai réseau ou décodage JSON à ce moment.
+    _preloadBothThemes();
+  }
+
+  /// Charge les thèmes clair et sombre en parallèle dès le démarrage.
+  Future<void> _preloadBothThemes() async {
+    await Future.wait([
+      _loadVectorMapTheme(Brightness.light, const Color(0xFFF2F4F5)),
+      _loadVectorMapTheme(Brightness.dark, null), // bgColor sombre sera résolu dans _loadVectorMapTheme
+    ]);
   }
 
   /// CENTRAGE INITIAL SUR LA POSITION GPS DE L'UTILISATEUR
@@ -142,12 +166,13 @@ class _MapScreenState extends State<MapScreen> {
         final userLatLng = LatLng(position.latitude, position.longitude);
         setState(() => _userPosition = userLatLng);
 
-        // FIX RACE CONDITION : _mapController.move() peut crasher si FlutterMap
-        // n'est pas encore attaché au premier frame. On attend le prochain frame
-        // rendu avant d'interagir avec le contrôleur.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _mapController.move(userLatLng, 15.0);
-        });
+        // CAS 1 : La carte est déjà prête (onMapReady déjà déclenché) → on bouge immédiatement.
+        // CAS 2 : La carte n'est pas encore prête → on stocke et onMapReady le fera.
+        if (_mapReady) {
+          _mapController.move(userLatLng, 15.0);
+        } else {
+          setState(() => _pendingMove = userLatLng);
+        }
       }
     } catch (e) {
       debugPrint('Impossible de récupérer la position GPS : $e');
@@ -231,20 +256,24 @@ class _MapScreenState extends State<MapScreen> {
     if (_lastBrightness != theme.brightness) {
       _lastBrightness = theme.brightness;
 
-      // Déduction de notre fameuse Hexadécimale d'arrière plan (sur lequel viendra peindre MapTiler ses parcs, mers, etc).
       final bgColor = theme.brightness == Brightness.dark
           ? theme.colorScheme.surface
           : const Color(0xFFF2F4F5);
 
-      // Envoie la couleur du système injecter le JSON
-      _loadVectorMapTheme(theme.brightness, bgColor);
+      // OPTIM : Si le thème a déjà été pré-chargé (cas nominal après pré-chargement
+      // parallèle), on switche instantanément sans réseau ni décodage.
+      final cachedTheme = theme.brightness == Brightness.dark ? _darkTheme : _lightTheme;
+      if (cachedTheme != null) {
+        setState(() => _mapTheme = cachedTheme);
+      } else {
+        // Première fois (rare) : on charge à la demande.
+        _loadVectorMapTheme(theme.brightness, bgColor);
+      }
 
-      // On s'assure de rafraichir aussi la couleur des bordures de nos *Marqueurs* UI.
+      // On s'assure de rafraîchir aussi la couleur des bordures de nos *Marqueurs* UI.
       // Le theme.colorScheme de la bordure du marqueur s'invaliderait pas de lui-même car il est listé statique dans un cache.
       if (_pharmacies.isNotEmpty) {
         setState(() => _isLoadingPharmacies = true); // Affiche le spinner "optimisation…"
-        
-        // Un micro-délai (400ms) pour laisser les couleurs et fonts OS se rafraîchir en priorité
         Future.delayed(const Duration(milliseconds: 400), () {
           if (mounted) _updateMarkers();
         });
@@ -252,15 +281,26 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  /// Gestion du thème vectoriel avec Cache Disque et Thread séparé
-  Future<void> _loadVectorMapTheme(Brightness brightness, Color bgColor) async {
-    if (_isThemeLoading) return;
-    setState(() => _isThemeLoading = true);
-
-    final styleId = brightness == Brightness.dark
-        ? 'streets-v2-dark'
-        : 'streets-v2';
+  /// Gestion du thème vectoriel avec Cache Disque et Thread séparé.
+  /// Supporte les deux modes (clair/sombre) — met à jour _lightTheme ou _darkTheme
+  /// et pointe _mapTheme vers le thème actif si c'est celui demandé par l'OS.
+  Future<void> _loadVectorMapTheme(Brightness brightness, Color? bgColorOverride) async {
+    final styleId = brightness == Brightness.dark ? 'streets-v2-dark' : 'streets-v2';
     final cacheKey = 'map_style_$styleId';
+
+    // Résolution de la couleur de fond : priorité à bgColorOverride, sinon valeur par défaut.
+    final bgColor = bgColorOverride ??
+        (brightness == Brightness.dark
+            ? const Color(0xFF121212)  // Surface sombre standard Material
+            : const Color(0xFFF2F4F5));
+
+    // OPTIM : On ne bloque pas _isThemeLoading globalement pour les deux thèmes.
+    // Chaque chargement (clair/sombre) est indépendant ; seul le thème actif
+    // met à jour _isThemeLoading pour afficher le spinner.
+    final isCurrentBrightness = (brightness == _lastBrightness);
+    if (isCurrentBrightness && mounted) {
+      setState(() => _isThemeLoading = true);
+    }
 
     try {
       final directory = await getApplicationDocumentsDirectory();
@@ -271,9 +311,7 @@ class _MapScreenState extends State<MapScreen> {
         rawJsonStr = await file.readAsString();
       } else {
         final response = await http.get(
-          Uri.parse(
-            'https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey',
-          ),
+          Uri.parse('https://api.maptiler.com/maps/$styleId/style.json?key=$mapTilerKey'),
         );
         if (response.statusCode == 200) {
           rawJsonStr = response.body;
@@ -281,10 +319,9 @@ class _MapScreenState extends State<MapScreen> {
         }
       }
 
-      if (rawJsonStr.isNotEmpty && mounted) {
-        // FIX : padLeft(8, '0') garantit 8 caractères même pour les couleurs
-        // dont la valeur hex serait courte (ex: noir pur 0xFF000000).
-        // Sans ce padding, .substring(2, 8) lèverait un RangeError.
+      if (rawJsonStr.isNotEmpty) {
+        // FIX : padLeft(8,'0') garantit 8 caractères hex même pour les couleurs
+        // dont la valeur serait courte — sans ça .substring(2,8) lèverait un RangeError.
         final bgHex =
             '#${bgColor.value.toRadixString(16).padLeft(8, '0').substring(2, 8).toUpperCase()}';
 
@@ -296,14 +333,23 @@ class _MapScreenState extends State<MapScreen> {
 
         if (mounted) {
           setState(() {
-            _mapTheme = decodedTheme;
-            _isThemeLoading = false;
+            // Stockage dans la bonne variable de cache.
+            if (brightness == Brightness.dark) {
+              _darkTheme = decodedTheme;
+            } else {
+              _lightTheme = decodedTheme;
+            }
+            // On expose _mapTheme uniquement si c'est le thème actuellement affiché.
+            if (brightness == _lastBrightness) {
+              _mapTheme = decodedTheme;
+              _isThemeLoading = false;
+            }
           });
         }
       }
     } catch (e) {
-      debugPrint("Erreur chargement thème: $e");
-      if (mounted) setState(() => _isThemeLoading = false);
+      debugPrint('Erreur chargement thème $styleId: $e');
+      if (mounted && isCurrentBrightness) setState(() => _isThemeLoading = false);
     }
   }
 
@@ -341,35 +387,57 @@ class _MapScreenState extends State<MapScreen> {
               options: MapOptions(
                 backgroundColor: bgColor,
                 // Si la position GPS est déjà connue avant le 1er rendu, on l'utilise directement.
-                // Sinon, on affiche Lomé par défaut et _centerOnUserLocation() recentrera via _mapController.move().
+                // Sinon, on affiche Lomé par défaut et _centerOnUserLocation() recentrera via onMapReady.
                 initialCenter: _userPosition ?? _initialCenter,
                 initialZoom: 15.0,
                 maxZoom: 20.0,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
+                // OPTIM : onMapReady est l'event OFFICIEL FlutterMap signalant que le
+                // moteur de carte est pleinement attaché et prêt à recevoir des commandes.
+                // Deux cas : GPS déjà arrivé (_pendingMove != null) → on bouge tout de suite.
+                //            GPS pas encore arrivé → on marque _mapReady=true pour que
+                //            _centerOnUserLocation() sache qu'il peut appeler move() directement.
+                onMapReady: () {
+                  _mapReady = true;
+                  if (_pendingMove != null) {
+                    _mapController.move(_pendingMove!, 15.0);
+                    _pendingMove = null;
+                  }
+                },
               ),
               children: [
                 // ================= COUCHES DE LA CARTE (Z-Index / Ordre de projection vectorielle) =================
-                
+
                 // COUCHE N°1 : FOND DE CARTE (VECTORIELLE)
-                // Rend les plans, bâtiments, océans en format dessin SVG-like redimensionnable à l'infini (Sans pixelisation).
+                // OPTIM : if() démonterait/remonterait VectorTileLayer à chaque changement de thème
+                // (très coûteux : reconstruction complète + rechargement des tuiles en VRAM).
+                // On construit le layer uniquement quand le thème est prêt ; une fois monté,
+                // il ne sera plus jamais démonté — le cache GPU reste intègre lors du switch dark/light.
                 if (_mapTheme != null)
                   VectorTileLayer(
+                    key: const ValueKey('vector_tile_layer'),
                     theme: _mapTheme!,
                     tileProviders: _tileProviders,
                   ),
 
                 // COUCHE N°2 : POSITION UTILISATEUR LITTÉRALE (Point bleu et Cône de vue directionnel)
-                CurrentLocationLayer(
-                  alignPositionStream: _alignController.stream, // Écoute notre bouton flottant sans forcer de rebuild général
-                  style: LocationMarkerStyle(
+                // OPTIM : Le style est extrait en variable locale finale pour éviter de reconstruire
+                // l'objet LocationMarkerStyle à chaque appel de build().
+                Builder(builder: (context) {
+                  final locationStyle = LocationMarkerStyle(
                     marker: DefaultLocationMarker(
-                      color: theme.colorScheme.primary, // Cible le BLEU ou COULEUR PRINCIPALE de votre charte graphique
+                      color: theme.colorScheme.primary,
                     ),
                     markerSize: const Size(20, 20),
-                  ),
-                ),
+                  );
+                  return CurrentLocationLayer(
+                    alignPositionStream: _alignController.stream,
+                    style: locationStyle,
+                  );
+                }),
+
 
                 // COUCHE N°3 : MARQUEURS PHARMACIES "CLUSTERS" (Boules agglomérées intelligentes)
                 // Conditions cumulatives : S'affichent uniquement SI pharmacies converties + Aucun delay/loading artificiel n'est de rigueur (Delay de 600ms au boot ok !).
