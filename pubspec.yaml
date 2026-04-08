@@ -20,8 +20,6 @@ dependencies:
 
   # PACKAGES CARTOGRAPHIE (Compatibles avec flutter_map v8)
   flutter_map: ^8.2.2
-  vector_map_tiles: ^9.0.0-beta.8             
-  vector_tile_renderer: ^6.0.0         
   flutter_map_location_marker: ^10.2.0
   flutter_map_marker_cluster: ^8.2.2
   path_provider: ^2.1.5
