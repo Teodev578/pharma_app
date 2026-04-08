@@ -7,7 +7,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
-// Importations de tes fichiers locaux
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 import 'package:pharma_app/models/pharmacy.dart';
@@ -22,21 +21,16 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  // --- CONSTANTES ET CONFIGURATIONS ---
   final LatLng _initialCenter = const LatLng(6.137, 1.212);
   final MapController _mapController = MapController();
 
-  // --- VARIABLES D'ÉTAT ---
   bool _isLoadingPharmacies = true;
   List<Pharmacy> _pharmacies = [];
   List<Marker> _cachedMarkers = [];
   LatLng? _userPosition;
-
-  // Gestion de l'ordre d'arrivée GPS/carte
   LatLng? _pendingMove;
   bool _mapReady = false;
 
-  // Stream pour recentrer la position utilisateur sans setState
   late final StreamController<double?> _alignController;
 
   @override
@@ -47,7 +41,6 @@ class _MapScreenState extends State<MapScreen> {
     _centerOnUserLocation();
   }
 
-  /// Centrage initial sur la position GPS de l'utilisateur
   Future<void> _centerOnUserLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -55,20 +48,14 @@ class _MapScreenState extends State<MapScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever ||
-          permission == LocationPermission.denied) {
-        return;
-      }
+          permission == LocationPermission.denied) return;
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
       );
-
       if (mounted) {
         final userLatLng = LatLng(position.latitude, position.longitude);
         setState(() => _userPosition = userLatLng);
-
         if (_mapReady) {
           _mapController.move(userLatLng, 15.0);
         } else {
@@ -76,44 +63,32 @@ class _MapScreenState extends State<MapScreen> {
         }
       }
     } catch (e) {
-      debugPrint('Impossible de récupérer la position GPS : $e');
+      debugPrint('GPS error: $e');
     }
   }
 
-  /// Chargement des pharmacies depuis Supabase
   Future<void> _fetchPharmacies() async {
     try {
       final pharmacies = await SupabaseService().getPharmacies();
-
       if (mounted) {
         setState(() => _pharmacies = pharmacies);
-
-        // Staggered loading : on attend le 1er frame rendu avant de calculer les marqueurs,
-        // pour ne pas surcharger le thread UI au démarrage.
         final completer = Completer<void>();
         WidgetsBinding.instance.addPostFrameCallback((_) => completer.complete());
         await completer.future;
         await Future.delayed(const Duration(milliseconds: 200));
-
         if (mounted) _updateMarkers();
       }
     } catch (e) {
-      debugPrint('Erreur Supabase: $e');
+      debugPrint('Supabase error: $e');
       if (mounted) setState(() => _isLoadingPharmacies = false);
     }
   }
 
-  /// Construit la liste de marqueurs depuis les données Supabase
   void _updateMarkers() {
     final newMarkers = _pharmacies
         .where((p) => p.latitude != null && p.longitude != null)
-        .map((p) => _buildPharmacyMarker(
-              context,
-              LatLng(p.latitude!, p.longitude!),
-              p,
-            ))
+        .map((p) => _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p))
         .toList();
-
     if (mounted) {
       setState(() {
         _cachedMarkers = newMarkers;
@@ -133,12 +108,8 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final bgColor = isDarkMode
-        ? theme.colorScheme.surface
-        : const Color(0xFFF2F4F5);
+    final bgColor = isDarkMode ? theme.colorScheme.surface : const Color(0xFFF2F4F5);
 
-    // Tuiles raster : CartoDB Positron (clair) + CartoDB Dark Matter (sombre)
-    // 100% gratuit, sans clé API, sans rate limiting sur mobile.
     final tileUrl = isDarkMode
         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
         : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -146,8 +117,7 @@ class _MapScreenState extends State<MapScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
       ),
       child: Scaffold(
         backgroundColor: bgColor,
@@ -160,14 +130,10 @@ class _MapScreenState extends State<MapScreen> {
               mapController: _mapController,
               options: MapOptions(
                 backgroundColor: bgColor,
-                // Si la position GPS est déjà connue avant le 1er rendu, on l'utilise directement.
-                // Sinon, on affiche Lomé par défaut et _centerOnUserLocation() recentrera via onMapReady.
                 initialCenter: _userPosition ?? _initialCenter,
                 initialZoom: 15.0,
                 maxZoom: 20.0,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all,
-                ),
+                interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
                 onMapReady: () {
                   _mapReady = true;
                   if (_pendingMove != null) {
@@ -177,46 +143,42 @@ class _MapScreenState extends State<MapScreen> {
                 },
               ),
               children: [
-                // COUCHE N°1 : FOND DE CARTE RASTER (PNG natif — rendu GPU direct, 0 lag)
+                // COUCHE 1 : Fond de carte raster CartoDB
                 TileLayer(
                   urlTemplate: tileUrl,
+                  subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.example.pharma_app',
                   maxNativeZoom: 19,
                 ),
 
-                // COUCHE N°2 : POSITION UTILISATEUR
+                // COUCHE 2 : Position utilisateur
                 Builder(builder: (context) {
-                  final locationStyle = LocationMarkerStyle(
-                    marker: DefaultLocationMarker(
-                      color: theme.colorScheme.primary,
-                    ),
-                    markerSize: const Size(20, 20),
-                  );
                   return CurrentLocationLayer(
                     alignPositionStream: _alignController.stream,
-                    style: locationStyle,
+                    style: LocationMarkerStyle(
+                      marker: DefaultLocationMarker(color: theme.colorScheme.primary),
+                      markerSize: const Size(20, 20),
+                    ),
                   );
                 }),
 
-                // COUCHE N°3 : MARQUEURS PHARMACIES avec CLUSTERING
+                // COUCHE 3 : Clusters de pharmacies
                 if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
-                  Builder(
-                    builder: (context) {
-                      return MarkerClusterLayer(
-                        mapController: _mapController,
-                        mapCamera: MapCamera.of(context),
-                        options: MarkerClusterLayerOptions(
-                          markers: _cachedMarkers,
-                          size: const Size(44, 44),
-                          maxClusterRadius: 45,
-                          builder: (context, markers) =>
-                              _buildClusterWidget(context, markers.length),
-                        ),
-                      );
-                    },
-                  ),
+                  Builder(builder: (context) {
+                    return MarkerClusterLayer(
+                      mapController: _mapController,
+                      mapCamera: MapCamera.of(context),
+                      options: MarkerClusterLayerOptions(
+                        markers: _cachedMarkers,
+                        size: const Size(44, 44),
+                        maxClusterRadius: 45,
+                        builder: (context, markers) =>
+                            _buildClusterWidget(context, markers.length),
+                      ),
+                    );
+                  }),
 
-                // COUCHE N°4 : BOUTONS FLOTTANTS
+                // COUCHE 4 : Boutons flottants
                 SafeArea(
                   child: Align(
                     alignment: Alignment.topRight,
@@ -232,21 +194,17 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
-            // BARRE DE RECHERCHE
+            // Barre de recherche
             SearchBottomSheet(
               pharmacies: _pharmacies,
               onPharmacySelected: (pharmacy) {
                 if (pharmacy.latitude != null && pharmacy.longitude != null) {
-                  _mapController.move(
-                    LatLng(pharmacy.latitude!, pharmacy.longitude!),
-                    16.0,
-                  );
+                  _mapController.move(LatLng(pharmacy.latitude!, pharmacy.longitude!), 16.0);
                   _showPharmacyDetails(context, pharmacy);
                 }
               },
             ),
 
-            // LOADER DISCRET
             if (_isLoadingPharmacies) _buildTopLoader(theme),
           ],
         ),
@@ -254,7 +212,8 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  /// Badge de cluster (nombre de pharmacies regroupées)
+  // ─── WIDGETS AUXILIAIRES ─────────────────────────────────────────────────────
+
   Widget _buildClusterWidget(BuildContext context, int count) {
     return RepaintBoundary(
       child: Container(
@@ -264,19 +223,13 @@ class _MapScreenState extends State<MapScreen> {
           boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
         ),
         child: Center(
-          child: Text(
-            count.toString(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: Text(count.toString(),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ),
     );
   }
 
-  /// Loader discret en haut de l'écran
   Widget _buildTopLoader(ThemeData theme) {
     return Positioned(
       top: 100,
@@ -290,15 +243,11 @@ class _MapScreenState extends State<MapScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
                 const SizedBox(width: 12),
-                Text(
-                  'Chargement des pharmacies...',
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text('Chargement des pharmacies...', style: theme.textTheme.bodySmall),
               ],
             ),
           ),
@@ -307,12 +256,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  /// Marqueur individuel d'une pharmacie
-  Marker _buildPharmacyMarker(
-    BuildContext context,
-    LatLng point,
-    Pharmacy pharmacy,
-  ) {
+  Marker _buildPharmacyMarker(BuildContext context, LatLng point, Pharmacy pharmacy) {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
     final colorScheme = Theme.of(context).colorScheme;
     final stableKey = ValueKey('marker_${point.latitude}_${point.longitude}');
@@ -331,72 +275,343 @@ class _MapScreenState extends State<MapScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: colorScheme.surface, width: 3),
             ),
-            child: Icon(
-              Icons.local_pharmacy,
-              color: isOpen ? Colors.green : Colors.red,
-              size: 20,
-            ),
+            child: Icon(Icons.local_pharmacy,
+                color: isOpen ? Colors.green : Colors.red, size: 20),
           ),
         ),
       ),
     );
   }
 
-  /// Bottom sheet de détails d'une pharmacie
+  // ─── BOTTOM SHEET DÉTAILS PHARMACIE ──────────────────────────────────────────
+
   void _showPharmacyDetails(BuildContext context, Pharmacy pharmacy) {
+    final isOpen = pharmacy.statutActuel == 'Ouvert';
+    final statusColor = isOpen ? const Color(0xFF22C55E) : const Color(0xFFEF4444);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) {
         final theme = Theme.of(context);
-        return Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                pharmacy.nom,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+        final isDark = theme.brightness == Brightness.dark;
+
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.35,
+          maxChildSize: 0.88,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 24,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              if (pharmacy.adresse != null)
-                Text(pharmacy.adresse!, style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    final url = pharmacy.itineraireGoogleMaps?.isNotEmpty == true
-                        ? pharmacy.itineraireGoogleMaps!
-                        : (pharmacy.latitude != null && pharmacy.longitude != null
-                            ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
-                            : null);
-                    if (url != null) {
-                      Clipboard.setData(ClipboardData(text: url));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Lien copié — collez-le dans Google Maps'),
-                          duration: Duration(seconds: 2),
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.zero,
+                children: [
+                  // ── HEADER coloré selon statut ──────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(isDark ? 0.12 : 0.08),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Poignée de drag
+                        Center(
+                          child: Container(
+                            width: 36,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
                         ),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.directions),
-                  label: const Text('Itinéraire'),
-                ),
+
+                        // Icône pharmacie + nom + badge statut
+                        Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: statusColor.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.local_pharmacy_rounded,
+                                  color: statusColor, size: 26),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    pharmacy.nom,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  // Badge statut avec point clignotant
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: statusColor.withOpacity(0.4), width: 1),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 6,
+                                          height: 6,
+                                          decoration: BoxDecoration(
+                                              color: statusColor,
+                                              shape: BoxShape.circle),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          pharmacy.statutActuel ?? 'Inconnu',
+                                          style: TextStyle(
+                                            color: statusColor,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── INFOS ───────────────────────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Adresse
+                        if (pharmacy.adresse != null)
+                          _infoCard(
+                            theme: theme,
+                            icon: Icons.location_on_rounded,
+                            iconColor: theme.colorScheme.primary,
+                            label: 'Adresse',
+                            content: pharmacy.adresse!,
+                          ),
+
+                        // Téléphone (cliquable → copier)
+                        if (pharmacy.telephone != null)
+                          _infoCard(
+                            theme: theme,
+                            icon: Icons.phone_rounded,
+                            iconColor: const Color(0xFF22C55E),
+                            label: 'Téléphone',
+                            content: pharmacy.telephone!,
+                            isClickable: true,
+                            onTap: () {
+                              Clipboard.setData(
+                                  ClipboardData(text: pharmacy.telephone!));
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: const Text('Numéro copié'),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                duration: const Duration(seconds: 2),
+                              ));
+                            },
+                          ),
+
+                        // Horaires d'ouverture
+                        if (pharmacy.horairesOuverture != null &&
+                            pharmacy.horairesOuverture!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(children: [
+                                  Icon(Icons.access_time_rounded,
+                                      size: 16, color: theme.colorScheme.secondary),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    "Horaires d'ouverture",
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: theme.colorScheme.secondary,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ]),
+                                const SizedBox(height: 10),
+                                ...pharmacy.horairesOuverture!.map((h) {
+                                  final horaire = h is Map ? h : {};
+                                  final jour =
+                                      horaire['jour']?.toString() ?? h.toString();
+                                  final heure = horaire['heures']?.toString() ?? '';
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    child: Row(children: [
+                                      SizedBox(
+                                        width: 100,
+                                        child: Text(jour,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(fontWeight: FontWeight.w600)),
+                                      ),
+                                      Expanded(
+                                        child: Text(heure,
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withOpacity(0.7),
+                                            )),
+                                      ),
+                                    ]),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 8),
+
+                        // Bouton Itinéraire
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                            ),
+                            onPressed: () {
+                              final url =
+                                  pharmacy.itineraireGoogleMaps?.isNotEmpty == true
+                                      ? pharmacy.itineraireGoogleMaps!
+                                      : (pharmacy.latitude != null &&
+                                              pharmacy.longitude != null
+                                          ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
+                                          : null);
+                              if (url != null) {
+                                Clipboard.setData(ClipboardData(text: url));
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: const Text('Lien copié — collez dans Maps'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  duration: const Duration(seconds: 2),
+                                ));
+                              }
+                            },
+                            icon: const Icon(Icons.directions_rounded),
+                            label: const Text('Obtenir l\'itinéraire',
+                                style: TextStyle(fontWeight: FontWeight.w700)),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            );
+          },
         );
       },
+    );
+  }
+
+  /// Card info réutilisable (adresse, téléphone…)
+  Widget _infoCard({
+    required ThemeData theme,
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String content,
+    VoidCallback? onTap,
+    bool isClickable = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(16),
+          border: isClickable
+              ? Border.all(color: iconColor.withOpacity(0.3), width: 1)
+              : null,
+        ),
+        child: Row(children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  content,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isClickable ? iconColor : null,
+                    fontWeight: isClickable ? FontWeight.w600 : null,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isClickable)
+            Icon(Icons.copy_rounded, size: 16, color: iconColor.withOpacity(0.6)),
+        ]),
+      ),
     );
   }
 }
