@@ -48,10 +48,13 @@ class _MapScreenState extends State<MapScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever ||
-          permission == LocationPermission.denied) return;
+          permission == LocationPermission.denied)
+        return;
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+        ),
       );
       if (mounted) {
         final userLatLng = LatLng(position.latitude, position.longitude);
@@ -73,7 +76,9 @@ class _MapScreenState extends State<MapScreen> {
       if (mounted) {
         setState(() => _pharmacies = pharmacies);
         final completer = Completer<void>();
-        WidgetsBinding.instance.addPostFrameCallback((_) => completer.complete());
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => completer.complete(),
+        );
         await completer.future;
         await Future.delayed(const Duration(milliseconds: 200));
         if (mounted) _updateMarkers();
@@ -87,7 +92,13 @@ class _MapScreenState extends State<MapScreen> {
   void _updateMarkers() {
     final newMarkers = _pharmacies
         .where((p) => p.latitude != null && p.longitude != null)
-        .map((p) => _buildPharmacyMarker(context, LatLng(p.latitude!, p.longitude!), p))
+        .map(
+          (p) => _buildPharmacyMarker(
+            context,
+            LatLng(p.latitude!, p.longitude!),
+            p,
+          ),
+        )
         .toList();
     if (mounted) {
       setState(() {
@@ -108,7 +119,9 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final bgColor = isDarkMode ? theme.colorScheme.surface : const Color(0xFFF2F4F5);
+    final bgColor = isDarkMode
+        ? theme.colorScheme.surface
+        : const Color(0xFFF2F4F5);
 
     final tileUrl = isDarkMode
         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
@@ -117,7 +130,9 @@ class _MapScreenState extends State<MapScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: isDarkMode
+            ? Brightness.light
+            : Brightness.dark,
       ),
       child: Scaffold(
         backgroundColor: bgColor,
@@ -133,7 +148,9 @@ class _MapScreenState extends State<MapScreen> {
                 initialCenter: _userPosition ?? _initialCenter,
                 initialZoom: 15.0,
                 maxZoom: 20.0,
-                interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.all,
+                ),
                 onMapReady: () {
                   _mapReady = true;
                   if (_pendingMove != null) {
@@ -152,31 +169,37 @@ class _MapScreenState extends State<MapScreen> {
                 ),
 
                 // COUCHE 2 : Position utilisateur
-                Builder(builder: (context) {
-                  return CurrentLocationLayer(
-                    alignPositionStream: _alignController.stream,
-                    style: LocationMarkerStyle(
-                      marker: DefaultLocationMarker(color: theme.colorScheme.primary),
-                      markerSize: const Size(20, 20),
-                    ),
-                  );
-                }),
+                Builder(
+                  builder: (context) {
+                    return CurrentLocationLayer(
+                      alignPositionStream: _alignController.stream,
+                      style: LocationMarkerStyle(
+                        marker: DefaultLocationMarker(
+                          color: theme.colorScheme.primary,
+                        ),
+                        markerSize: const Size(20, 20),
+                      ),
+                    );
+                  },
+                ),
 
                 // COUCHE 3 : Clusters de pharmacies
                 if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
-                  Builder(builder: (context) {
-                    return MarkerClusterLayer(
-                      mapController: _mapController,
-                      mapCamera: MapCamera.of(context),
-                      options: MarkerClusterLayerOptions(
-                        markers: _cachedMarkers,
-                        size: const Size(44, 44),
-                        maxClusterRadius: 45,
-                        builder: (context, markers) =>
-                            _buildClusterWidget(context, markers.length),
-                      ),
-                    );
-                  }),
+                  Builder(
+                    builder: (context) {
+                      return MarkerClusterLayer(
+                        mapController: _mapController,
+                        mapCamera: MapCamera.of(context),
+                        options: MarkerClusterLayerOptions(
+                          markers: _cachedMarkers,
+                          size: const Size(44, 44),
+                          maxClusterRadius: 45,
+                          builder: (context, markers) =>
+                              _buildClusterWidget(context, markers.length),
+                        ),
+                      );
+                    },
+                  ),
 
                 // COUCHE 4 : Boutons flottants
                 SafeArea(
@@ -199,7 +222,10 @@ class _MapScreenState extends State<MapScreen> {
               pharmacies: _pharmacies,
               onPharmacySelected: (pharmacy) {
                 if (pharmacy.latitude != null && pharmacy.longitude != null) {
-                  _mapController.move(LatLng(pharmacy.latitude!, pharmacy.longitude!), 16.0);
+                  _mapController.move(
+                    LatLng(pharmacy.latitude!, pharmacy.longitude!),
+                    16.0,
+                  );
                   _showPharmacyDetails(context, pharmacy);
                 }
               },
@@ -223,8 +249,13 @@ class _MapScreenState extends State<MapScreen> {
           boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
         ),
         child: Center(
-          child: Text(count.toString(),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: Text(
+            count.toString(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
@@ -243,11 +274,15 @@ class _MapScreenState extends State<MapScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
                 const SizedBox(width: 12),
-                Text('Chargement des pharmacies...', style: theme.textTheme.bodySmall),
+                Text(
+                  'Chargement des pharmacies...',
+                  style: theme.textTheme.bodySmall,
+                ),
               ],
             ),
           ),
@@ -256,7 +291,11 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Marker _buildPharmacyMarker(BuildContext context, LatLng point, Pharmacy pharmacy) {
+  Marker _buildPharmacyMarker(
+    BuildContext context,
+    LatLng point,
+    Pharmacy pharmacy,
+  ) {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
     final colorScheme = Theme.of(context).colorScheme;
     final stableKey = ValueKey('marker_${point.latitude}_${point.longitude}');
@@ -275,8 +314,11 @@ class _MapScreenState extends State<MapScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: colorScheme.surface, width: 3),
             ),
-            child: Icon(Icons.local_pharmacy,
-                color: isOpen ? Colors.green : Colors.red, size: 20),
+            child: Icon(
+              Icons.local_pharmacy,
+              color: isOpen ? Colors.green : Colors.red,
+              size: 20,
+            ),
           ),
         ),
       ),
@@ -287,7 +329,9 @@ class _MapScreenState extends State<MapScreen> {
 
   void _showPharmacyDetails(BuildContext context, Pharmacy pharmacy) {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
-    final statusColor = isOpen ? const Color(0xFF22C55E) : const Color(0xFFEF4444);
+    final statusColor = isOpen
+        ? const Color(0xFF22C55E)
+        : const Color(0xFFEF4444);
 
     showModalBottomSheet(
       context: context,
@@ -305,7 +349,9 @@ class _MapScreenState extends State<MapScreen> {
             return Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.18),
@@ -323,7 +369,9 @@ class _MapScreenState extends State<MapScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(isDark ? 0.12 : 0.08),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(28),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,8 +399,11 @@ class _MapScreenState extends State<MapScreen> {
                                 color: statusColor.withOpacity(0.15),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.local_pharmacy_rounded,
-                                  color: statusColor, size: 26),
+                              child: Icon(
+                                Icons.local_pharmacy_rounded,
+                                color: statusColor,
+                                size: 26,
+                              ),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -361,21 +412,26 @@ class _MapScreenState extends State<MapScreen> {
                                 children: [
                                   Text(
                                     pharmacy.nom,
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.3,
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.3,
+                                        ),
                                   ),
                                   const SizedBox(height: 5),
                                   // Badge statut avec point clignotant
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 3),
+                                      horizontal: 10,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: statusColor.withOpacity(0.15),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                          color: statusColor.withOpacity(0.4), width: 1),
+                                        color: statusColor.withOpacity(0.4),
+                                        width: 1,
+                                      ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -384,8 +440,9 @@ class _MapScreenState extends State<MapScreen> {
                                           width: 6,
                                           height: 6,
                                           decoration: BoxDecoration(
-                                              color: statusColor,
-                                              shape: BoxShape.circle),
+                                            color: statusColor,
+                                            shape: BoxShape.circle,
+                                          ),
                                         ),
                                         const SizedBox(width: 5),
                                         Text(
@@ -435,14 +492,18 @@ class _MapScreenState extends State<MapScreen> {
                             isClickable: true,
                             onTap: () {
                               Clipboard.setData(
-                                  ClipboardData(text: pharmacy.telephone!));
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: const Text('Numéro copié'),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                duration: const Duration(seconds: 2),
-                              ));
+                                ClipboardData(text: pharmacy.telephone!),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Numéro copié'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
                             },
                           ),
 
@@ -461,42 +522,61 @@ class _MapScreenState extends State<MapScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(children: [
-                                  Icon(Icons.access_time_rounded,
-                                      size: 16, color: theme.colorScheme.secondary),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    "Horaires d'ouverture",
-                                    style: theme.textTheme.labelSmall?.copyWith(
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time_rounded,
+                                      size: 16,
                                       color: theme.colorScheme.secondary,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.5,
                                     ),
-                                  ),
-                                ]),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      "Horaires d'ouverture",
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.secondary,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.5,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                                 const SizedBox(height: 10),
                                 ...pharmacy.horairesOuverture!.map((h) {
                                   final horaire = h is Map ? h : {};
                                   final jour =
-                                      horaire['jour']?.toString() ?? h.toString();
-                                  final heure = horaire['heures']?.toString() ?? '';
+                                      horaire['jour']?.toString() ??
+                                      h.toString();
+                                  final heure =
+                                      horaire['heure']?.toString() ?? '';
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 6),
-                                    child: Row(children: [
-                                      SizedBox(
-                                        width: 100,
-                                        child: Text(jour,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 100,
+                                          child: Text(
+                                            jour,
                                             style: theme.textTheme.bodySmall
-                                                ?.copyWith(fontWeight: FontWeight.w600)),
-                                      ),
-                                      Expanded(
-                                        child: Text(heure,
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.7),
-                                            )),
-                                      ),
-                                    ]),
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            heure,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withOpacity(0.7),
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 }),
                               ],
@@ -513,30 +593,39 @@ class _MapScreenState extends State<MapScreen> {
                           child: FilledButton.icon(
                             style: FilledButton.styleFrom(
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                             onPressed: () {
                               final url =
-                                  pharmacy.itineraireGoogleMaps?.isNotEmpty == true
-                                      ? pharmacy.itineraireGoogleMaps!
-                                      : (pharmacy.latitude != null &&
-                                              pharmacy.longitude != null
-                                          ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
-                                          : null);
+                                  pharmacy.itineraireGoogleMaps?.isNotEmpty ==
+                                      true
+                                  ? pharmacy.itineraireGoogleMaps!
+                                  : (pharmacy.latitude != null &&
+                                            pharmacy.longitude != null
+                                        ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
+                                        : null);
                               if (url != null) {
                                 Clipboard.setData(ClipboardData(text: url));
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: const Text('Lien copié — collez dans Maps'),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  duration: const Duration(seconds: 2),
-                                ));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      'Lien copié — collez dans Maps',
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
                               }
                             },
                             icon: const Icon(Icons.directions_rounded),
-                            label: const Text('Obtenir l\'itinéraire',
-                                style: TextStyle(fontWeight: FontWeight.w700)),
+                            label: const Text(
+                              'Obtenir l\'itinéraire',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -574,43 +663,49 @@ class _MapScreenState extends State<MapScreen> {
               ? Border.all(color: iconColor.withOpacity(0.3), width: 1)
               : null,
         ),
-        child: Row(children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 18),
             ),
-            child: Icon(icon, color: iconColor, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.4,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  content,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isClickable ? iconColor : null,
-                    fontWeight: isClickable ? FontWeight.w600 : null,
+                  const SizedBox(height: 2),
+                  Text(
+                    content,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isClickable ? iconColor : null,
+                      fontWeight: isClickable ? FontWeight.w600 : null,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (isClickable)
-            Icon(Icons.copy_rounded, size: 16, color: iconColor.withOpacity(0.6)),
-        ]),
+            if (isClickable)
+              Icon(
+                Icons.copy_rounded,
+                size: 16,
+                color: iconColor.withOpacity(0.6),
+              ),
+          ],
+        ),
       ),
     );
   }
