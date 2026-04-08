@@ -7,11 +7,13 @@ class FloatingMapButtons extends StatelessWidget {
   final MapController mapController;
   // Callback déclenché quand on appuie sur le bouton de localisation
   final VoidCallback onMyLocationPressed;
+  final int trackingState; // 0: none, 1: position, 2: compass
 
   const FloatingMapButtons({
     super.key,
     required this.mapController,
     required this.onMyLocationPressed,
+    this.trackingState = 0,
   });
 
   @override
@@ -35,12 +37,14 @@ class FloatingMapButtons extends StatelessWidget {
           mapController.move(mapController.camera.center, zoom);
         }),
         const SizedBox(height: 8),
-        // Bouton "Ma position" : Recentre la carte sur la position réelle de l'utilisateur
+        // Bouton "Ma position" : 0=Off, 1=Centré, 2=Boussole
         _buildButton(
           context,
-          Icons.my_location,
-          onMyLocationPressed, // Utilise le callback fourni pour recentrer
-          isPrimary: true, // Couleur plus vive pour le bouton principal
+          trackingState == 2
+              ? Icons.explore
+              : (trackingState == 1 ? Icons.my_location : Icons.location_searching),
+          onMyLocationPressed,
+          isPrimary: trackingState != 0,
         ),
       ],
     );

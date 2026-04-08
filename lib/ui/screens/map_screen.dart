@@ -34,6 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _userPosition;
   LatLng? _pendingMove;
   bool _mapReady = false;
+  int _trackingState = 0; // 0: tracking disabled, 1: position, 2: heading
 
   late final StreamController<double?> _alignController;
 
@@ -62,7 +63,10 @@ class _MapScreenState extends State<MapScreen> {
       );
       if (mounted) {
         final userLatLng = LatLng(position.latitude, position.longitude);
-        setState(() => _userPosition = userLatLng);
+        setState(() {
+          _userPosition = userLatLng;
+          _trackingState = 1;
+        });
         if (_mapReady) {
           _mapController.move(userLatLng, 15.0);
         } else {
@@ -155,6 +159,11 @@ class _MapScreenState extends State<MapScreen> {
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
+                onPositionChanged: (position, hasGesture) {
+                  if (hasGesture && _trackingState != 0) {
+                    setState(() => _trackingState = 0);
+                  }
+                },
                 onMapReady: () {
                   _mapReady = true;
                   if (_pendingMove != null) {
@@ -177,6 +186,9 @@ class _MapScreenState extends State<MapScreen> {
                   builder: (context) {
                     return CurrentLocationLayer(
                       alignPositionStream: _alignController.stream,
+                      alignDirectionOnUpdate: _trackingState == 2
+                          ? AlignOnUpdate.always
+                          : AlignOnUpdate.never,
                       style: LocationMarkerStyle(
                         marker: DefaultLocationMarker(
                           color: theme.colorScheme.primary,
@@ -213,7 +225,18 @@ class _MapScreenState extends State<MapScreen> {
                       padding: const EdgeInsets.all(16),
                       child: FloatingMapButtons(
                         mapController: _mapController,
-                        onMyLocationPressed: () => _alignController.add(15.0),
+                        trackingState: _trackingState,
+                        onMyLocationPressed: () {
+                          if (_trackingState == 0) {
+                            setState(() => _trackingState = 1);
+                            _alignController.add(15.0);
+                          } else if (_trackingState == 1) {
+                            setState(() => _trackingState = 2);
+                          } else {
+                            setState(() => _trackingState = 1);
+                            _mapController.rotate(0);
+                          }
+                        },
                       ),
                     ),
                   ),

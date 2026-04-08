@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 
 void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy) {
@@ -161,21 +162,72 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy) {
                             iconColor: const Color(0xFF22C55E),
                             label: 'Téléphone',
                             content: pharmacy.telephone!,
-                            isClickable: true,
-                            onTap: () {
-                              Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Numéro copié',
-                                    style: TextStyle(fontWeight: FontWeight.w600),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Bouton Appeler
+                                InkWell(
+                                  onTap: () async {
+                                    final Uri phoneUri = Uri(
+                                      scheme: 'tel',
+                                      path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
+                                    );
+                                    if (await canLaunchUrl(phoneUri)) {
+                                      await launchUrl(phoneUri);
+                                    } else {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: const Text(
+                                              'Impossible de lancer l\'appel.',
+                                              style: TextStyle(fontWeight: FontWeight.w600),
+                                            ),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            backgroundColor: theme.colorScheme.error,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF22C55E).withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.call_rounded, size: 18, color: Color(0xFF22C55E)),
                                   ),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  backgroundColor: theme.colorScheme.inverseSurface,
                                 ),
-                              );
-                            },
+                                const SizedBox(width: 8),
+                                // Bouton Copier
+                                InkWell(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Numéro copié',
+                                          style: TextStyle(fontWeight: FontWeight.w600),
+                                        ),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        backgroundColor: theme.colorScheme.inverseSurface,
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.copy_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           
                         // Horaires Opening
@@ -287,17 +339,13 @@ Widget _infoCard({
   required Color iconColor,
   required String label,
   required String content,
-  VoidCallback? onTap,
-  bool isClickable = false,
+  Widget? trailing,
 }) {
   return Container(
     margin: const EdgeInsets.only(bottom: 12),
     child: Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
+      child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
@@ -332,8 +380,8 @@ Widget _infoCard({
                     Text(
                       content,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: isClickable ? iconColor : theme.colorScheme.onSurface,
-                        fontWeight: isClickable ? FontWeight.w600 : FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -341,19 +389,10 @@ Widget _infoCard({
                   ],
                 ),
               ),
-              if (isClickable)
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.copy_rounded, size: 18, color: iconColor),
-                ),
+              if (trailing != null) trailing,
             ],
           ),
         ),
-      ),
     ),
   );
 }
