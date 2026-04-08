@@ -36,14 +36,34 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(SearchBottomSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.pharmacies != oldWidget.pharmacies && _isSearching) {
+      _onSearchChanged();
+    }
+  }
+
+  String _normalize(String input) {
+    return input
+        .toLowerCase()
+        .replaceAll('é', 'e')
+        .replaceAll('è', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('à', 'a')
+        .replaceAll('ç', 'c')
+        .replaceAll('ô', 'o')
+        .replaceAll('î', 'i');
+  }
+
   void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
+    final query = _normalize(_searchController.text);
     setState(() {
       _isSearching = query.isNotEmpty;
       if (_isSearching) {
         _filteredPharmacies = widget.pharmacies.where((p) {
-          final name = p.nom.toLowerCase();
-          final address = p.adresse?.toLowerCase() ?? '';
+          final name = _normalize(p.nom);
+          final address = _normalize(p.adresse ?? '');
           return name.contains(query) || address.contains(query);
         }).toList();
       } else {
@@ -83,28 +103,37 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
             child: CustomScrollView(
               controller: scrollController,
               slivers: [
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 12),
-                      // Indicateur de drag M3
-                      Container(
-                        width: 48,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: colorScheme.onSurface.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
+                SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  backgroundColor: colorScheme.surface,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 110,
+                  flexibleSpace: Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Indicateur de drag M3
+                        Container(
+                          width: 48,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: colorScheme.onSurface.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                      ),
-                    const SizedBox(height: 16),
-                    CustomSearchBar(
-                      controller: _searchController,
-                      onClear: () => setState(() => _isSearching = false),
+                        const SizedBox(height: 16),
+                        CustomSearchBar(
+                          controller: _searchController,
+                          onClear: () => setState(() => _isSearching = false),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-
               if (!_isSearching)
                 SliverToBoxAdapter(
                   child: Padding(
