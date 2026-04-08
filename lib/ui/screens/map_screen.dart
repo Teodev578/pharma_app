@@ -137,10 +137,11 @@ class _MapScreenState extends State<MapScreen> {
         ? theme.colorScheme.surface
         : const Color(0xFFF2F4F5);
 
-    // Tuiles raster OSM : clair par défaut, sombre via Stadia Alidade Smooth Dark
+    // Tuiles raster : CartoDB Positron (clair) + CartoDB Dark Matter (sombre)
+    // 100% gratuit, sans clé API, sans rate limiting sur mobile.
     final tileUrl = isDarkMode
-        ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-        : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
