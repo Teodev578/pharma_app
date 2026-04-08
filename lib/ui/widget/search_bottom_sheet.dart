@@ -67,32 +67,35 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
+                color: Colors.black.withOpacity(0.15),
+                spreadRadius: 0,
+                blurRadius: 40,
+                offset: const Offset(0, -10),
               ),
             ],
           ),
-          child: CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    // Indicateur de drag M3
-                    Container(
-                      width: 32,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: colorScheme.outlineVariant,
-                        borderRadius: BorderRadius.circular(2),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      // Indicateur de drag M3
+                      Container(
+                        width: 48,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 16),
                     CustomSearchBar(
                       controller: _searchController,
@@ -195,6 +198,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                   ),
                 ),
             ],
+          ),
           ),
         );
       },

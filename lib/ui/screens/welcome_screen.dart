@@ -22,31 +22,41 @@ class WelcomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
+                    color: colorScheme.surface,
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withOpacity(0.2),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
                   child: Icon(
-                    Icons.check_circle_outline_rounded,
+                    Icons.check_circle_rounded,
                     size: 80,
-                    color: colorScheme.onPrimaryContainer,
+                    color: colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 48),
                 Text(
                   'Prêt à commencer ?',
                   style: textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1.0,
                     color: colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Bienvenue sur Pharma App. Votre santé, notre priorité.',
+                  'Bienvenue sur Pharma App.\nVotre santé, notre priorité.',
                   style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                    height: 1.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -59,12 +69,15 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.of(context).pushReplacementNamed(MapScreen.routeName);
                     }
                   },
-                  icon: const Icon(Icons.explore_rounded),
-                  label: const Text('Trouver une pharmacie'),
+                  icon: const Icon(Icons.explore_rounded, size: 24),
+                  label: const Text('Trouver une pharmacie', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    elevation: 0,
                     minimumSize: const Size(double.infinity, 64),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                     ),
                   ),
                 ),

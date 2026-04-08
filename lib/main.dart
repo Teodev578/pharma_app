@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pharma_app/ui/screens/onboarding_screen.dart';
@@ -33,7 +34,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const seedColor = Colors.green;
+    const seedColor = Color(0xFF10B981); // Emerald green for a premium look
+    final lightTextTheme = GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme);
+    final darkTextTheme = GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -44,6 +47,7 @@ class MainApp extends StatelessWidget {
           seedColor: seedColor,
           brightness: Brightness.light,
         ),
+        textTheme: lightTextTheme,
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
@@ -51,6 +55,7 @@ class MainApp extends StatelessWidget {
           seedColor: seedColor,
           brightness: Brightness.dark,
         ),
+        textTheme: darkTextTheme,
         useMaterial3: true,
       ),
       initialRoute: !hasSeenOnboarding
