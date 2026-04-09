@@ -20,9 +20,9 @@ class FloatingMapButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Bouton pour changer de calque ou de vue (Prévu pour une future version)
-        _buildButton(context, Icons.layers_outlined, () {
-          // Action changer de vue (implémentation future)
+        // Bouton pour repointer vers le nord
+        _buildButton(context, Icons.explore_outlined, () {
+          mapController.rotate(0);
         }),
         const SizedBox(height: 8),
         // Bouton Zoom + (rapproche la caméra)
