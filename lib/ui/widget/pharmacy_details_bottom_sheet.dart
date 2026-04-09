@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 
-void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy) {
+void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {VoidCallback? onDirectionsPressed}) {
   final isOpen = pharmacy.statutActuel == 'Ouvert';
   final statusColor = isOpen
       ? const Color(0xFF22C55E)
@@ -265,26 +265,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy) {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                               elevation: 0,
                             ),
-                            onPressed: () {
-                              final url = pharmacy.itineraireGoogleMaps?.isNotEmpty == true
-                                      ? pharmacy.itineraireGoogleMaps!
-                                      : (pharmacy.latitude != null && pharmacy.longitude != null
-                                          ? 'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}'
-                                          : null);
-                              if (url != null) {
-                                Clipboard.setData(ClipboardData(text: url));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      'Lien copié — collez dans Maps',
-                                      style: TextStyle(fontWeight: FontWeight.w600),
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  ),
-                                );
-                              }
-                            },
+                            onPressed: onDirectionsPressed,
                             icon: const Icon(Icons.directions_rounded, size: 22),
                             label: const Text('Obtenir l\'itinéraire', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           ),

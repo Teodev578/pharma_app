@@ -9,6 +9,7 @@ class PharmacyMarker {
     required BuildContext context,
     required LatLng point,
     required Pharmacy pharmacy,
+    VoidCallback? onDirectionsPressed,
   }) {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
     final colorScheme = Theme.of(context).colorScheme;
@@ -19,7 +20,7 @@ class PharmacyMarker {
       width: 44,
       height: 44,
       child: GestureDetector(
-        onTap: () => showPharmacyDetailsBottomSheet(context, pharmacy),
+        onTap: () => showPharmacyDetailsBottomSheet(context, pharmacy, onDirectionsPressed: onDirectionsPressed),
         child: RepaintBoundary(
           key: stableKey,
           child: Container(

@@ -16,6 +16,7 @@ import 'package:pharma_app/ui/widget/map_scale_widget.dart';
 import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'package:pharma_app/services/supabase_service.dart';
+import 'package:pharma_app/services/routing_service.dart';
 
 class MapScreen extends StatefulWidget {
   static const String routeName = '/map';
@@ -39,6 +40,8 @@ class _MapScreenState extends State<MapScreen> {
   double _rotation = 0.0;
   double _zoom = 15.0;
   double _centerLat = 6.137;
+  List<LatLng> _routePoints = [];
+  bool _isRouting = false;
 
   late final StreamController<double?> _alignController;
 
@@ -109,6 +112,10 @@ class _MapScreenState extends State<MapScreen> {
             context: context,
             point: LatLng(p.latitude!, p.longitude!),
             pharmacy: p,
+            onDirectionsPressed: () {
+              Navigator.pop(context); // Fermer le bottom sheet pour voir la carte
+              _fetchAndShowRoute(p);
+            },
           ),
         )
         .toList();
@@ -117,6 +124,37 @@ class _MapScreenState extends State<MapScreen> {
         _cachedMarkers = newMarkers;
         _isLoadingPharmacies = false;
       });
+    }
+  }
+
+  Future<void> _fetchAndShowRoute(Pharmacy pharmacy) async {
+    if (_userPosition == null) return;
+    if (pharmacy.latitude == null || pharmacy.longitude == null) return;
+
+    setState(() {
+      _isRouting = true;
+      _routePoints = []; // Clear previous route
+    });
+
+    final dest = LatLng(pharmacy.latitude!, pharmacy.longitude!);
+    final points = await RoutingService().getRoute(_userPosition!, dest);
+
+    if (mounted) {
+      setState(() {
+        _routePoints = points;
+        _isRouting = false;
+      });
+
+      if (points.isNotEmpty) {
+        // Fit bounds to show the whole route
+        final bounds = LatLngBounds.fromPoints(points);
+        _mapController.fitCamera(
+          CameraFit.bounds(
+            bounds: bounds,
+            padding: const EdgeInsets.all(80),
+          ),
+        );
+      }
     }
   }
 
@@ -212,6 +250,20 @@ class _MapScreenState extends State<MapScreen> {
                   },
                 ),
 
+                // COUCHE : Itinéraire (Polyline)
+                if (_routePoints.isNotEmpty)
+                  PolylineLayer(
+                    polylines: [
+                      Polyline(
+                        points: _routePoints,
+                        color: theme.colorScheme.primary,
+                        strokeWidth: 5,
+                        borderColor: theme.colorScheme.primary.withOpacity(0.3),
+                        borderStrokeWidth: 3,
+                      ),
+                    ],
+                  ),
+
                 // COUCHE 3 : Clusters de pharmacies
                 if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
                   Builder(
@@ -281,12 +333,19 @@ class _MapScreenState extends State<MapScreen> {
                     LatLng(pharmacy.latitude!, pharmacy.longitude!),
                     16.0,
                   );
-                  showPharmacyDetailsBottomSheet(context, pharmacy);
+                  showPharmacyDetailsBottomSheet(context, pharmacy, onDirectionsPressed: () {
+                    Navigator.pop(context); // Close bottom sheet to see map
+                    _fetchAndShowRoute(pharmacy);
+                  });
                 }
               },
             ),
 
             if (_isLoadingPharmacies) const MapTopLoader(),
+            if (_isRouting)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
           ],
         ),
       ),
