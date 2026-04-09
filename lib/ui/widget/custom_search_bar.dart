@@ -55,17 +55,23 @@ class CustomSearchBar extends StatelessWidget {
                   if (onChanged != null) onChanged!('');
                 },
               ),
-            const Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.blueGrey,
-                child: Text(
-                  "FK",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, '/settings');
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 24,
                   ),
                 ),
               ),
