@@ -162,72 +162,42 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy) {
                             iconColor: const Color(0xFF22C55E),
                             label: 'Téléphone',
                             content: pharmacy.telephone!,
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Bouton Appeler
-                                InkWell(
-                                  onTap: () async {
-                                    final Uri phoneUri = Uri(
-                                      scheme: 'tel',
-                                      path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
-                                    );
-                                    if (await canLaunchUrl(phoneUri)) {
-                                      await launchUrl(phoneUri);
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: const Text(
-                                              'Impossible de lancer l\'appel.',
-                                              style: TextStyle(fontWeight: FontWeight.w600),
-                                            ),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                            backgroundColor: theme.colorScheme.error,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF22C55E).withOpacity(0.1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(Icons.call_rounded, size: 18, color: Color(0xFF22C55E)),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                // Bouton Copier
-                                InkWell(
-                                  onTap: () {
-                                    Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text(
-                                          'Numéro copié',
-                                          style: TextStyle(fontWeight: FontWeight.w600),
-                                        ),
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                        backgroundColor: theme.colorScheme.inverseSurface,
+                            onTap: () async {
+                              final Uri phoneUri = Uri(
+                                scheme: 'tel',
+                                path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
+                              );
+                              if (await canLaunchUrl(phoneUri)) {
+                                await launchUrl(phoneUri);
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'Impossible de lancer l\'appel.',
+                                        style: TextStyle(fontWeight: FontWeight.w600),
                                       ),
-                                    );
-                                  },
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.outlineVariant.withOpacity(0.2),
-                                      shape: BoxShape.circle,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      backgroundColor: theme.colorScheme.error,
                                     ),
-                                    child: Icon(Icons.copy_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                                  );
+                                }
+                              }
+                            },
+                            onLongPress: () {
+                              Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    'Numéro copié',
+                                    style: TextStyle(fontWeight: FontWeight.w600),
                                   ),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  backgroundColor: theme.colorScheme.inverseSurface,
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                           
                         // Horaires Opening
@@ -340,12 +310,18 @@ Widget _infoCard({
   required String label,
   required String content,
   Widget? trailing,
+  VoidCallback? onTap,
+  VoidCallback? onLongPress,
 }) {
   return Container(
     margin: const EdgeInsets.only(bottom: 12),
     child: Material(
       color: Colors.transparent,
-      child: Container(
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
@@ -393,6 +369,7 @@ Widget _infoCard({
             ],
           ),
         ),
+      ),
     ),
   );
 }
