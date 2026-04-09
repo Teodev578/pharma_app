@@ -8,12 +8,14 @@ class FloatingMapButtons extends StatelessWidget {
   // Callback déclenché quand on appuie sur le bouton de localisation
   final VoidCallback onMyLocationPressed;
   final int trackingState; // 0: none, 1: position, 2: compass
+  final double rotation;
 
   const FloatingMapButtons({
     super.key,
     required this.mapController,
     required this.onMyLocationPressed,
     this.trackingState = 0,
+    this.rotation = 0.0,
   });
 
   @override
@@ -21,9 +23,14 @@ class FloatingMapButtons extends StatelessWidget {
     return Column(
       children: [
         // Bouton pour repointer vers le nord
-        _buildButton(context, Icons.explore_outlined, () {
-          mapController.rotate(0);
-        }),
+        _buildButton(
+          context,
+          rotation == 0 ? Icons.navigation : Icons.explore_outlined,
+          () {
+            mapController.rotate(0);
+          },
+          rotation: rotation,
+        ),
         const SizedBox(height: 8),
         // Bouton Zoom + (rapproche la caméra)
         _buildButton(context, Icons.add, () {
@@ -56,8 +63,25 @@ class FloatingMapButtons extends StatelessWidget {
     IconData icon,
     VoidCallback onPressed, {
     bool isPrimary = false,
+    double? rotation,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isNorth = (rotation ?? 0) == 0;
+
+    Widget iconWidget = Icon(
+      icon,
+      color: isPrimary ? colorScheme.onPrimary : colorScheme.onSurface,
+      size: 24,
+    );
+
+    // Si on a une rotation et qu'on n'est pas au nord, on fait pivoter l'icône
+    if (rotation != null && !isNorth) {
+      iconWidget = Transform.rotate(
+        // On convertit les degrés en radians et on inverse pour pointer le nord
+        angle: -rotation * (3.1415926535897932 / 180),
+        child: iconWidget,
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -86,11 +110,7 @@ class FloatingMapButtons extends StatelessWidget {
           onTap: onPressed,
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Icon(
-              icon,
-              color: isPrimary ? colorScheme.onPrimary : colorScheme.onSurface,
-              size: 24,
-            ),
+            child: iconWidget,
           ),
         ),
       ),

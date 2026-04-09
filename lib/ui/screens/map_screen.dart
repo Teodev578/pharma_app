@@ -12,6 +12,7 @@ import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 import 'package:pharma_app/ui/widget/pharmacy_details_bottom_sheet.dart';
 import 'package:pharma_app/ui/widget/map_cluster_widget.dart';
 import 'package:pharma_app/ui/widget/map_top_loader.dart';
+import 'package:pharma_app/ui/widget/map_scale_widget.dart';
 import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'package:pharma_app/services/supabase_service.dart';
@@ -35,6 +36,9 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _pendingMove;
   bool _mapReady = false;
   int _trackingState = 0; // 0: tracking disabled, 1: position, 2: heading
+  double _rotation = 0.0;
+  double _zoom = 15.0;
+  double _centerLat = 6.137;
 
   late final StreamController<double?> _alignController;
 
@@ -160,6 +164,15 @@ class _MapScreenState extends State<MapScreen> {
                   flags: InteractiveFlag.all,
                 ),
                 onPositionChanged: (position, hasGesture) {
+                  if (position.rotation != _rotation ||
+                      position.zoom != _zoom ||
+                      position.center.latitude != _centerLat) {
+                    setState(() {
+                      _rotation = position.rotation;
+                      _zoom = position.zoom;
+                      _centerLat = position.center.latitude;
+                    });
+                  }
                   if (hasGesture && _trackingState != 0) {
                     setState(() => _trackingState = 0);
                   }
@@ -226,6 +239,7 @@ class _MapScreenState extends State<MapScreen> {
                       child: FloatingMapButtons(
                         mapController: _mapController,
                         trackingState: _trackingState,
+                        rotation: _rotation,
                         onMyLocationPressed: () {
                           if (_trackingState == 0) {
                             setState(() => _trackingState = 1);
@@ -237,6 +251,20 @@ class _MapScreenState extends State<MapScreen> {
                             _mapController.rotate(0);
                           }
                         },
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Échelle de la carte
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: MapScaleWidget(
+                        zoom: _zoom,
+                        latitude: _centerLat,
                       ),
                     ),
                   ),
