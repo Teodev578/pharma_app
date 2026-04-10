@@ -26,7 +26,8 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchChanged);
+    _filteredPharmacies = widget.pharmacies;
+    _searchController.addListener(_applyFilters);
   }
 
   @override
@@ -38,8 +39,8 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
   @override
   void didUpdateWidget(SearchBottomSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.pharmacies != oldWidget.pharmacies && _isSearching) {
-      _onSearchChanged();
+    if (widget.pharmacies != oldWidget.pharmacies) {
+      _applyFilters();
     }
   }
 
@@ -55,19 +56,28 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
         .replaceAll('î', 'i');
   }
 
-  void _onSearchChanged() {
+  void _applyFilters() {
     final query = _normalize(_searchController.text);
     setState(() {
       _isSearching = query.isNotEmpty;
-      if (_isSearching) {
-        _filteredPharmacies = widget.pharmacies.where((p) {
-          final name = _normalize(p.nom);
-          final address = _normalize(p.adresse ?? '');
-          return name.contains(query) || address.contains(query);
-        }).toList();
-      } else {
-        _filteredPharmacies = [];
-      }
+      _filteredPharmacies = widget.pharmacies.where((p) {
+        final name = _normalize(p.nom);
+        final address = _normalize(p.adresse ?? '');
+        
+        bool matchesSearch = query.isEmpty || name.contains(query) || address.contains(query);
+        if (!matchesSearch) return false;
+
+        if (_selectedFilter == 'De garde') {
+          return p.statutActuel?.toLowerCase() == 'de garde';
+        } else if (_selectedFilter == 'Ouvertes') {
+          return p.statutActuel?.toLowerCase() == 'ouverte' || p.statutActuel?.toLowerCase() == 'ouvert';
+        } else if (_selectedFilter == 'Proches') {
+          return true; // Implémente le tri par distance si tu l'as, par defaut ca retourne tout
+        }
+        
+        // "Toutes"
+        return true;
+      }).toList();
     });
   }
 
@@ -133,86 +143,74 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                     ),
                   ),
                 ),
-              if (!_isSearching)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(
                       left: 16.0,
                       right: 16.0,
-                      top: 8.0, // Reduced padding so chips are visible
-                      bottom: 24.0,
+                      top: 8.0,
+                      bottom: 8.0,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              FilterChip(
-                                label: const Text('Toutes'),
-                                selected: _selectedFilter == 'Toutes',
-                                showCheckmark: false,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onSelected: (bool selected) {
-                                  setState(() => _selectedFilter = 'Toutes');
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              FilterChip(
-                                label: const Text('De garde'),
-                                selected: _selectedFilter == 'De garde',
-                                showCheckmark: false,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onSelected: (bool selected) {
-                                  setState(() => _selectedFilter = 'De garde');
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              FilterChip(
-                                label: const Text('Ouvertes'),
-                                selected: _selectedFilter == 'Ouvertes',
-                                showCheckmark: false,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onSelected: (bool selected) {
-                                  setState(() => _selectedFilter = 'Ouvertes');
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              FilterChip(
-                                label: const Text('Proches'),
-                                selected: _selectedFilter == 'Proches',
-                                showCheckmark: false,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onSelected: (bool selected) {
-                                  setState(() => _selectedFilter = 'Proches');
-                                },
-                              ),
-                            ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          FilterChip(
+                            label: const Text('Toutes'),
+                            selected: _selectedFilter == 'Toutes',
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() => _selectedFilter = 'Toutes');
+                              _applyFilters();
+                            },
                           ),
-                        ),
-                        const SizedBox(height: 32),
-                        Text(
-                          "Récents",
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(width: 8),
+                          FilterChip(
+                            label: const Text('De garde'),
+                            selected: _selectedFilter == 'De garde',
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() => _selectedFilter = 'De garde');
+                              _applyFilters();
+                            },
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        // On pourra mettre les vrais récents ici plus tard
-                      ],
+                          const SizedBox(width: 8),
+                          FilterChip(
+                            label: const Text('Ouvertes'),
+                            selected: _selectedFilter == 'Ouvertes',
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() => _selectedFilter = 'Ouvertes');
+                              _applyFilters();
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          FilterChip(
+                            label: const Text('Proches'),
+                            selected: _selectedFilter == 'Proches',
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() => _selectedFilter = 'Proches');
+                              _applyFilters();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                )
-              else
+                ),
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
