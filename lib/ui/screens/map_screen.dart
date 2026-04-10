@@ -14,7 +14,9 @@ import 'package:pharma_app/ui/widget/map_cluster_widget.dart';
 import 'package:pharma_app/ui/widget/map_top_loader.dart';
 import 'package:pharma_app/ui/widget/map_scale_widget.dart';
 import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
+import 'package:pharma_app/ui/widget/navigation_banner.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/models/route_info.dart';
 import 'package:pharma_app/services/supabase_service.dart';
 import 'package:pharma_app/services/routing_service.dart';
 
@@ -41,6 +43,7 @@ class _MapScreenState extends State<MapScreen> {
   double _zoom = 15.0;
   double _centerLat = 6.137;
   List<LatLng> _routePoints = [];
+  RouteInfo? _currentRoute;
   bool _isRouting = false;
 
   late final StreamController<double?> _alignController;
@@ -134,20 +137,22 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _isRouting = true;
       _routePoints = []; // Clear previous route
+      _currentRoute = null;
     });
 
     final dest = LatLng(pharmacy.latitude!, pharmacy.longitude!);
-    final points = await RoutingService().getRoute(_userPosition!, dest);
+    final routeInfo = await RoutingService().getRoute(_userPosition!, dest);
 
     if (mounted) {
       setState(() {
-        _routePoints = points;
+        _currentRoute = routeInfo;
+        _routePoints = routeInfo?.points ?? [];
         _isRouting = false;
       });
 
-      if (points.isNotEmpty) {
+      if (_routePoints.isNotEmpty) {
         // Fit bounds to show the whole route
-        final bounds = LatLngBounds.fromPoints(points);
+        final bounds = LatLngBounds.fromPoints(_routePoints);
         _mapController.fitCamera(
           CameraFit.bounds(
             bounds: bounds,
@@ -321,6 +326,70 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
+
+                // Panneau de navigation
+                if (_routePoints.isNotEmpty && _currentRoute != null && _currentRoute!.steps.isNotEmpty)
+                  Builder(
+                    builder: (context) {
+                      final steps = _currentRoute!.steps;
+                      String distanceText = '0 m';
+                      String instructionText = 'Arrivée';
+                      IconData icon = Icons.check_circle_outline;
+
+                      // Use distance of step 0 (distance to reach maneuver 1)
+                      // and instruction of step 1
+                      if (steps.length > 1) {
+                        double dist = steps[0].distance;
+                        if (dist > 1000) {
+                          distanceText = '${(dist / 1000).toStringAsFixed(1)} km';
+                        } else {
+                          distanceText = '${dist.round()} m';
+                        }
+                        instructionText = steps[1].instruction;
+                        
+                        // Map modifier to Icon
+                        switch (steps[1].modifier) {
+                          case 'left':
+                          case 'sharp left':
+                            icon = Icons.turn_left;
+                            break;
+                          case 'slight left':
+                            icon = Icons.turn_slight_left;
+                            break;
+                          case 'right':
+                          case 'sharp right':
+                            icon = Icons.turn_right;
+                            break;
+                          case 'slight right':
+                            icon = Icons.turn_slight_right;
+                            break;
+                          case 'uturn':
+                            icon = Icons.u_turn_left;
+                            break;
+                          case 'straight':
+                            icon = Icons.straight;
+                            break;
+                          default:
+                            icon = Icons.turn_right;
+                        }
+                      }
+
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: NavigationBanner(
+                          distance: distanceText,
+                          instruction: instructionText,
+                          directionIcon: icon,
+                          onCancel: () {
+                            setState(() {
+                              _routePoints = [];
+                              _currentRoute = null;
+                            });
+                          },
+                        ),
+                      );
+                    }
+                  ),
               ],
             ),
 

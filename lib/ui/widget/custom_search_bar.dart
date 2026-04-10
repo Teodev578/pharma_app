@@ -57,23 +57,16 @@ class CustomSearchBar extends StatelessWidget {
               ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: InkWell(
-                onTap: () {
+              child: IconButton(
+                onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.person_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 24,
-                  ),
+                icon: Icon(
+                  Icons.person, // L'icône de la maquette
+                  color: colorScheme.onSurfaceVariant,
+                  size: 28, // Taille équivalente à la maquette
                 ),
+                tooltip: 'Profil',
               ),
             ),
           ],
