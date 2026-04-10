@@ -87,13 +87,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Future<void> _checkPermissionsStatus() async {
-    final notifStatus = await Permission.notification.status;
-    final locationStatus = await Permission.locationWhenInUse.status;
-    if (mounted) {
-      setState(() {
-        _notificationsEnabled = notifStatus.isGranted;
-        _locationEnabled = locationStatus.isGranted;
-      });
+    try {
+      final notifStatus = await Permission.notification.status;
+      final locationStatus = await Permission.locationWhenInUse.status;
+      if (mounted) {
+        setState(() {
+          _notificationsEnabled = notifStatus.isGranted;
+          _locationEnabled = locationStatus.isGranted;
+        });
+      }
+    } on MissingPluginException {
+      debugPrint("Plugin Permission non trouvé. Soit un 'Stop et Relancer' est nécessaire, soit l'OS (ex: Linux) n'est pas supporté par le plugin.");
+    } catch (e) {
+      debugPrint("Erreur de statut de permission: $e");
     }
   }
 
@@ -119,6 +125,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             });
           }
           if (status.isGranted) await HapticFeedback.lightImpact();
+        }
+      } on MissingPluginException {
+        debugPrint("MissingPluginException: Redémarrage complet nécessaire, ou OS non supporté (Linux).");
+        // Simule l'activation de la permission pour ne pas bloquer l'UI sur Linux Desktop
+        if (mounted) {
+          setState(() {
+            if (permission == Permission.notification) _notificationsEnabled = true;
+            else if (permission == Permission.locationWhenInUse) _locationEnabled = true;
+          });
         }
       } catch (e) {
         debugPrint("Erreur permission: $e");
