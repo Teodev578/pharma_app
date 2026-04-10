@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'custom_search_bar.dart';
-import 'action_button.dart';
 import 'recent_tile.dart';
-
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
   final Function(Pharmacy) onPharmacySelected;
@@ -23,6 +21,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
   final DraggableScrollableController _sheetController = DraggableScrollableController();
   List<Pharmacy> _filteredPharmacies = [];
   bool _isSearching = false;
+  String _selectedFilter = 'Toutes';
 
   @override
   void initState() {
@@ -137,39 +136,68 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
               if (!_isSearching)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 24.0,
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 8.0, // Reduced padding so chips are visible
+                      bottom: 24.0,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Lieux",
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              FilterChip(
+                                label: const Text('Toutes'),
+                                selected: _selectedFilter == 'Toutes',
+                                showCheckmark: false,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                onSelected: (bool selected) {
+                                  setState(() => _selectedFilter = 'Toutes');
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              FilterChip(
+                                label: const Text('De garde'),
+                                selected: _selectedFilter == 'De garde',
+                                showCheckmark: false,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                onSelected: (bool selected) {
+                                  setState(() => _selectedFilter = 'De garde');
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              FilterChip(
+                                label: const Text('Ouvertes'),
+                                selected: _selectedFilter == 'Ouvertes',
+                                showCheckmark: false,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                onSelected: (bool selected) {
+                                  setState(() => _selectedFilter = 'Ouvertes');
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              FilterChip(
+                                label: const Text('Proches'),
+                                selected: _selectedFilter == 'Proches',
+                                showCheckmark: false,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                onSelected: (bool selected) {
+                                  setState(() => _selectedFilter = 'Proches');
+                                },
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ActionButton(
-                              icon: Icons.local_pharmacy,
-                              label: "Proches",
-                              color: Colors.green,
-                            ),
-                            ActionButton(
-                              icon: Icons.star,
-                              label: "Favoris",
-                              color: Colors.orange,
-                            ),
-                            ActionButton(
-                              icon: Icons.add,
-                              label: "Ajouter",
-                              color: Colors.blue,
-                            ),
-                          ],
                         ),
                         const SizedBox(height: 32),
                         Text(
@@ -194,6 +222,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                         return RecentTile(
                           title: p.nom,
                           subtitle: p.adresse ?? 'Adresse inconnue',
+                          status: p.statutActuel,
                           onTap: () {
                             _sheetController.animateTo(
                               0.15,
