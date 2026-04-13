@@ -38,7 +38,7 @@ class CustomSearchBar extends StatelessWidget {
                   color: colorScheme.onSurface,
                 ),
                 decoration: InputDecoration(
-                  hintText: "Recherche...",
+                  hintText: "Recherche de pharmacie...",
                   hintStyle: textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -61,10 +61,14 @@ class CustomSearchBar extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
-                icon: Icon(
-                  Icons.person_outline,
-                  color: colorScheme.primary,
-                  size: 24,
+                icon: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: colorScheme.primaryContainer,
+                  child: Icon(
+                    Icons.person_outline,
+                    color: colorScheme.primary,
+                    size: 20,
+                  ),
                 ),
                 tooltip: 'Profil',
               ),
