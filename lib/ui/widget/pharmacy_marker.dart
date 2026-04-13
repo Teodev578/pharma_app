@@ -49,13 +49,6 @@ class PharmacyMarker {
                   decoration: BoxDecoration(
                     color: colorScheme.surface.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(4),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Text(
                     pharmacy.nom,

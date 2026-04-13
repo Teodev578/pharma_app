@@ -67,9 +67,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
         bool matchesSearch = query.isEmpty || name.contains(query) || address.contains(query);
         if (!matchesSearch) return false;
 
-        if (_selectedFilter == 'De garde') {
-          return p.statutActuel?.toLowerCase() == 'de garde';
-        } else if (_selectedFilter == 'Ouvertes') {
+        if (_selectedFilter == 'Ouvertes') {
           return p.statutActuel?.toLowerCase() == 'ouverte' || p.statutActuel?.toLowerCase() == 'ouvert';
         } else if (_selectedFilter == 'Proches') {
           return true; // Implémente le tri par distance si tu l'as, par defaut ca retourne tout
@@ -164,19 +162,6 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                             ),
                             onSelected: (bool selected) {
                               setState(() => _selectedFilter = 'Toutes');
-                              _applyFilters();
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          FilterChip(
-                            label: const Text('De garde'),
-                            selected: _selectedFilter == 'De garde',
-                            showCheckmark: false,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            onSelected: (bool selected) {
-                              setState(() => _selectedFilter = 'De garde');
                               _applyFilters();
                             },
                           ),

@@ -5,15 +5,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+
 
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 import 'package:pharma_app/ui/widget/pharmacy_details_bottom_sheet.dart';
-import 'package:pharma_app/ui/widget/map_cluster_widget.dart';
+
 import 'package:pharma_app/ui/widget/map_top_loader.dart';
 import 'package:pharma_app/ui/widget/map_scale_widget.dart';
 import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
+import 'package:pharma_app/ui/widget/pharmacy_cluster_layer.dart';
 import 'package:pharma_app/ui/widget/navigation_banner.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'package:pharma_app/models/route_info.dart';
@@ -39,9 +40,9 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _pendingMove;
   bool _mapReady = false;
   int _trackingState = 0; // 0: tracking disabled, 1: position, 2: heading
-  double _rotation = 0.0;
-  double _zoom = 15.0;
-  double _centerLat = 6.137;
+  late final ValueNotifier<double> _rotationNotifier;
+  late final ValueNotifier<double> _zoomNotifier;
+  late final ValueNotifier<double> _centerLatNotifier;
   List<LatLng> _routePoints = [];
   RouteInfo? _currentRoute;
   bool _isRouting = false;
@@ -51,6 +52,9 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _rotationNotifier = ValueNotifier(0.0);
+    _zoomNotifier = ValueNotifier(15.0);
+    _centerLatNotifier = ValueNotifier(6.137);
     _alignController = StreamController<double?>.broadcast();
     _fetchPharmacies();
     _centerOnUserLocation();
@@ -165,6 +169,9 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    _rotationNotifier.dispose();
+    _zoomNotifier.dispose();
+    _centerLatNotifier.dispose();
     _mapController.dispose();
     _alignController.close();
     super.dispose();
@@ -207,14 +214,15 @@ class _MapScreenState extends State<MapScreen> {
                   flags: InteractiveFlag.all,
                 ),
                 onPositionChanged: (position, hasGesture) {
-                  if (position.rotation != _rotation ||
-                      position.zoom != _zoom ||
-                      position.center.latitude != _centerLat) {
-                    setState(() {
-                      _rotation = position.rotation;
-                      _zoom = position.zoom;
-                      _centerLat = position.center.latitude;
-                    });
+                  // Update notifiers without triggering a full setState
+                  if (position.rotation != _rotationNotifier.value) {
+                    _rotationNotifier.value = position.rotation;
+                  }
+                  if (position.zoom != _zoomNotifier.value) {
+                    _zoomNotifier.value = position.zoom;
+                  }
+                  if (position.center.latitude != _centerLatNotifier.value) {
+                    _centerLatNotifier.value = position.center.latitude;
                   }
                   if (hasGesture && _trackingState != 0) {
                     setState(() => _trackingState = 0);
@@ -271,20 +279,9 @@ class _MapScreenState extends State<MapScreen> {
 
                 // COUCHE 3 : Clusters de pharmacies
                 if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
-                  Builder(
-                    builder: (context) {
-                      return MarkerClusterLayer(
-                        mapController: _mapController,
-                        mapCamera: MapCamera.of(context),
-                        options: MarkerClusterLayerOptions(
-                          markers: _cachedMarkers,
-                          size: const Size(44, 44),
-                          maxClusterRadius: 45,
-                          builder: (context, markers) =>
-                              MapClusterWidget(count: markers.length),
-                        ),
-                      );
-                    },
+                  PharmacyClusterLayer(
+                    markers: _cachedMarkers,
+                    mapController: _mapController,
                   ),
 
                 // COUCHE 4 : Boutons flottants
@@ -293,21 +290,24 @@ class _MapScreenState extends State<MapScreen> {
                     alignment: Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: FloatingMapButtons(
-                        mapController: _mapController,
-                        trackingState: _trackingState,
-                        rotation: _rotation,
-                        onMyLocationPressed: () {
-                          if (_trackingState == 0) {
-                            setState(() => _trackingState = 1);
-                            _alignController.add(15.0);
-                          } else if (_trackingState == 1) {
-                            setState(() => _trackingState = 2);
-                          } else {
-                            setState(() => _trackingState = 1);
-                            _mapController.rotate(0);
-                          }
-                        },
+                      child: ValueListenableBuilder<double>(
+                        valueListenable: _rotationNotifier,
+                        builder: (context, rotation, _) => FloatingMapButtons(
+                          mapController: _mapController,
+                          trackingState: _trackingState,
+                          rotation: rotation,
+                          onMyLocationPressed: () {
+                            if (_trackingState == 0) {
+                              setState(() => _trackingState = 1);
+                              _alignController.add(15.0);
+                            } else if (_trackingState == 1) {
+                              setState(() => _trackingState = 2);
+                            } else {
+                              setState(() => _trackingState = 1);
+                              _mapController.rotate(0);
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -319,9 +319,12 @@ class _MapScreenState extends State<MapScreen> {
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: MapScaleWidget(
-                        zoom: _zoom,
-                        latitude: _centerLat,
+                      child: ListenableBuilder(
+                        listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
+                        builder: (context, _) => MapScaleWidget(
+                          zoom: _zoomNotifier.value,
+                          latitude: _centerLatNotifier.value,
+                        ),
                       ),
                     ),
                   ),
