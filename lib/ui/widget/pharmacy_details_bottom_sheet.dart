@@ -199,19 +199,9 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                                   height: 1.4,
                                 ),
                               ),
-                              trailing: Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface, size: 36),
-                              onTap: () async {
+                              trailing: Icon(Icons.copy_rounded, color: theme.colorScheme.onSurface.withOpacity(0.5), size: 24),
+                              onTap: () {
                                 HapticFeedback.lightImpact();
-                                final Uri phoneUri = Uri(
-                                  scheme: 'tel',
-                                  path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
-                                );
-                                if (await canLaunchUrl(phoneUri)) {
-                                  await launchUrl(phoneUri);
-                                }
-                              },
-                              onLongPress: () {
-                                HapticFeedback.heavyImpact();
                                 Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
