@@ -11,7 +11,11 @@ void showPharmacyDetailsBottomSheet(
   Pharmacy pharmacy, {
   VoidCallback? onDirectionsPressed,
 }) {
-  final isOpen = pharmacy.statutActuel == 'Ouvert';
+  final status = pharmacy.statutActuel?.toLowerCase();
+  final isOpen = status == 'ouvert';
+  final isClosed = status == 'fermé';
+  final isUnknown = status == null || status == 'inconnu';
+
   bool isHoursExpanded = false; // État local pour le toggle des horaires
 
   showModalBottomSheet(
@@ -27,7 +31,6 @@ void showPharmacyDetailsBottomSheet(
           final theme = Theme.of(context);
 
           // --- STRICT MATERIAL 3 THEME CONVENTIONS ---
-          final isClosed = pharmacy.statutActuel == 'Fermé';
 
           // Statut (Ouvert = succès via primary, Fermé = erreur, Inconnu = Orange)
           final Color openBgColor;
@@ -144,8 +147,9 @@ void showPharmacyDetailsBottomSheet(
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      pharmacy.statutActuel ??
-                                          'Vérifier sur place',
+                                      isUnknown
+                                          ? 'Vérifier sur place'
+                                          : pharmacy.statutActuel!,
                                       style: TextStyle(
                                         color: openTextColor,
                                         fontSize: 15,

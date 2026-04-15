@@ -11,8 +11,9 @@ class PharmacyMarker {
     required Pharmacy pharmacy,
     VoidCallback? onDirectionsPressed,
   }) {
-    final isOpen = pharmacy.statutActuel == 'Ouvert';
-    final isClosed = pharmacy.statutActuel == 'Fermé';
+    final status = pharmacy.statutActuel?.toLowerCase();
+    final isOpen = status == 'ouvert';
+    final isClosed = status == 'fermé';
     final colorScheme = Theme.of(context).colorScheme;
     final stableKey = ValueKey('marker_${point.latitude}_${point.longitude}');
 
