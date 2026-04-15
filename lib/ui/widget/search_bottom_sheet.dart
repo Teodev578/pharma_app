@@ -71,8 +71,8 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
         if (!matchesSearch) return false;
 
         if (_selectedFilter == 'Ouvertes') {
-          return p.statutActuel?.toLowerCase() == 'ouverte' ||
-              p.statutActuel?.toLowerCase() == 'ouvert';
+          final s = p.statutActuel?.toLowerCase();
+          return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
         } else if (_selectedFilter == 'Proches') {
           return true; // Implémente le tri par distance si tu l'as, par defaut ca retourne tout
         }

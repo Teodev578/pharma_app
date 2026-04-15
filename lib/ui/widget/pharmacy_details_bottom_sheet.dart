@@ -12,9 +12,13 @@ void showPharmacyDetailsBottomSheet(
   VoidCallback? onDirectionsPressed,
 }) {
   final status = pharmacy.statutActuel?.toLowerCase();
-  final isOpen = status == 'ouvert';
-  final isClosed = status == 'fermé';
-  final isUnknown = status == null || status == 'inconnu';
+  final bool isOpen = status == 'ouvert' || status == 'ouverte';
+  final bool isClosed = status == 'fermé' || status == 'fermee';
+  final bool isDeGarde = status == 'de garde';
+  final bool isUnknown =
+      status == null ||
+      status == 'inconnu' ||
+      (!isOpen && !isClosed && !isDeGarde);
 
   bool isHoursExpanded = false; // État local pour le toggle des horaires
 
@@ -35,21 +39,33 @@ void showPharmacyDetailsBottomSheet(
           // Statut (Ouvert = succès via primary, Fermé = erreur, Inconnu = Orange)
           final Color openBgColor;
           final Color openTextColor;
+          final IconData openIcon;
 
-          if (isOpen) {
+          if (isOpen || isDeGarde) {
             openBgColor = theme.colorScheme.primaryContainer;
             openTextColor = theme.colorScheme.onPrimaryContainer;
+            openIcon = Icons.check_circle;
           } else if (isClosed) {
             openBgColor = theme.colorScheme.errorContainer;
             openTextColor = theme.colorScheme.onErrorContainer;
+            openIcon = Icons.access_time_filled_rounded;
           } else {
             // Orange pour le cas "Vérifier sur place"
-            openBgColor = const Color(0xFFFFE0B2); // Orange très clair (Orange 100)
-            openTextColor = const Color(0xFFE65100); // Orange foncé (Orange 900)
+            openBgColor = const Color(
+              0xFFFFE0B2,
+            ); // Orange très clair (Orange 100)
+            openTextColor = const Color(
+              0xFFE65100,
+            ); // Orange foncé (Orange 900)
+            openIcon = Icons.warning_amber_rounded;
           }
-              
+
+          String displayStatus = isUnknown
+              ? 'Vérifier sur place'
+              : pharmacy.statutActuel!;
+
           // Conteneurs de surface (Cartes)
-          final cardBgColor = theme.colorScheme.surfaceContainerHighest; 
+          final cardBgColor = theme.colorScheme.surfaceContainerHighest;
 
           // Bouton principal
           final buttonBgColor = theme.colorScheme.primary;
@@ -137,19 +153,13 @@ void showPharmacyDetailsBottomSheet(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      isOpen
-                                          ? Icons.check_circle
-                                          : (isClosed
-                                              ? Icons.access_time_filled_rounded
-                                              : Icons.warning_amber_rounded),
+                                      openIcon,
                                       size: 18,
                                       color: openTextColor,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      isUnknown
-                                          ? 'Vérifier sur place'
-                                          : pharmacy.statutActuel!,
+                                      displayStatus,
                                       style: TextStyle(
                                         color: openTextColor,
                                         fontSize: 15,

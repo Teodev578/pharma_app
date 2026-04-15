@@ -16,68 +16,112 @@ class RecentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
-    Color bgColor;
-    Color iconBgColor;
-    Color iconColor = Colors.white;
-    Color textColor = colorScheme.onSurface;
-    Color subtitleColor = colorScheme.onSurfaceVariant;
+    final String statusLower = status?.toLowerCase() ?? '';
+    final bool isOpen = statusLower == 'ouvert' || statusLower == 'ouverte';
+    final bool isClosed = statusLower == 'fermé' || statusLower == 'fermee';
+    final bool isDeGarde = statusLower == 'de garde';
+    final bool isUnknown =
+        statusLower.isEmpty ||
+        statusLower == 'inconnu' ||
+        (!isOpen && !isClosed && !isDeGarde);
 
-    final statusLower = status?.toLowerCase() ?? '';
-    if (statusLower == 'de garde') {
-      bgColor = const Color(0xFFDCE5D8); 
-      iconBgColor = const Color(0xFF266649);
-      textColor = const Color(0xFF1E1E1E);
-      subtitleColor = const Color(0xFF333333);
-    } else if (statusLower == 'fermée' || statusLower == 'fermee') {
-      bgColor = colorScheme.errorContainer;
-      iconBgColor = colorScheme.error;
-      iconColor = colorScheme.onError;
-      textColor = colorScheme.onErrorContainer;
-      subtitleColor = colorScheme.onErrorContainer.withOpacity(0.8);
+    Color statusBgColor;
+    Color statusTextColor;
+    IconData statusIcon;
+
+    if (isOpen || isDeGarde) {
+      statusBgColor = colorScheme.primaryContainer;
+      statusTextColor = colorScheme.onPrimaryContainer;
+      statusIcon = Icons.check_circle;
+    } else if (isClosed) {
+      statusBgColor = colorScheme.errorContainer;
+      statusTextColor = colorScheme.onErrorContainer;
+      statusIcon = Icons.access_time_filled_rounded;
     } else {
-      bgColor = colorScheme.surfaceContainerHighest;
-      iconBgColor = colorScheme.primary;
-      iconColor = colorScheme.onPrimary;
-      textColor = colorScheme.onSurface;
-      subtitleColor = colorScheme.onSurfaceVariant;
+      statusBgColor = const Color(0xFFFFE0B2);
+      statusTextColor = const Color(0xFFE65100);
+      statusIcon = Icons.warning_amber_rounded;
     }
 
-    return Card(
-      elevation: 0,
-      color: bgColor,
+    String displayStatus = isUnknown ? 'Vérifier sur place' : status!;
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: iconBgColor,
-              foregroundColor: iconColor,
-              radius: 24,
-              child: const Icon(Icons.local_pharmacy),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Status Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusBgColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(statusIcon, size: 14, color: statusTextColor),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                displayStatus,
+                                style: TextStyle(
+                                  color: statusTextColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        title,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+              ],
             ),
-            title: Text(
-              title,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            subtitle: Text(
-              subtitle,
-              style: textTheme.bodyMedium?.copyWith(
-                color: subtitleColor,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: Icon(Icons.chevron_right, color: subtitleColor),
           ),
         ),
       ),
