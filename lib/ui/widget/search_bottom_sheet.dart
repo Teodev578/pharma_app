@@ -30,11 +30,20 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
     super.initState();
     _filteredPharmacies = widget.pharmacies;
     _searchController.addListener(_applyFilters);
+    _sheetController.addListener(_onSheetScroll);
+  }
+
+  void _onSheetScroll() {
+    if (_sheetController.size < 0.85 && FocusManager.instance.primaryFocus?.hasFocus == true) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _sheetController.removeListener(_onSheetScroll);
+    _sheetController.dispose();
     super.dispose();
   }
 
@@ -112,6 +121,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
           child: ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             child: CustomScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               controller: scrollController,
               slivers: [
                 SliverAppBar(
