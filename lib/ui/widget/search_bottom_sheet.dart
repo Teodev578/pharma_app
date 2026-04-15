@@ -144,58 +144,61 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                       ],
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16.0,
-                      right: 16.0,
-                      top: 8.0,
-                      bottom: 8.0,
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          FilterChip(
-                            label: const Text('Toutes'),
-                            selected: _selectedFilter == 'Toutes',
-                            showCheckmark: false,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                  bottom: PreferredSize(
+                    preferredSize: const Size.fromHeight(64.0),
+                    child: Container(
+                      color: colorScheme.surface,
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        top: 8.0,
+                        bottom: 16.0,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            FilterChip(
+                              label: const Text('Toutes'),
+                              selected: _selectedFilter == 'Toutes',
+                              showCheckmark: false,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              onSelected: (bool selected) {
+                                setState(() => _selectedFilter = 'Toutes');
+                                _applyFilters();
+                              },
                             ),
-                            onSelected: (bool selected) {
-                              setState(() => _selectedFilter = 'Toutes');
-                              _applyFilters();
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          FilterChip(
-                            label: const Text('Ouvertes'),
-                            selected: _selectedFilter == 'Ouvertes',
-                            showCheckmark: false,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                            const SizedBox(width: 8),
+                            FilterChip(
+                              label: const Text('Ouvertes'),
+                              selected: _selectedFilter == 'Ouvertes',
+                              showCheckmark: false,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              onSelected: (bool selected) {
+                                setState(() => _selectedFilter = 'Ouvertes');
+                                _applyFilters();
+                              },
                             ),
-                            onSelected: (bool selected) {
-                              setState(() => _selectedFilter = 'Ouvertes');
-                              _applyFilters();
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          FilterChip(
-                            label: const Text('Proches'),
-                            selected: _selectedFilter == 'Proches',
-                            showCheckmark: false,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                            const SizedBox(width: 8),
+                            FilterChip(
+                              label: const Text('Proches'),
+                              selected: _selectedFilter == 'Proches',
+                              showCheckmark: false,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              onSelected: (bool selected) {
+                                setState(() => _selectedFilter = 'Proches');
+                                _applyFilters();
+                              },
                             ),
-                            onSelected: (bool selected) {
-                              setState(() => _selectedFilter = 'Proches');
-                              _applyFilters();
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
