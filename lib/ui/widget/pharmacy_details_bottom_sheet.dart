@@ -3,18 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 
+/// Affiche une BottomSheet présentant les détails d'une pharmacie.
+/// Est structuré selon la dernière maquette UI avec des éléments M3 (Material 3).
 void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {VoidCallback? onDirectionsPressed}) {
   final isOpen = pharmacy.statutActuel == 'Ouvert';
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
+    backgroundColor: Colors.transparent, // Rendu du fond géré par le Container principal de DraggableScrollableSheet
+    isScrollControlled: true, // Permet un dimensionnement plus fin du BottomSheet
     useSafeArea: true,
     builder: (context) {
       final theme = Theme.of(context);
       final isDark = theme.brightness == Brightness.dark;
       
+      // Configuration adaptative des couleurs selon le mode sombre/clair
+      // La pastille de statut "Ouvert/Fermé" utilise une teinte verte ou d'erreur
       final openBgColor = isOpen 
           ? (isDark ? const Color(0xFF1B4332) : const Color(0xFFA8E6BB))
           : (isDark ? theme.colorScheme.errorContainer : theme.colorScheme.errorContainer);
@@ -22,10 +26,12 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
           ? (isDark ? const Color(0xFFA8E6BB) : Colors.black)
           : theme.colorScheme.onErrorContainer;
           
+      // Couleur de fond générale des cartes (Adresse, Téléphone, Horaires)
       final cardBgColor = isDark 
           ? theme.colorScheme.surfaceContainerHighest 
-          : const Color(0xFFD8ECD8); 
+          : const Color(0xFFD8ECD8); // Teinte verte légère calquée sur la maquette
 
+      // Couleur de fond pour le gros bouton de navigation
       final buttonBgColor = isDark ? theme.colorScheme.primary : const Color(0xFF095834);
 
       return DraggableScrollableSheet(
@@ -35,6 +41,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
         builder: (context, scrollController) {
           return Container(
             decoration: BoxDecoration(
+              // Utilisation d'un fond très clair avec léger gris/vert pour le mode clair
               color: isDark ? theme.colorScheme.surface : const Color(0xFFF7F9F8),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
               boxShadow: [
@@ -53,7 +60,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  // Handle
+                  // --- POIGNÉE DE DRAG (Drag Handle) ---
                   Center(
                     child: Container(
                       width: 48,
@@ -66,7 +73,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                     ),
                   ),
                   
-                  // Title
+                  // --- TITRE DE LA PHARMACIE ---
                   Text(
                     pharmacy.nom,
                     style: theme.textTheme.headlineMedium?.copyWith(
@@ -77,7 +84,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                   ),
                   const SizedBox(height: 16),
                   
-                  // Status Badge
+                  // --- BADGE DE STATUT (Ouvert / Fermé) ---
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -111,7 +118,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                   
                   const SizedBox(height: 24),
                   
-                  // Adresse Card
+                  // --- CARTE D'ADRESSE ---
                   if (pharmacy.adresse != null)
                     _buildMockupCard(
                       theme: theme,
@@ -128,7 +135,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                       ),
                     ),
 
-                  // Téléphone Card
+                  // --- CARTE TÉLÉPHONE ---
                   if (pharmacy.telephone != null)
                     _buildMockupCard(
                       theme: theme,
@@ -143,6 +150,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                           height: 1.4,
                         ),
                       ),
+                      // Chevron de droite indiquant l'action d'appel
                       trailing: Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface, size: 36),
                       onTap: () async {
                         final Uri phoneUri = Uri(
@@ -182,7 +190,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                       },
                     ),
 
-                  // Horaires d'ouverture
+                  // --- CARTE DES HORAIRES D'OUVERTURE ---
                   if (pharmacy.horairesOuverture != null && pharmacy.horairesOuverture!.isNotEmpty)
                     _buildMockupCard(
                       theme: theme,
@@ -190,6 +198,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                       icon: Icons.access_time_filled_rounded,
                       label: 'Horaires d\'ouverture',
                       child: Column(
+                        // Mappage dynamique des horaires formatés
                         children: pharmacy.horairesOuverture!.map((h) {
                           final horaire = h is Map ? h : {};
                           final jour = horaire['jour']?.toString() ?? h.toString();
@@ -222,7 +231,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
 
                   const SizedBox(height: 12),
 
-                  // Directions Button
+                  // --- BOUTON DE NAVIGATION (Obtenir l'itinéraire) ---
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     width: double.infinity,
@@ -250,6 +259,8 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
   );
 }
 
+/// [_buildMockupCard] : Génère un bloc d'information standardisé,
+/// constitué d'une étiquette (pillule bleue), d'un contenu et d'un fond vert clair (en mode clair).
 Widget _buildMockupCard({
   required ThemeData theme,
   required Color bgColor,
@@ -261,9 +272,11 @@ Widget _buildMockupCard({
   VoidCallback? onLongPress,
 }) {
   final isDark = theme.brightness == Brightness.dark;
+  
+  // Couleur de fond typique du badge titre de la carte (Label Pilule bleue)
   final labelBgColor = isDark 
       ? theme.colorScheme.secondaryContainer.withOpacity(0.6) 
-      : const Color(0xFFCDEAFC); // Light blue from mockup
+      : const Color(0xFFCDEAFC); // Bleu tendre de la maquette
 
   return Container(
     margin: const EdgeInsets.only(bottom: 16),
@@ -273,7 +286,7 @@ Widget _buildMockupCard({
       borderRadius: BorderRadius.circular(20),
     ),
     child: Material(
-      color: Colors.transparent,
+      color: Colors.transparent, // Essentiel pour les animations 'Ink' (ondulation du InkWell)
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
@@ -286,6 +299,7 @@ Widget _buildMockupCard({
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // --- Étiquette supérieure (Pilule) ---
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
@@ -308,10 +322,13 @@ Widget _buildMockupCard({
                       ),
                     ),
                     const SizedBox(height: 12),
+                    
+                    // --- Contenu principal de la carte (ex : "+228 1234567") ---
                     child,
                   ],
                 ),
               ),
+              // Élément additionnel optionnel superposé à droite de la ligne
               if (trailing != null) ...[
                 const SizedBox(width: 16),
                 trailing,
