@@ -5,9 +5,6 @@ import 'package:pharma_app/models/pharmacy.dart';
 
 void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {VoidCallback? onDirectionsPressed}) {
   final isOpen = pharmacy.statutActuel == 'Ouvert';
-  final statusColor = isOpen
-      ? const Color(0xFF22C55E)
-      : const Color(0xFFEF4444);
 
   showModalBottomSheet(
     context: context,
@@ -17,15 +14,28 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
     builder: (context) {
       final theme = Theme.of(context);
       final isDark = theme.brightness == Brightness.dark;
+      
+      final openBgColor = isOpen 
+          ? (isDark ? const Color(0xFF1B4332) : const Color(0xFFA8E6BB))
+          : (isDark ? theme.colorScheme.errorContainer : theme.colorScheme.errorContainer);
+      final openTextColor = isOpen 
+          ? (isDark ? const Color(0xFFA8E6BB) : Colors.black)
+          : theme.colorScheme.onErrorContainer;
+          
+      final cardBgColor = isDark 
+          ? theme.colorScheme.surfaceContainerHighest 
+          : const Color(0xFFD8ECD8); 
+
+      final buttonBgColor = isDark ? theme.colorScheme.primary : const Color(0xFF095834);
 
       return DraggableScrollableSheet(
-        initialChildSize: 0.6,
+        initialChildSize: 0.65,
         minChildSize: 0.4,
-        maxChildSize: 0.9,
+        maxChildSize: 0.95,
         builder: (context, scrollController) {
           return Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
+              color: isDark ? theme.colorScheme.surface : const Color(0xFFF7F9F8),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
               boxShadow: [
                 BoxShadow(
@@ -40,239 +50,196 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
               borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
               child: ListView(
                 controller: scrollController,
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  // Header Area with Gradient
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          statusColor.withOpacity(isDark ? 0.2 : 0.1),
-                          statusColor.withOpacity(0.02),
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 48,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  
+                  // Title
+                  Text(
+                    pharmacy.nom,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      height: 1.2,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Status Badge
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: openBgColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isOpen ? Icons.check_circle : Icons.access_time_filled_rounded,
+                            size: 18,
+                            color: openTextColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            pharmacy.statutActuel ?? 'Inconnu',
+                            style: TextStyle(
+                              color: openTextColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Handle
-                        Container(
-                          width: 48,
-                          height: 5,
-                          margin: const EdgeInsets.only(bottom: 24),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        
-                        // Icon and Title
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surface,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: statusColor.withOpacity(0.2),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(Icons.local_pharmacy_rounded, color: statusColor, size: 32),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    pharmacy.nom,
-                                    style: theme.textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.2,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  // Status Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: statusColor.withOpacity(isDark ? 0.2 : 0.1),
-                                      borderRadius: BorderRadius.circular(24),
-                                      border: Border.all(color: statusColor.withOpacity(0.3), width: 1.5),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          isOpen ? Icons.check_circle_rounded : Icons.access_time_rounded,
-                                          size: 16,
-                                          color: statusColor,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          pharmacy.statutActuel ?? 'Inconnu',
-                                          style: TextStyle(
-                                            color: statusColor,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.2,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
                   ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Adresse Card
+                  if (pharmacy.adresse != null)
+                    _buildMockupCard(
+                      theme: theme,
+                      bgColor: cardBgColor,
+                      icon: Icons.location_on,
+                      label: 'adresse',
+                      child: Text(
+                        pharmacy.adresse!,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
 
-                  // Content Area
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (pharmacy.adresse != null)
-                          _infoCard(
-                            theme: theme,
-                            icon: Icons.location_on_rounded,
-                            iconColor: theme.colorScheme.primary,
-                            label: 'Adresse',
-                            content: pharmacy.adresse!,
-                          ),
-                        if (pharmacy.telephone != null)
-                          _infoCard(
-                            theme: theme,
-                            icon: Icons.phone_rounded,
-                            iconColor: const Color(0xFF22C55E),
-                            label: 'Téléphone',
-                            content: pharmacy.telephone!,
-                            onTap: () async {
-                              final Uri phoneUri = Uri(
-                                scheme: 'tel',
-                                path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
-                              );
-                              if (await canLaunchUrl(phoneUri)) {
-                                await launchUrl(phoneUri);
-                              } else {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: const Text(
-                                        'Impossible de lancer l\'appel.',
-                                        style: TextStyle(fontWeight: FontWeight.w600),
-                                      ),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                      backgroundColor: theme.colorScheme.error,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            onLongPress: () {
-                              Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Numéro copié',
-                                    style: TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  backgroundColor: theme.colorScheme.inverseSurface,
+                  // Téléphone Card
+                  if (pharmacy.telephone != null)
+                    _buildMockupCard(
+                      theme: theme,
+                      bgColor: cardBgColor,
+                      icon: Icons.phone,
+                      label: 'Téléphone',
+                      child: Text(
+                        pharmacy.telephone!,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
+                      ),
+                      trailing: Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface, size: 36),
+                      onTap: () async {
+                        final Uri phoneUri = Uri(
+                          scheme: 'tel',
+                          path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
+                        );
+                        if (await canLaunchUrl(phoneUri)) {
+                          await launchUrl(phoneUri);
+                        } else {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  'Impossible de lancer l\'appel.',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
-                              );
-                            },
-                          ),
-                          
-                        // Horaires Opening
-                        if (pharmacy.horairesOuverture != null && pharmacy.horairesOuverture!.isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            "Horaires d'ouverture",
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                backgroundColor: theme.colorScheme.error,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      onLongPress: () {
+                        Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              'Numéro copié',
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: theme.colorScheme.inverseSurface,
                           ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.4)),
-                            ),
-                            child: Column(
-                              children: pharmacy.horairesOuverture!.map((h) {
-                                final horaire = h is Map ? h : {};
-                                final jour = horaire['jour']?.toString() ?? h.toString();
-                                final heure = horaire['heure']?.toString() ?? '';
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 6),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        jour,
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                                        ),
-                                      ),
-                                      Text(
-                                        heure,
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: theme.colorScheme.onSurface,
-                                        ),
-                                      ),
-                                    ],
+                        );
+                      },
+                    ),
+
+                  // Horaires d'ouverture
+                  if (pharmacy.horairesOuverture != null && pharmacy.horairesOuverture!.isNotEmpty)
+                    _buildMockupCard(
+                      theme: theme,
+                      bgColor: cardBgColor,
+                      icon: Icons.access_time_filled_rounded,
+                      label: 'Horaires d\'ouverture',
+                      child: Column(
+                        children: pharmacy.horairesOuverture!.map((h) {
+                          final horaire = h is Map ? h : {};
+                          final jour = horaire['jour']?.toString() ?? h.toString();
+                          final heure = horaire['heure']?.toString() ?? '';
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  jour,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
                                   ),
-                                );
-                              }).toList(),
+                                ),
+                                Text(
+                                  heure,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
 
-                        const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
-                        // Directions Button
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 32),
-                          width: double.infinity,
-                          height: 56,
-                          child: FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              elevation: 0,
-                            ),
-                            onPressed: onDirectionsPressed,
-                            icon: const Icon(Icons.directions_rounded, size: 22),
-                            label: const Text('Obtenir l\'itinéraire', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                      ],
+                  // Directions Button
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    width: double.infinity,
+                    height: 56,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: buttonBgColor, 
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                        elevation: 0,
+                      ),
+                      onPressed: onDirectionsPressed,
+                      icon: const Icon(Icons.directions, size: 24),
+                      label: const Text('Obtenir l\'itinéraire', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                     ),
                   ),
+
                 ],
               ),
             ),
@@ -283,70 +250,72 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
   );
 }
 
-/// Card info réutilisable (adresse, téléphone…)
-Widget _infoCard({
+Widget _buildMockupCard({
   required ThemeData theme,
+  required Color bgColor,
   required IconData icon,
-  required Color iconColor,
   required String label,
-  required String content,
+  required Widget child,
   Widget? trailing,
   VoidCallback? onTap,
   VoidCallback? onLongPress,
 }) {
+  final isDark = theme.brightness == Brightness.dark;
+  final labelBgColor = isDark 
+      ? theme.colorScheme.secondaryContainer.withOpacity(0.6) 
+      : const Color(0xFFCDEAFC); // Light blue from mockup
+
   return Container(
-    margin: const EdgeInsets.only(bottom: 12),
+    margin: const EdgeInsets.only(bottom: 16),
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(20),
+    ),
     child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.4)),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, color: iconColor, size: 24),
-              ),
-              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      label,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: labelBgColor,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: 16, color: theme.colorScheme.onSurface),
+                          const SizedBox(width: 8),
+                          Text(
+                            label,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      content,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    const SizedBox(height: 12),
+                    child,
                   ],
                 ),
               ),
-              if (trailing != null) trailing,
+              if (trailing != null) ...[
+                const SizedBox(width: 16),
+                trailing,
+              ],
             ],
           ),
         ),
