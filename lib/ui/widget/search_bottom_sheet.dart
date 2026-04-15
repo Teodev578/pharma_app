@@ -140,6 +140,15 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                         CustomSearchBar(
                           controller: _searchController,
                           onClear: () => setState(() => _isSearching = false),
+                          onTap: () {
+                            if (_sheetController.size < 0.9) {
+                              _sheetController.animateTo(
+                                0.9,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
