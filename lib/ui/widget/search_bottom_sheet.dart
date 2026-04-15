@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'custom_search_bar.dart';
 import 'recent_tile.dart';
+
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
   final Function(Pharmacy) onPharmacySelected;
@@ -18,7 +19,8 @@ class SearchBottomSheet extends StatefulWidget {
 
 class _SearchBottomSheetState extends State<SearchBottomSheet> {
   final TextEditingController _searchController = TextEditingController();
-  final DraggableScrollableController _sheetController = DraggableScrollableController();
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
   List<Pharmacy> _filteredPharmacies = [];
   bool _isSearching = false;
   String _selectedFilter = 'Toutes';
@@ -63,16 +65,18 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       _filteredPharmacies = widget.pharmacies.where((p) {
         final name = _normalize(p.nom);
         final address = _normalize(p.adresse ?? '');
-        
-        bool matchesSearch = query.isEmpty || name.contains(query) || address.contains(query);
+
+        bool matchesSearch =
+            query.isEmpty || name.contains(query) || address.contains(query);
         if (!matchesSearch) return false;
 
         if (_selectedFilter == 'Ouvertes') {
-          return p.statutActuel?.toLowerCase() == 'ouverte' || p.statutActuel?.toLowerCase() == 'ouvert';
+          return p.statutActuel?.toLowerCase() == 'ouverte' ||
+              p.statutActuel?.toLowerCase() == 'ouvert';
         } else if (_selectedFilter == 'Proches') {
           return true; // Implémente le tri par distance si tu l'as, par defaut ca retourne tout
         }
-        
+
         // "Toutes"
         return true;
       }).toList();
@@ -199,47 +203,50 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final p = _filteredPharmacies[index];
-                        return RecentTile(
-                          title: p.nom,
-                          subtitle: p.adresse ?? 'Adresse inconnue',
-                          status: p.statutActuel,
-                          onTap: () {
-                            _sheetController.animateTo(
-                              0.15,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            widget.onPharmacySelected(p);
-                          },
-                        );
-                      },
-                      childCount: _filteredPharmacies.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final p = _filteredPharmacies[index];
+                      return RecentTile(
+                        title: p.nom,
+                        subtitle: p.adresse ?? 'Adresse inconnue',
+                        status: p.statutActuel,
+                        onTap: () {
+                          _sheetController.animateTo(
+                            0.15,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                          widget.onPharmacySelected(p);
+                        },
+                      );
+                    }, childCount: _filteredPharmacies.length),
                   ),
                 ),
-              
-              if (_isSearching && _filteredPharmacies.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off, size: 48, color: colorScheme.outline),
-                        const SizedBox(height: 16),
-                        Text(
-                          "Aucune pharmacie trouvée",
-                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.outline),
-                        ),
-                      ],
+
+                if (_isSearching && _filteredPharmacies.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 48,
+                            color: colorScheme.outline,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Aucune pharmacie trouvée",
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
           ),
         );
       },
