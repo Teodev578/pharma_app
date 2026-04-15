@@ -12,15 +12,33 @@ class PharmacyMarker {
     VoidCallback? onDirectionsPressed,
   }) {
     final isOpen = pharmacy.statutActuel == 'Ouvert';
+    final isClosed = pharmacy.statutActuel == 'Fermé';
     final colorScheme = Theme.of(context).colorScheme;
     final stableKey = ValueKey('marker_${point.latitude}_${point.longitude}');
+
+    // Définition des couleurs selon le statut (Ouvert / Fermé / Inconnu)
+    final Color markerBgColor;
+    final Color markerIconColor;
+
+    if (isOpen) {
+      markerBgColor = Colors.green.shade100;
+      markerIconColor = Colors.green;
+    } else if (isClosed) {
+      markerBgColor = Colors.red.shade100;
+      markerIconColor = Colors.red;
+    } else {
+      // Orange pour statut inconnu / À vérifier
+      markerBgColor = const Color(0xFFFFE0B2); // Orange 100
+      markerIconColor = const Color(0xFFE65100); // Orange 900
+    }
 
     return Marker(
       point: point,
       width: 200,
       height: 44,
       child: GestureDetector(
-        onTap: () => showPharmacyDetailsBottomSheet(context, pharmacy, onDirectionsPressed: onDirectionsPressed),
+        onTap: () => showPharmacyDetailsBottomSheet(context, pharmacy,
+            onDirectionsPressed: onDirectionsPressed),
         behavior: HitTestBehavior.deferToChild,
         child: RepaintBoundary(
           key: stableKey,
@@ -32,13 +50,13 @@ class PharmacyMarker {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: isOpen ? Colors.green.shade100 : Colors.red.shade100,
+                  color: markerBgColor,
                   shape: BoxShape.circle,
                   border: Border.all(color: colorScheme.surface, width: 3),
                 ),
                 child: Icon(
                   Icons.local_pharmacy,
-                  color: isOpen ? Colors.green : Colors.red,
+                  color: markerIconColor,
                   size: 20,
                 ),
               ),
