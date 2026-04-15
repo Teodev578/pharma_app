@@ -56,6 +56,7 @@ class CustomSearchBar extends StatelessWidget {
                   controller?.clear();
                   if (onClear != null) onClear!();
                   if (onChanged != null) onChanged!('');
+                  FocusScope.of(context).unfocus();
                 },
               ),
             Padding(

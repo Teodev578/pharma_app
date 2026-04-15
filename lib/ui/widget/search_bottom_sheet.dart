@@ -222,6 +222,19 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                     ),
                   ),
                 ),
+                if (_filteredPharmacies.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+                      child: Text(
+                        '${_filteredPharmacies.length} résultat${_filteredPharmacies.length > 1 ? 's' : ''}',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
@@ -231,6 +244,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                         title: p.nom,
                         subtitle: p.adresse ?? 'Adresse inconnue',
                         status: p.statutActuel,
+                        searchQuery: _isSearching ? _searchController.text : null,
                         onTap: () {
                           _sheetController.animateTo(
                             0.15,
@@ -262,6 +276,19 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                             style: textTheme.bodyLarge?.copyWith(
                               color: colorScheme.outline,
                             ),
+                          ),
+                          const SizedBox(height: 24),
+                          FilledButton.tonalIcon(
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _selectedFilter = 'Toutes';
+                                _isSearching = false;
+                              });
+                              _applyFilters();
+                            },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Réinitialiser la recherche'),
                           ),
                         ],
                       ),

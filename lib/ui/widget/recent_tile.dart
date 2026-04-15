@@ -5,6 +5,8 @@ class RecentTile extends StatelessWidget {
   final String subtitle;
   final String? status;
   final VoidCallback? onTap;
+  final String? searchQuery;
+  final String? distance;
 
   const RecentTile({
     super.key,
@@ -12,7 +14,38 @@ class RecentTile extends StatelessWidget {
     required this.subtitle,
     this.status,
     this.onTap,
+    this.searchQuery,
+    this.distance,
   });
+
+  Widget _buildHighlightedText(String text, String? query, TextStyle? style, Color highlightColor) {
+    if (query == null || query.isEmpty) return Text(text, style: style);
+    
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final index = lowerText.indexOf(lowerQuery);
+    
+    if (index == -1) return Text(text, style: style);
+    
+    return RichText(
+      text: TextSpan(
+        style: style,
+        children: [
+          TextSpan(text: text.substring(0, index)),
+          TextSpan(
+            text: text.substring(index, index + query.length),
+            style: style?.copyWith(
+              color: highlightColor,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          TextSpan(text: text.substring(index + query.length)),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,12 +132,14 @@ class RecentTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      _buildHighlightedText(
                         title,
-                        style: textTheme.titleMedium?.copyWith(
+                        searchQuery,
+                        textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
                         ),
+                        colorScheme.primary,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -119,7 +154,23 @@ class RecentTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+                if (distance != null)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.location_on, size: 14, color: colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 4),
+                      Text(
+                        distance!,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
               ],
             ),
           ),
