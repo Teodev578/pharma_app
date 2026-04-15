@@ -77,7 +77,7 @@ void showPharmacyDetailsBottomSheet(BuildContext context, Pharmacy pharmacy, {Vo
                   Text(
                     pharmacy.nom,
                     style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w700,
                       height: 1.2,
                       color: theme.colorScheme.onSurface,
                     ),
