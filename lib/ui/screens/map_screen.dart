@@ -248,6 +248,9 @@ class _MapScreenState extends State<MapScreen> {
                 maxZoom: 20.0,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
+                  // Nécessite un geste de rotation d'au moins 20° avant de pivoter la carte
+                  // Évite la rotation accidentelle lors d'un pinch-zoom légèrement de travers
+                  rotationThreshold: 20.0,
                 ),
                 onPositionChanged: (position, hasGesture) {
                   // Rotation — mise à jour directe
