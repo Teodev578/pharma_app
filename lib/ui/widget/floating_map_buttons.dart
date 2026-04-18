@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 // Widget regroupant les boutons flottants de contrôle de la carte (Zoom, Position, etc.)
@@ -20,40 +23,135 @@ class FloatingMapButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Vérifie si la carte est pivotée (avec une petite tolérance pour les virgules flottantes)
+    final isRotated = rotation.abs() > 0.1;
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Bouton pour repointer vers le nord
-        _buildButton(
-          context,
-          rotation == 0 ? Icons.navigation : Icons.explore_outlined,
-          () {
-            mapController.rotate(0);
+        // Bouton Boussole (visible uniquement si la carte est pivotée)
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: FadeTransition(opacity: animation, child: child),
+            );
           },
-          rotation: rotation,
+          child: isRotated
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _buildButton(
+                    context,
+                    Icons.navigation,
+                    () {
+                      HapticFeedback.mediumImpact();
+                      mapController.rotate(0);
+                    },
+                    rotation: rotation,
+                  ),
+                )
+              : const SizedBox.shrink(),
         ),
-        const SizedBox(height: 8),
-        // Bouton Zoom + (rapproche la caméra)
-        _buildButton(context, Icons.add, () {
-          final zoom = mapController.camera.zoom + 1;
-          mapController.move(mapController.camera.center, zoom);
-        }),
-        const SizedBox(height: 2),
-        // Bouton Zoom - (éloigne la caméra)
-        _buildButton(context, Icons.remove, () {
-          final zoom = mapController.camera.zoom - 1;
-          mapController.move(mapController.camera.center, zoom);
-        }),
-        const SizedBox(height: 8),
+
+        // Groupe Zoom (+ / -) unifié
+        _buildZoomGroup(context),
+        const SizedBox(height: 12),
+
         // Bouton "Ma position" : 0=Off, 1=Centré, 2=Boussole
         _buildButton(
           context,
           trackingState == 2
               ? Icons.explore
               : (trackingState == 1 ? Icons.my_location : Icons.location_searching),
-          onMyLocationPressed,
+          () {
+            HapticFeedback.mediumImpact();
+            onMyLocationPressed();
+          },
           isPrimary: trackingState != 0,
         ),
       ],
+    );
+  }
+
+  // Groupe de boutons Zoom unifié (Style Pilule / Segments)
+  Widget _buildZoomGroup(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          width: 0.5,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildRawButton(
+                context,
+                Icons.add,
+                () {
+                  HapticFeedback.lightImpact();
+                  final zoom = mapController.camera.zoom + 1;
+                  mapController.move(mapController.camera.center, zoom);
+                },
+              ),
+              Container(
+                height: 1,
+                width: 32,
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+              ),
+              _buildRawButton(
+                context,
+                Icons.remove,
+                () {
+                  HapticFeedback.lightImpact();
+                  final zoom = mapController.camera.zoom - 1;
+                  mapController.move(mapController.camera.center, zoom);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper pour les boutons sans bordures internes du groupe Zoom
+  Widget _buildRawButton(
+    BuildContext context,
+    IconData icon,
+    VoidCallback onPressed,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Icon(
+            icon,
+            color: colorScheme.onSurface,
+            size: 24,
+          ),
+        ),
+      ),
     );
   }
 
@@ -66,7 +164,6 @@ class FloatingMapButtons extends StatelessWidget {
     double? rotation,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isNorth = (rotation ?? 0) == 0;
 
     Widget iconWidget = Icon(
       icon,
@@ -74,11 +171,10 @@ class FloatingMapButtons extends StatelessWidget {
       size: 24,
     );
 
-    // Si on a une rotation et qu'on n'est pas au nord, on fait pivoter l'icône
-    if (rotation != null && !isNorth) {
+    // Si on a une rotation, on fait pivoter l'icône de manière fluide
+    if (rotation != null) {
       iconWidget = Transform.rotate(
-        // On convertit les degrés en radians et on inverse pour pointer le nord
-        angle: -rotation * (3.1415926535897932 / 180),
+        angle: -rotation * (math.pi / 180),
         child: iconWidget,
       );
     }
@@ -86,31 +182,38 @@ class FloatingMapButtons extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isPrimary
-            ? colorScheme.primary
-            : colorScheme.surface.withValues(alpha: 0.9),
+            ? colorScheme.primary.withValues(alpha: 0.95)
+            : colorScheme.surface.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
+            color: isPrimary
+                ? colorScheme.primary.withValues(alpha: 0.25)
+                : Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
           color: isPrimary
               ? Colors.transparent
-              : colorScheme.outlineVariant.withValues(alpha: 0.5),
+              : colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 0.5,
         ),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: iconWidget,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPressed,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: iconWidget,
+              ),
+            ),
           ),
         ),
       ),
