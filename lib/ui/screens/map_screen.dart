@@ -13,7 +13,6 @@ import 'package:pharma_app/ui/widget/pharmacy_details_bottom_sheet.dart';
 
 import 'package:pharma_app/ui/widget/map_top_loader.dart';
 import 'package:pharma_app/ui/widget/map_scale_widget.dart';
-import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
 import 'package:pharma_app/ui/widget/pharmacy_cluster_layer.dart';
 import 'package:pharma_app/ui/widget/navigation_banner.dart';
 import 'package:pharma_app/models/pharmacy.dart';
@@ -35,12 +34,12 @@ class _MapScreenState extends State<MapScreen> {
 
   bool _isLoadingPharmacies = true;
   List<Pharmacy> _pharmacies = [];
-  List<Marker> _cachedMarkers = [];
   LatLng? _userPosition;
   LatLng? _pendingMove;
   bool _mapReady = false;
   int _trackingState = 0; // 0: tracking disabled, 1: position, 2: heading
   late final ValueNotifier<double> _rotationNotifier;
+  // Zoom discret arrondi à 0.5 pour limiter les rebuilds de la couche marqueurs
   late final ValueNotifier<double> _zoomNotifier;
   late final ValueNotifier<double> _centerLatNotifier;
   List<LatLng> _routePoints = [];
@@ -96,41 +95,14 @@ class _MapScreenState extends State<MapScreen> {
     try {
       final pharmacies = await SupabaseService().getPharmacies();
       if (mounted) {
-        setState(() => _pharmacies = pharmacies);
-        final completer = Completer<void>();
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => completer.complete(),
-        );
-        await completer.future;
-        await Future.delayed(const Duration(milliseconds: 200));
-        if (mounted) _updateMarkers();
+        setState(() {
+          _pharmacies = pharmacies;
+          _isLoadingPharmacies = false;
+        });
       }
     } catch (e) {
       debugPrint('Supabase error: $e');
       if (mounted) setState(() => _isLoadingPharmacies = false);
-    }
-  }
-
-  void _updateMarkers() {
-    final newMarkers = _pharmacies
-        .where((p) => p.latitude != null && p.longitude != null)
-        .map(
-          (p) => PharmacyMarker.build(
-            context: context,
-            point: LatLng(p.latitude!, p.longitude!),
-            pharmacy: p,
-            onDirectionsPressed: () {
-              Navigator.pop(context); // Fermer le bottom sheet pour voir la carte
-              _fetchAndShowRoute(p);
-            },
-          ),
-        )
-        .toList();
-    if (mounted) {
-      setState(() {
-        _cachedMarkers = newMarkers;
-        _isLoadingPharmacies = false;
-      });
     }
   }
 
@@ -214,12 +186,14 @@ class _MapScreenState extends State<MapScreen> {
                   flags: InteractiveFlag.all,
                 ),
                 onPositionChanged: (position, hasGesture) {
-                  // Update notifiers without triggering a full setState
+                  // Rotation — mise à jour directe
                   if (position.rotation != _rotationNotifier.value) {
                     _rotationNotifier.value = position.rotation;
                   }
-                  if (position.zoom != _zoomNotifier.value) {
-                    _zoomNotifier.value = position.zoom;
+                  // Zoom discret (arrondi à 0.5) pour limiter les rebuilds marqueurs
+                  final double discreteZoom = (position.zoom * 2).roundToDouble() / 2;
+                  if (discreteZoom != _zoomNotifier.value) {
+                    _zoomNotifier.value = discreteZoom;
                   }
                   if (position.center.latitude != _centerLatNotifier.value) {
                     _centerLatNotifier.value = position.center.latitude;
@@ -277,11 +251,19 @@ class _MapScreenState extends State<MapScreen> {
                     ],
                   ),
 
-                // COUCHE 3 : Clusters de pharmacies
-                if (!_isLoadingPharmacies && _cachedMarkers.isNotEmpty)
-                  PharmacyClusterLayer(
-                    markers: _cachedMarkers,
-                    mapController: _mapController,
+                // COUCHE 3 : Clusters de pharmacies (zoom-adaptatif)
+                if (!_isLoadingPharmacies && _pharmacies.isNotEmpty)
+                  ValueListenableBuilder<double>(
+                    valueListenable: _zoomNotifier,
+                    builder: (context, zoom, _) => PharmacyClusterLayer(
+                      pharmacies: _pharmacies,
+                      mapController: _mapController,
+                      zoom: zoom,
+                      onDirectionsPressedBuilder: (p) => () {
+                        Navigator.pop(context);
+                        _fetchAndShowRoute(p);
+                      },
+                    ),
                   ),
 
                 // COUCHE 4 : Boutons flottants
