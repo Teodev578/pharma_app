@@ -45,6 +45,10 @@ class _MapScreenState extends State<MapScreen> {
   List<LatLng> _routePoints = [];
   RouteInfo? _currentRoute;
   bool _isRouting = false;
+  // Debounce timer pour éviter les rebuilds excessifs sur onPositionChanged
+  Timer? _centerDebounce;
+  // Rafraîchissement automatique des statuts toutes les 10 minutes
+  Timer? _refreshTimer;
 
   late final StreamController<double?> _alignController;
 
@@ -57,6 +61,18 @@ class _MapScreenState extends State<MapScreen> {
     _alignController = StreamController<double?>.broadcast();
     _fetchPharmacies();
     _centerOnUserLocation();
+    // Rafraîchissement silencieux des statuts toutes les 10 minutes
+    _refreshTimer = Timer.periodic(const Duration(minutes: 10), (_) => _silentRefresh());
+  }
+
+  /// Met à jour les pharmacies en arrière-plan sans afficher le loader
+  Future<void> _silentRefresh() async {
+    try {
+      final pharmacies = await SupabaseService().getPharmacies();
+      if (mounted) setState(() => _pharmacies = pharmacies);
+    } catch (_) {
+      // Silence — une erreur de rafraîchissement ne doit pas déranger l'utilisateur
+    }
   }
 
   Future<void> _centerOnUserLocation() async {
@@ -65,9 +81,15 @@ class _MapScreenState extends State<MapScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      if (permission == LocationPermission.deniedForever ||
-          permission == LocationPermission.denied)
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) _showGpsPermissionDeniedSnackBar(permanent: true);
         return;
+      }
+      if (permission == LocationPermission.denied) {
+        if (mounted) _showGpsPermissionDeniedSnackBar(permanent: false);
+        return;
+      }
 
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -88,7 +110,32 @@ class _MapScreenState extends State<MapScreen> {
       }
     } catch (e) {
       debugPrint('GPS error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossible d\'obtenir la position GPS.')),
+        );
+      }
     }
+  }
+
+  void _showGpsPermissionDeniedSnackBar({required bool permanent}) {
+    final action = permanent
+        ? SnackBarAction(
+            label: 'Paramètres',
+            onPressed: () => Geolocator.openAppSettings(),
+          )
+        : null;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          permanent
+              ? 'Localisation bloquée. Autorisez-la dans les paramètres.'
+              : 'Permission de localisation refusée.',
+        ),
+        action: action,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _fetchPharmacies() async {
@@ -102,7 +149,22 @@ class _MapScreenState extends State<MapScreen> {
       }
     } catch (e) {
       debugPrint('Supabase error: $e');
-      if (mounted) setState(() => _isLoadingPharmacies = false);
+      if (mounted) {
+        setState(() => _isLoadingPharmacies = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Impossible de charger les pharmacies.'),
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: 'Réessayer',
+              onPressed: () {
+                setState(() => _isLoadingPharmacies = true);
+                _fetchPharmacies();
+              },
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -141,6 +203,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    _centerDebounce?.cancel();
+    _refreshTimer?.cancel();
     _rotationNotifier.dispose();
     _zoomNotifier.dispose();
     _centerLatNotifier.dispose();
@@ -195,9 +259,13 @@ class _MapScreenState extends State<MapScreen> {
                   if (discreteZoom != _zoomNotifier.value) {
                     _zoomNotifier.value = discreteZoom;
                   }
-                  if (position.center.latitude != _centerLatNotifier.value) {
-                    _centerLatNotifier.value = position.center.latitude;
-                  }
+                  // Latitude avec debounce 150ms pour éviter des rebuilds excessifs
+                  _centerDebounce?.cancel();
+                  _centerDebounce = Timer(const Duration(milliseconds: 150), () {
+                    if (position.center.latitude != _centerLatNotifier.value) {
+                      _centerLatNotifier.value = position.center.latitude;
+                    }
+                  });
                   if (hasGesture && _trackingState != 0) {
                     setState(() => _trackingState = 0);
                   }
@@ -381,6 +449,7 @@ class _MapScreenState extends State<MapScreen> {
             // Barre de recherche
             SearchBottomSheet(
               pharmacies: _pharmacies,
+              userPosition: _userPosition,
               onPharmacySelected: (pharmacy) {
                 if (pharmacy.latitude != null && pharmacy.longitude != null) {
                   _mapController.move(

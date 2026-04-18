@@ -1,16 +1,21 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:latlong2/latlong.dart';
 import 'custom_search_bar.dart';
 import 'recent_tile.dart';
 
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
   final Function(Pharmacy) onPharmacySelected;
+  // Position de l'utilisateur pour le tri par proximité
+  final LatLng? userPosition;
 
   const SearchBottomSheet({
     super.key,
     required this.pharmacies,
     required this.onPharmacySelected,
+    this.userPosition,
   });
 
   @override
@@ -67,28 +72,59 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
         .replaceAll('î', 'i');
   }
 
+  /// Distance haversine en mètres entre deux points
+  double _haversineDistance(double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371000.0; // rayon Terre en mètres
+    final dLat = (lat2 - lat1) * math.pi / 180;
+    final dLon = (lon2 - lon1) * math.pi / 180;
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1 * math.pi / 180) *
+            math.cos(lat2 * math.pi / 180) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    return r * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  }
+
+  /// Formate une distance en m
+  String _formatDistance(double meters) {
+    if (meters < 1000) return '${meters.round()} m';
+    return '${(meters / 1000).toStringAsFixed(1)} km';
+  }
+
   void _applyFilters() {
     final query = _normalize(_searchController.text);
+    final userPos = widget.userPosition;
+
+    List<Pharmacy> results = widget.pharmacies.where((p) {
+      final name = _normalize(p.nom);
+      final address = _normalize(p.adresse ?? '');
+      bool matchesSearch =
+          query.isEmpty || name.contains(query) || address.contains(query);
+      if (!matchesSearch) return false;
+
+      if (_selectedFilter == 'Ouvertes') {
+        final s = p.statutActuel?.toLowerCase();
+        return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
+      }
+      return true;
+    }).toList();
+
+    // Tri par proximité si filtre "Proches" ou si position disponible
+    if (_selectedFilter == 'Proches' && userPos != null) {
+      results.sort((a, b) {
+        final da = (a.latitude != null && a.longitude != null)
+            ? _haversineDistance(userPos.latitude, userPos.longitude, a.latitude!, a.longitude!)
+            : double.infinity;
+        final db = (b.latitude != null && b.longitude != null)
+            ? _haversineDistance(userPos.latitude, userPos.longitude, b.latitude!, b.longitude!)
+            : double.infinity;
+        return da.compareTo(db);
+      });
+    }
+
     setState(() {
       _isSearching = query.isNotEmpty;
-      _filteredPharmacies = widget.pharmacies.where((p) {
-        final name = _normalize(p.nom);
-        final address = _normalize(p.adresse ?? '');
-
-        bool matchesSearch =
-            query.isEmpty || name.contains(query) || address.contains(query);
-        if (!matchesSearch) return false;
-
-        if (_selectedFilter == 'Ouvertes') {
-          final s = p.statutActuel?.toLowerCase();
-          return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
-        } else if (_selectedFilter == 'Proches') {
-          return true; // Implémente le tri par distance si tu l'as, par defaut ca retourne tout
-        }
-
-        // "Toutes"
-        return true;
-      }).toList();
+      _filteredPharmacies = results;
     });
   }
 
@@ -240,9 +276,23 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final p = _filteredPharmacies[index];
+                      final userPos = widget.userPosition;
+                      final String subtitle;
+                      if (_selectedFilter == 'Proches' &&
+                          userPos != null &&
+                          p.latitude != null &&
+                          p.longitude != null) {
+                        final dist = _haversineDistance(
+                          userPos.latitude, userPos.longitude,
+                          p.latitude!, p.longitude!,
+                        );
+                        subtitle = '${_formatDistance(dist)} · ${p.adresse ?? 'Adresse inconnue'}';
+                      } else {
+                        subtitle = p.adresse ?? 'Adresse inconnue';
+                      }
                       return RecentTile(
                         title: p.nom,
-                        subtitle: p.adresse ?? 'Adresse inconnue',
+                        subtitle: subtitle,
                         status: p.statutActuel,
                         searchQuery: _isSearching ? _searchController.text : null,
                         onTap: () {
