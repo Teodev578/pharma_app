@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
@@ -33,7 +34,8 @@ class _MapScreenState extends State<MapScreen> {
   final MapController _mapController = MapController();
 
   bool _isLoadingPharmacies = true;
-  List<Pharmacy> _pharmacies = [];
+  // ValueNotifier évite que SearchBottomSheet rebuild quand _trackingState ou la route changent
+  final ValueNotifier<List<Pharmacy>> _pharmaciesNotifier = ValueNotifier([]);
   LatLng? _userPosition;
   LatLng? _pendingMove;
   bool _mapReady = false;
@@ -49,6 +51,8 @@ class _MapScreenState extends State<MapScreen> {
   Timer? _centerDebounce;
   // Rafraîchissement automatique des statuts toutes les 10 minutes
   Timer? _refreshTimer;
+  // Stream d'arrivée — surveille la position pour stopper le routing auto
+  StreamSubscription<Position>? _arrivalSubscription;
 
   late final StreamController<double?> _alignController;
 
@@ -69,7 +73,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _silentRefresh() async {
     try {
       final pharmacies = await SupabaseService().getPharmacies();
-      if (mounted) setState(() => _pharmacies = pharmacies);
+      if (mounted) _pharmaciesNotifier.value = pharmacies;
     } catch (_) {
       // Silence — une erreur de rafraîchissement ne doit pas déranger l'utilisateur
     }
@@ -142,10 +146,8 @@ class _MapScreenState extends State<MapScreen> {
     try {
       final pharmacies = await SupabaseService().getPharmacies();
       if (mounted) {
-        setState(() {
-          _pharmacies = pharmacies;
-          _isLoadingPharmacies = false;
-        });
+        _pharmaciesNotifier.value = pharmacies;
+        setState(() => _isLoadingPharmacies = false);
       }
     } catch (e) {
       debugPrint('Supabase error: $e');
@@ -197,17 +199,56 @@ class _MapScreenState extends State<MapScreen> {
             padding: const EdgeInsets.all(80),
           ),
         );
+        // Démarrer la surveillance d'arrivée
+        _startArrivalDetection(LatLng(pharmacy.latitude!, pharmacy.longitude!));
       }
     }
+  }
+
+  /// Démarre un stream Geolocator pour détecter l'arrivée (<50m)
+  void _startArrivalDetection(LatLng destination) {
+    _arrivalSubscription?.cancel();
+    _arrivalSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10, // ne déclenche que si l'utilisateur bouge de +10m
+      ),
+    ).listen((pos) {
+      final distanceM = Geolocator.distanceBetween(
+        pos.latitude, pos.longitude,
+        destination.latitude, destination.longitude,
+      );
+      if (distanceM < 50 && mounted) {
+        _clearRoute();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Vous êtes arrivé à destination ✅'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+  }
+
+  void _clearRoute() {
+    _arrivalSubscription?.cancel();
+    _arrivalSubscription = null;
+    setState(() {
+      _routePoints = [];
+      _currentRoute = null;
+    });
   }
 
   @override
   void dispose() {
     _centerDebounce?.cancel();
     _refreshTimer?.cancel();
+    _arrivalSubscription?.cancel();
     _rotationNotifier.dispose();
     _zoomNotifier.dispose();
     _centerLatNotifier.dispose();
+    _pharmaciesNotifier.dispose();
     _mapController.dispose();
     _alignController.close();
     super.dispose();
@@ -288,6 +329,10 @@ class _MapScreenState extends State<MapScreen> {
                   subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.example.pharma_app',
                   maxNativeZoom: 19,
+                  // Annule les requêtes de tuiles hors-viewport pour économiser la bande passante
+                  tileProvider: CancellableNetworkTileProvider(),
+                  // Fondu d'apparition des tuiles (remplace le flash blanc)
+                  tileDisplay: TileDisplay.fadeIn(),
                 ),
 
                 // COUCHE 2 : Position utilisateur
@@ -323,19 +368,28 @@ class _MapScreenState extends State<MapScreen> {
                   ),
 
                 // COUCHE 3 : Clusters de pharmacies (zoom-adaptatif)
-                if (!_isLoadingPharmacies && _pharmacies.isNotEmpty)
-                  ValueListenableBuilder<double>(
-                    valueListenable: _zoomNotifier,
-                    builder: (context, zoom, _) => PharmacyClusterLayer(
-                      pharmacies: _pharmacies,
-                      mapController: _mapController,
-                      zoom: zoom,
-                      onDirectionsPressedBuilder: (p) => () {
-                        Navigator.pop(context);
-                        _fetchAndShowRoute(p);
-                      },
-                    ),
-                  ),
+                ValueListenableBuilder<List<Pharmacy>>(
+                  valueListenable: _pharmaciesNotifier,
+                  builder: (context, pharmacies, _) {
+                    if (_isLoadingPharmacies || pharmacies.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return RepaintBoundary(
+                      child: ValueListenableBuilder<double>(
+                        valueListenable: _zoomNotifier,
+                        builder: (context, zoom, _) => PharmacyClusterLayer(
+                          pharmacies: pharmacies,
+                          mapController: _mapController,
+                          zoom: zoom,
+                          onDirectionsPressedBuilder: (p) => () {
+                            Navigator.pop(context);
+                            _fetchAndShowRoute(p);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
 
                 // COUCHE 4 : Boutons flottants
                 SafeArea(
@@ -450,21 +504,25 @@ class _MapScreenState extends State<MapScreen> {
             ),
 
             // Barre de recherche
-            SearchBottomSheet(
-              pharmacies: _pharmacies,
-              userPosition: _userPosition,
-              onPharmacySelected: (pharmacy) {
-                if (pharmacy.latitude != null && pharmacy.longitude != null) {
-                  _mapController.move(
-                    LatLng(pharmacy.latitude!, pharmacy.longitude!),
-                    16.0,
-                  );
-                  showPharmacyDetailsBottomSheet(context, pharmacy, onDirectionsPressed: () {
-                    Navigator.pop(context); // Close bottom sheet to see map
-                    _fetchAndShowRoute(pharmacy);
-                  });
-                }
-              },
+            ValueListenableBuilder<List<Pharmacy>>(
+              valueListenable: _pharmaciesNotifier,
+              builder: (context, pharmacies, _) => SearchBottomSheet(
+                pharmacies: pharmacies,
+                userPosition: _userPosition,
+                onPharmacySelected: (pharmacy) {
+                  if (pharmacy.latitude != null && pharmacy.longitude != null) {
+                    _mapController.move(
+                      LatLng(pharmacy.latitude!, pharmacy.longitude!),
+                      16.0,
+                    );
+                    showPharmacyDetailsBottomSheet(context, pharmacy,
+                        onDirectionsPressed: () {
+                      Navigator.pop(context);
+                      _fetchAndShowRoute(pharmacy);
+                    });
+                  }
+                },
+              ),
             ),
 
             if (_isLoadingPharmacies) const MapTopLoader(),

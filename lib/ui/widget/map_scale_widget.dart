@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-class MapScaleWidget extends StatelessWidget {
+/// Echelle de carte avec mémoïsation — ne recalcule que si zoom ou latitude changent.
+class MapScaleWidget extends StatefulWidget {
   final double zoom;
   final double latitude;
 
@@ -12,27 +13,62 @@ class MapScaleWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Calcul des mètres par pixel selon la latitude et le zoom
-    // Formule : S = C * cos(lat) / (256 * 2^zoom)
-    // C = Circonférence de la Terre (équatoriale) ≈ 40075016.686 mètres
+  State<MapScaleWidget> createState() => _MapScaleWidgetState();
+}
+
+class _MapScaleWidgetState extends State<MapScaleWidget> {
+  // Valeurs calculées cachées pour éviter les recalculs inutiles
+  late double _barWidth;
+  late String _label;
+
+  @override
+  void initState() {
+    super.initState();
+    _recalculate(widget.zoom, widget.latitude);
+  }
+
+  @override
+  void didUpdateWidget(MapScaleWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Ne recalcule que si les inputs ont réellement changé
+    if (oldWidget.zoom != widget.zoom || oldWidget.latitude != widget.latitude) {
+      _recalculate(widget.zoom, widget.latitude);
+    }
+  }
+
+  void _recalculate(double zoom, double latitude) {
     const double earthCircumference = 40075016.686;
     final double metersPerPixel = earthCircumference *
         cos(latitude * pi / 180) /
         (256 * pow(2, zoom));
 
-    // On veut une barre d'échelle d'environ 100-150 pixels maximum
     const double maxBarWidth = 100.0;
     final double maxMeters = maxBarWidth * metersPerPixel;
-
-    // Trouver un nombre "rond" de mètres pour l'échelle
     final double scaleMeters = _getScaleDistance(maxMeters);
-    final double barWidth = scaleMeters / metersPerPixel;
 
-    final String label = scaleMeters >= 1000
+    _barWidth = scaleMeters / metersPerPixel;
+    _label = scaleMeters >= 1000
         ? '${(scaleMeters / 1000).toStringAsFixed(scaleMeters % 1000 == 0 ? 0 : 1)} km'
         : '${scaleMeters.toInt()} m';
+  }
 
+  double _getScaleDistance(double maxMeters) {
+    const List<double> increments = [
+      1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000
+    ];
+    double best = increments.first;
+    for (final inc in increments) {
+      if (inc <= maxMeters) {
+        best = inc;
+      } else {
+        break;
+      }
+    }
+    return best;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -44,52 +80,27 @@ class MapScaleWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            _label,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 2,
-                ),
-              ],
+              shadows: [Shadow(color: Colors.black, blurRadius: 2)],
             ),
           ),
           const SizedBox(height: 2),
           Container(
-            width: barWidth,
+            width: _barWidth,
             height: 2,
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 1,
-                  offset: Offset(0, 1),
-                ),
+                BoxShadow(color: Colors.black26, blurRadius: 1, offset: Offset(0, 1)),
               ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  double _getScaleDistance(double maxMeters) {
-    final List<double> increments = [
-      1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000
-    ];
-    
-    double best = increments.first;
-    for (final inc in increments) {
-      if (inc <= maxMeters) {
-        best = inc;
-      } else {
-        break;
-      }
-    }
-    return best;
   }
 }

@@ -164,9 +164,13 @@ class _FloatingMapButtonsState extends State<FloatingMapButtons>
                   ? Padding(
                       key: const ValueKey('compass'),
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: _buildBouncingButton(
-                        ctrl: _bounceCompassCtrl,
-                        child: _buildCompassButton(context),
+                      child: Tooltip(
+                        message: 'Pointer vers le Nord',
+                        preferBelow: false,
+                        child: _buildBouncingButton(
+                          ctrl: _bounceCompassCtrl,
+                          child: _buildCompassButton(context),
+                        ),
                       ),
                     )
                   : const SizedBox.shrink(key: ValueKey('no-compass')),
@@ -177,9 +181,17 @@ class _FloatingMapButtonsState extends State<FloatingMapButtons>
             const SizedBox(height: 12),
 
             // Bouton localisation avec transition d'icône et aura animée
-            _buildBouncingButton(
-              ctrl: _bounceLocationCtrl,
-              child: _buildAnimatedLocationButton(context),
+            Tooltip(
+              message: widget.trackingState == 0
+                  ? 'Centrer sur ma position'
+                  : widget.trackingState == 1
+                      ? 'Activer la boussole'
+                      : 'Désactiver le suivi',
+              preferBelow: false,
+              child: _buildBouncingButton(
+                ctrl: _bounceLocationCtrl,
+                child: _buildAnimatedLocationButton(context),
+              ),
             ),
           ],
         ),
