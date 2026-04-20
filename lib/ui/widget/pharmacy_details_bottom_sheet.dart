@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
-import 'package:pharma_app/services/connectivity_service.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Affiche une BottomSheet présentant les détails d'une pharmacie.
 /// Intègre des comportements premium : retours haptiques, bouton flottant,
@@ -59,14 +57,6 @@ void showPharmacyDetailsBottomSheet(
           final buttonTextColor = theme.colorScheme.onPrimary;
           final sheetBgColor = theme.colorScheme.surfaceContainerLow;
 
-          final ConnectivityService connectivityService = ConnectivityService();
-
-          return StreamBuilder<List<ConnectivityResult>>(
-            stream: connectivityService.connectivityStream,
-            builder: (context, snapshot) {
-              final results = snapshot.data ?? [];
-              final isOffline = results.isEmpty || results.contains(ConnectivityResult.none);
-
               return DraggableScrollableSheet(
                 initialChildSize: 0.65,
                 minChildSize: 0.4,
@@ -106,34 +96,6 @@ void showPharmacyDetailsBottomSheet(
                                 ),
                               ),
 
-                              if (isOffline)
-                                Container(
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orangeAccent.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.orangeAccent.withValues(alpha: 0.3),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.wifi_off_rounded, color: Colors.orangeAccent, size: 20),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          "Certaines informations peuvent ne pas être à jour (Hors-ligne)",
-                                          style: TextStyle(
-                                            color: Colors.orangeAccent,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
 
                               Text(
                                 pharmacy.nom,
@@ -374,16 +336,14 @@ void showPharmacyDetailsBottomSheet(
                                     ),
                                     elevation: 0,
                                   ),
-                                  onPressed: isOffline
-                                      ? null
-                                      : () {
-                                          HapticFeedback.lightImpact();
-                                          if (onDirectionsPressed != null) onDirectionsPressed();
-                                        },
+                                  onPressed: () {
+                                    HapticFeedback.lightImpact();
+                                    if (onDirectionsPressed != null) onDirectionsPressed();
+                                  },
                                   icon: const Icon(Icons.directions, size: 24),
-                                  label: Text(
-                                    isOffline ? 'Itinéraire (Hors-ligne)' : 'Obtenir l\'itinéraire',
-                                    style: const TextStyle(
+                                  label: const Text(
+                                    'Obtenir l\'itinéraire',
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -398,8 +358,6 @@ void showPharmacyDetailsBottomSheet(
                   );
                 },
               );
-            },
-          );
         },
       );
     },

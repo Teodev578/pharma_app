@@ -141,6 +141,12 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
     }
 
     if (_selectedFilter == 'Proches' && userPos != null) {
+      // Pour l'option "Proches", on ne garde que les pharmacies ouvertes ou de garde
+      results = results.where((p) {
+        final s = p.statutActuel?.toLowerCase();
+        return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
+      }).toList();
+
       results.sort((a, b) {
         final da = (a.latitude != null && a.longitude != null)
             ? _haversineDistance(userPos.latitude, userPos.longitude, a.latitude!, a.longitude!)
@@ -150,6 +156,11 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
             : double.infinity;
         return da.compareTo(db);
       });
+
+      // Conservation uniquement des 10 pharmacies les plus proches
+      if (results.length > 10) {
+        results = results.sublist(0, 10);
+      }
     }
 
     if (mounted) {
