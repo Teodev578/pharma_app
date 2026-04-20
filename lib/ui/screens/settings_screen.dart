@@ -74,8 +74,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showRadiusDialog() {
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
+      builder: (context) => ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) => AlertDialog(
           title: const Text('Rayon de recherche'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -88,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 divisions: 49,
                 label: '${widget.controller.searchRadius.toInt()} km',
                 onChanged: (value) {
-                  setDialogState(() => widget.controller.updateSearchRadius(value));
+                  widget.controller.updateSearchRadius(value);
                 },
               ),
             ],
