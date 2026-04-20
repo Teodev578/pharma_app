@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:pharma_app/services/connectivity_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// Skeleton loader affiché pendant le chargement des pharmacies.
-/// Remplace le spinner bloquant par une animation shimmer non-intrusive.
+/// Loader et indicateur d'état (chargement / connectivité).
+/// Affiche un shimmer pendant le chargement ou un message si hors-ligne.
 class MapTopLoader extends StatefulWidget {
-  const MapTopLoader({super.key});
+  final bool isLoading;
+
+  const MapTopLoader({super.key, this.isLoading = false});
 
   @override
   State<MapTopLoader> createState() => _MapTopLoaderState();
@@ -13,6 +17,7 @@ class _MapTopLoaderState extends State<MapTopLoader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _shimmerCtrl;
   late final Animation<double> _shimmerAnim;
+  final ConnectivityService _connectivityService = ConnectivityService();
 
   @override
   void initState() {
@@ -21,9 +26,10 @@ class _MapTopLoaderState extends State<MapTopLoader>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
-    _shimmerAnim = Tween<double>(begin: -1.5, end: 1.5).animate(
-      CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut),
-    );
+    _shimmerAnim = Tween<double>(
+      begin: -1.5,
+      end: 1.5,
+    ).animate(CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -34,34 +40,63 @@ class _MapTopLoaderState extends State<MapTopLoader>
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 100,
-      left: 0,
-      right: 0,
-      child: Center(
-        child: AnimatedBuilder(
+    return StreamBuilder<List<ConnectivityResult>>(
+      stream: _connectivityService.connectivityStream,
+      builder: (context, snapshot) {
+        final results = snapshot.data ?? [];
+        final isOffline =
+            results.isEmpty || results.contains(ConnectivityResult.none);
+
+        if (!isOffline && !widget.isLoading) {
+          return const SizedBox.shrink();
+        }
+
+        return AnimatedBuilder(
           animation: _shimmerAnim,
           builder: (context, child) {
-            return Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(4),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _ShimmerBox(width: 14, height: 14, radius: 7, anim: _shimmerAnim),
-                    const SizedBox(width: 12),
-                    _ShimmerBox(width: 160, height: 12, radius: 6, anim: _shimmerAnim),
-                  ],
-                ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
               ),
+              child: isOffline ? _buildOfflineInfo() : _buildShimmerContent(),
             );
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildShimmerContent() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ShimmerBox(width: 14, height: 14, radius: 7, anim: _shimmerAnim),
+        const SizedBox(width: 12),
+        _ShimmerBox(width: 160, height: 12, radius: 6, anim: _shimmerAnim),
+      ],
+    );
+  }
+
+  Widget _buildOfflineInfo() {
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.wifi_off_rounded, color: Colors.orangeAccent, size: 14),
+        SizedBox(width: 8),
+        Text(
+          'Vous êtes hors connexion',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -81,9 +116,8 @@ class _ShimmerBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
-    final highlightColor = isDark ? Colors.grey.shade600 : Colors.grey.shade100;
+    final baseColor = Colors.white.withValues(alpha: 0.1);
+    final highlightColor = Colors.white.withValues(alpha: 0.3);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),

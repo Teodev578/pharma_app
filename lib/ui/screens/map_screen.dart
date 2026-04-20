@@ -420,18 +420,26 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-                // Échelle de la carte
+                // UI Supérieure : Échelle et Indicateur de statut (Loader / Connectivité)
                 SafeArea(
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: ListenableBuilder(
-                        listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
-                        builder: (context, _) => MapScaleWidget(
-                          zoom: _zoomNotifier.value,
-                          latitude: _centerLatNotifier.value,
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListenableBuilder(
+                            listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
+                            builder: (context, _) => MapScaleWidget(
+                              zoom: _zoomNotifier.value,
+                              latitude: _centerLatNotifier.value,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          MapTopLoader(isLoading: _isLoadingPharmacies),
+                        ],
                       ),
                     ),
                   ),
@@ -525,7 +533,6 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-            if (_isLoadingPharmacies) const MapTopLoader(),
             if (_isRouting)
               const Center(
                 child: CircularProgressIndicator(),
