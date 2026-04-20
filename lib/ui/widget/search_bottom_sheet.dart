@@ -4,6 +4,8 @@ import 'package:pharma_app/models/pharmacy.dart';
 import 'package:latlong2/latlong.dart';
 import 'custom_search_bar.dart';
 import 'recent_tile.dart';
+import 'package:pharma_app/services/connectivity_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
@@ -132,6 +134,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final ConnectivityService connectivityService = ConnectivityService();
 
     return DraggableScrollableSheet(
       controller: _sheetController,
@@ -141,214 +144,291 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       snap: true,
       snapSizes: const [0.15, 0.5, 0.9],
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                spreadRadius: 0,
-                blurRadius: 40,
-                offset: const Offset(0, -10),
+        return StreamBuilder<List<ConnectivityResult>>(
+            stream: connectivityService.connectivityStream,
+            builder: (context, snapshot) {
+              final results = snapshot.data ?? [];
+              final isOffline = results.isEmpty ||
+                  results.contains(ConnectivityResult.none);
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(32)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      spreadRadius: 0,
+                      blurRadius: 40,
+                      offset: const Offset(0, -10),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(32)),
+                  child: CustomScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    controller: scrollController,
+                    slivers: [
+                      SliverAppBar(
+                        pinned: true,
+                        floating: false,
+                        elevation: 0,
+                        scrolledUnderElevation: 0,
+                        backgroundColor: colorScheme.surface,
+                        automaticallyImplyLeading: false,
+                        toolbarHeight: 110,
+                        flexibleSpace: Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Indicateur de drag M3
+                              Container(
+                                width: 48,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.onSurface.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              CustomSearchBar(
+                                controller: _searchController,
+                                onClear: () =>
+                                    setState(() => _isSearching = false),
+                                onTap: () {
+                                  if (_sheetController.size < 0.9) {
+                                    _sheetController.animateTo(
+                                      0.9,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        bottom: PreferredSize(
+                          preferredSize: const Size.fromHeight(64.0),
+                          child: Container(
+                            color: colorScheme.surface,
+                            width: double.infinity,
+                            padding: const EdgeInsets.only(
+                              left: 16.0,
+                              right: 16.0,
+                              top: 8.0,
+                              bottom: 16.0,
+                            ),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  FilterChip(
+                                    label: const Text('Toutes'),
+                                    selected: _selectedFilter == 'Toutes',
+                                    showCheckmark: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    onSelected: !isOffline
+                                        ? (bool selected) {
+                                            setState(() =>
+                                                _selectedFilter = 'Toutes');
+                                            _applyFilters();
+                                          }
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilterChip(
+                                    label: const Text('Ouvertes'),
+                                    selected: _selectedFilter == 'Ouvertes',
+                                    showCheckmark: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    onSelected: !isOffline
+                                        ? (bool selected) {
+                                            setState(() =>
+                                                _selectedFilter = 'Ouvertes');
+                                            _applyFilters();
+                                          }
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilterChip(
+                                    label: const Text('Proches'),
+                                    selected: _selectedFilter == 'Proches',
+                                    showCheckmark: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    onSelected: !isOffline
+                                        ? (bool selected) {
+                                            setState(() =>
+                                                _selectedFilter = 'Proches');
+                                            _applyFilters();
+                                          }
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (isOffline)
+                        _buildOfflineState(colorScheme, textTheme)
+                      else ...[
+                        if (_filteredPharmacies.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 16),
+                              child: Text(
+                                '${_filteredPharmacies.length} résultat${_filteredPharmacies.length > 1 ? 's' : ''}',
+                                style: textTheme.labelLarge?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverList(
+                            delegate:
+                                SliverChildBuilderDelegate((context, index) {
+                              final p = _filteredPharmacies[index];
+                              final userPos = widget.userPosition;
+                              final String subtitle;
+                              if (_selectedFilter == 'Proches' &&
+                                  userPos != null &&
+                                  p.latitude != null &&
+                                  p.longitude != null) {
+                                final dist = _haversineDistance(
+                                  userPos.latitude,
+                                  userPos.longitude,
+                                  p.latitude!,
+                                  p.longitude!,
+                                );
+                                subtitle =
+                                    '${_formatDistance(dist)} · ${p.adresse ?? 'Adresse inconnue'}';
+                              } else {
+                                subtitle = p.adresse ?? 'Adresse inconnue';
+                              }
+                              return RecentTile(
+                                title: p.nom,
+                                subtitle: subtitle,
+                                status: p.statutActuel,
+                                searchQuery: _isSearching
+                                    ? _searchController.text
+                                    : null,
+                                onTap: () {
+                                  _sheetController.animateTo(
+                                    0.15,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                  widget.onPharmacySelected(p);
+                                },
+                              );
+                            }, childCount: _filteredPharmacies.length),
+                          ),
+                        ),
+                        if (_isSearching && _filteredPharmacies.isEmpty)
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search_off,
+                                    size: 48,
+                                    color: colorScheme.outline,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "Aucune pharmacie trouvée",
+                                    style: textTheme.bodyLarge?.copyWith(
+                                      color: colorScheme.outline,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  FilledButton.tonalIcon(
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      setState(() {
+                                        _selectedFilter = 'Toutes';
+                                        _isSearching = false;
+                                      });
+                                      _applyFilters();
+                                    },
+                                    icon: const Icon(Icons.refresh),
+                                    label:
+                                        const Text('Réinitialiser la recherche'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            });
+      },
+    );
+  }
+
+  Widget _buildOfflineState(ColorScheme colorScheme, TextTheme textTheme) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 64,
+                  color: Colors.orangeAccent,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                "Vous êtes hors-ligne",
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "La recherche nécessite une connexion internet pour accéder aux données en temps réel.",
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            child: CustomScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              controller: scrollController,
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  backgroundColor: colorScheme.surface,
-                  automaticallyImplyLeading: false,
-                  toolbarHeight: 110,
-                  flexibleSpace: Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Indicateur de drag M3
-                        Container(
-                          width: 48,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: colorScheme.onSurface.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        CustomSearchBar(
-                          controller: _searchController,
-                          onClear: () => setState(() => _isSearching = false),
-                          onTap: () {
-                            if (_sheetController.size < 0.9) {
-                              _sheetController.animateTo(
-                                0.9,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(64.0),
-                    child: Container(
-                      color: colorScheme.surface,
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(
-                        left: 16.0,
-                        right: 16.0,
-                        top: 8.0,
-                        bottom: 16.0,
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            FilterChip(
-                              label: const Text('Toutes'),
-                              selected: _selectedFilter == 'Toutes',
-                              showCheckmark: false,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              onSelected: (bool selected) {
-                                setState(() => _selectedFilter = 'Toutes');
-                                _applyFilters();
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            FilterChip(
-                              label: const Text('Ouvertes'),
-                              selected: _selectedFilter == 'Ouvertes',
-                              showCheckmark: false,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              onSelected: (bool selected) {
-                                setState(() => _selectedFilter = 'Ouvertes');
-                                _applyFilters();
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            FilterChip(
-                              label: const Text('Proches'),
-                              selected: _selectedFilter == 'Proches',
-                              showCheckmark: false,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              onSelected: (bool selected) {
-                                setState(() => _selectedFilter = 'Proches');
-                                _applyFilters();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                if (_filteredPharmacies.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-                      child: Text(
-                        '${_filteredPharmacies.length} résultat${_filteredPharmacies.length > 1 ? 's' : ''}',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final p = _filteredPharmacies[index];
-                      final userPos = widget.userPosition;
-                      final String subtitle;
-                      if (_selectedFilter == 'Proches' &&
-                          userPos != null &&
-                          p.latitude != null &&
-                          p.longitude != null) {
-                        final dist = _haversineDistance(
-                          userPos.latitude, userPos.longitude,
-                          p.latitude!, p.longitude!,
-                        );
-                        subtitle = '${_formatDistance(dist)} · ${p.adresse ?? 'Adresse inconnue'}';
-                      } else {
-                        subtitle = p.adresse ?? 'Adresse inconnue';
-                      }
-                      return RecentTile(
-                        title: p.nom,
-                        subtitle: subtitle,
-                        status: p.statutActuel,
-                        searchQuery: _isSearching ? _searchController.text : null,
-                        onTap: () {
-                          _sheetController.animateTo(
-                            0.15,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                          widget.onPharmacySelected(p);
-                        },
-                      );
-                    }, childCount: _filteredPharmacies.length),
-                  ),
-                ),
-
-                if (_isSearching && _filteredPharmacies.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 48,
-                            color: colorScheme.outline,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Aucune pharmacie trouvée",
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.outline,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          FilledButton.tonalIcon(
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                _selectedFilter = 'Toutes';
-                                _isSearching = false;
-                              });
-                              _applyFilters();
-                            },
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Réinitialiser la recherche'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

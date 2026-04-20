@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
@@ -173,6 +174,19 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _fetchAndShowRoute(Pharmacy pharmacy) async {
     if (_userPosition == null) return;
     if (pharmacy.latitude == null || pharmacy.longitude == null) return;
+
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity.isEmpty || connectivity.contains(ConnectivityResult.none)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Impossible de calculer l\'itinéraire hors-ligne.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
 
     setState(() {
       _isRouting = true;

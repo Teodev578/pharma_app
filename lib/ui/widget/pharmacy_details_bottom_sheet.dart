@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/services/connectivity_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Affiche une BottomSheet présentant les détails d'une pharmacie.
 /// Intègre des comportements premium : retours haptiques, bouton flottant,
@@ -24,17 +26,13 @@ void showPharmacyDetailsBottomSheet(
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors
-        .transparent, // Rendu du fond géré par le Container principal de DraggableScrollableSheet
-    isScrollControlled:
-        true, // Permet un dimensionnement plus fin du BottomSheet
+    backgroundColor: Colors.transparent, 
+    isScrollControlled: true, 
     useSafeArea: true,
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
           final theme = Theme.of(context);
-
-          // --- STRICT MATERIAL 3 THEME CONVENTIONS ---
 
           // Statut (Ouvert = succès via primary, Fermé = erreur, Inconnu = Orange)
           final Color openBgColor;
@@ -50,407 +48,355 @@ void showPharmacyDetailsBottomSheet(
             openTextColor = theme.colorScheme.onErrorContainer;
             openIcon = Icons.access_time_filled_rounded;
           } else {
-            // Orange pour le cas "Vérifier sur place"
-            openBgColor = const Color(
-              0xFFFFE0B2,
-            ); // Orange très clair (Orange 100)
-            openTextColor = const Color(
-              0xFFE65100,
-            ); // Orange foncé (Orange 900)
+            openBgColor = const Color(0xFFFFE0B2);
+            openTextColor = const Color(0xFFE65100);
             openIcon = Icons.warning_amber_rounded;
           }
 
-          String displayStatus = isUnknown
-              ? 'Vérifier sur place'
-              : pharmacy.statutActuel!;
-
-          // Conteneurs de surface (Cartes)
+          String displayStatus = isUnknown ? 'Vérifier sur place' : pharmacy.statutActuel!;
           final cardBgColor = theme.colorScheme.surfaceContainerHighest;
-
-          // Bouton principal
           final buttonBgColor = theme.colorScheme.primary;
           final buttonTextColor = theme.colorScheme.onPrimary;
-
-          // Fond du BottomSheet (légèrement différencié du background global de la page s'il est surface)
           final sheetBgColor = theme.colorScheme.surfaceContainerLow;
 
-          return DraggableScrollableSheet(
-            initialChildSize: 0.65,
-            minChildSize: 0.4,
-            maxChildSize: 0.95,
-            builder: (context, scrollController) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: sheetBgColor,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.shadow.withOpacity(0.15),
-                      spreadRadius: 0,
-                      blurRadius: 40,
-                      offset: const Offset(0, -10),
+          final ConnectivityService connectivityService = ConnectivityService();
+
+          return StreamBuilder<List<ConnectivityResult>>(
+            stream: connectivityService.connectivityStream,
+            builder: (context, snapshot) {
+              final results = snapshot.data ?? [];
+              final isOffline = results.isEmpty || results.contains(ConnectivityResult.none);
+
+              return DraggableScrollableSheet(
+                initialChildSize: 0.65,
+                minChildSize: 0.4,
+                maxChildSize: 0.95,
+                builder: (context, scrollController) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: sheetBgColor,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.shadow.withOpacity(0.15),
+                          spreadRadius: 0,
+                          blurRadius: 40,
+                          offset: const Offset(0, -10),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Contenu défilant principal
-                      ListView(
-                        controller: scrollController,
-                        padding: const EdgeInsets.fromLTRB(
-                          24,
-                          16,
-                          24,
-                          120,
-                        ), // Espace supplémentaire en bas pour le bouton
-                        physics: const BouncingScrollPhysics(),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                      child: Stack(
                         children: [
-                          // --- POIGNÉE DE DRAG ---
-                          Center(
-                            child: Container(
-                              width: 48,
-                              height: 4,
-                              margin: const EdgeInsets.only(bottom: 24),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.onSurfaceVariant
-                                    .withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-
-                          // --- TITRE DE LA PHARMACIE ---
-                          Text(
-                            pharmacy.nom,
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // --- STATUT ET ACTIONS RAPIDES ---
-                          Row(
+                          ListView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+                            physics: const BouncingScrollPhysics(),
                             children: [
-                              // Badge (Ouvert / Fermé / Vérifier sur place)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
+                              Center(
+                                child: Container(
+                                  width: 48,
+                                  height: 4,
+                                  margin: const EdgeInsets.only(bottom: 24),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: openBgColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      openIcon,
-                                      size: 18,
-                                      color: openTextColor,
+                              ),
+
+                              if (isOffline)
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orangeAccent.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.orangeAccent.withValues(alpha: 0.3),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      displayStatus,
-                                      style: TextStyle(
-                                        color: openTextColor,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.2,
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.wifi_off_rounded, color: Colors.orangeAccent, size: 20),
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          "Certaines informations peuvent ne pas être à jour (Hors-ligne)",
+                                          style: TextStyle(
+                                            color: Colors.orangeAccent,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              Text(
+                                pharmacy.nom,
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: openBgColor,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(openIcon, size: 18, color: openTextColor),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          displayStatus,
+                                          style: TextStyle(
+                                            color: openTextColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (pharmacy.telephone != null)
+                                    IconButton.filledTonal(
+                                      onPressed: () async {
+                                        HapticFeedback.selectionClick();
+                                        final Uri phoneUri = Uri(
+                                          scheme: 'tel',
+                                          path: pharmacy.telephone!.replaceAll(RegExp(r'\s+'), ''),
+                                        );
+                                        if (await canLaunchUrl(phoneUri)) {
+                                          await launchUrl(phoneUri);
+                                        }
+                                      },
+                                      icon: const Icon(Icons.phone),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: theme.colorScheme.secondaryContainer,
+                                        foregroundColor: theme.colorScheme.onSecondaryContainer,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
 
-                              const Spacer(),
-
-                              // Quick Action : Téléphone
-                              if (pharmacy.telephone != null)
-                                Container(
-                                  margin: const EdgeInsets.only(right: 8),
-                                  child: IconButton.filledTonal(
-                                    onPressed: () async {
+                                  IconButton.filledTonal(
+                                    onPressed: () {
                                       HapticFeedback.selectionClick();
-                                      final Uri phoneUri = Uri(
-                                        scheme: 'tel',
-                                        path: pharmacy.telephone!.replaceAll(
-                                          RegExp(r'\s+'),
-                                          '',
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text('Lien de la pharmacie copié (Simulé)'),
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
                                         ),
                                       );
-                                      if (await canLaunchUrl(phoneUri)) {
-                                        await launchUrl(phoneUri);
-                                      }
                                     },
-                                    icon: const Icon(Icons.phone),
+                                    icon: const Icon(Icons.share_rounded),
                                     style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          theme.colorScheme.secondaryContainer,
-                                      foregroundColor: theme
-                                          .colorScheme
-                                          .onSecondaryContainer,
+                                      backgroundColor: theme.colorScheme.secondaryContainer,
+                                      foregroundColor: theme.colorScheme.onSecondaryContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              if (pharmacy.adresse != null)
+                                _buildMockupCard(
+                                  theme: theme,
+                                  bgColor: cardBgColor,
+                                  icon: Icons.location_on,
+                                  label: 'adresse',
+                                  child: Text(
+                                    pharmacy.adresse!,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.4,
                                     ),
                                   ),
                                 ),
 
-                              // Quick Action : Partager
-                              IconButton.filledTonal(
-                                onPressed: () {
-                                  HapticFeedback.selectionClick();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: const Text(
-                                        'Lien de la pharmacie copié (Simulé)',
-                                      ),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                              if (pharmacy.telephone != null)
+                                _buildMockupCard(
+                                  theme: theme,
+                                  bgColor: cardBgColor,
+                                  icon: Icons.phone,
+                                  label: 'Téléphone',
+                                  child: Text(
+                                    pharmacy.telephone!,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.4,
                                     ),
-                                  );
-                                },
-                                icon: const Icon(Icons.share_rounded),
-                                style: IconButton.styleFrom(
-                                  backgroundColor:
-                                      theme.colorScheme.secondaryContainer,
-                                  foregroundColor:
-                                      theme.colorScheme.onSecondaryContainer,
+                                  ),
+                                  trailing: Icon(
+                                    Icons.copy_rounded,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    size: 24,
+                                  ),
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    Clipboard.setData(ClipboardData(text: pharmacy.telephone!));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Numéro copié',
+                                          style: TextStyle(fontWeight: FontWeight.w600),
+                                        ),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
+
+                              if (pharmacy.horairesOuverture != null && pharmacy.horairesOuverture!.isNotEmpty)
+                                _buildMockupCard(
+                                  theme: theme,
+                                  bgColor: cardBgColor,
+                                  icon: Icons.access_time_filled_rounded,
+                                  label: 'Horaires',
+                                  trailing: Icon(
+                                    isHoursExpanded
+                                        ? Icons.keyboard_arrow_up_rounded
+                                        : Icons.keyboard_arrow_down_rounded,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    size: 28,
+                                  ),
+                                  onTap: () {
+                                    HapticFeedback.selectionClick();
+                                    setState(() {
+                                      isHoursExpanded = !isHoursExpanded;
+                                    });
+                                  },
+                                  child: AnimatedSize(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.fastOutSlowIn,
+                                    alignment: Alignment.topCenter,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: isHoursExpanded
+                                          ? pharmacy.horairesOuverture!.map((h) {
+                                              final horaire = h is Map ? h : {};
+                                              final jour = horaire['jour']?.toString() ?? h.toString();
+                                              final heure = horaire['heure']?.toString() ?? '';
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      jour,
+                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                        color: theme.colorScheme.onSurface,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      heure,
+                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                        fontWeight: FontWeight.w400,
+                                                        color: theme.colorScheme.onSurface,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList()
+                                          : [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      "Voir les horaires de la semaine",
+                                                      style: theme.textTheme.titleMedium?.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                        color: theme.colorScheme.primary,
+                                                      ),
+                                                      overflow: TextOverflow.visible,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 16),
                             ],
                           ),
 
-                          const SizedBox(height: 24),
-
-                          // --- CARTE D'ADRESSE ---
-                          if (pharmacy.adresse != null)
-                            _buildMockupCard(
-                              theme: theme,
-                              bgColor: cardBgColor,
-                              icon: Icons.location_on,
-                              label: 'adresse',
-                              child: Text(
-                                pharmacy.adresse!,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.4,
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [
+                                    sheetBgColor,
+                                    sheetBgColor,
+                                    sheetBgColor.withOpacity(0.0),
+                                  ],
+                                  stops: const [0.0, 0.6, 1.0],
                                 ),
                               ),
-                            ),
-
-                          // --- CARTE TÉLÉPHONE ---
-                          if (pharmacy.telephone != null)
-                            _buildMockupCard(
-                              theme: theme,
-                              bgColor: cardBgColor,
-                              icon: Icons.phone,
-                              label: 'Téléphone',
-                              child: Text(
-                                pharmacy.telephone!,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.4,
-                                ),
-                              ),
-                              trailing: Icon(
-                                Icons.copy_rounded,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                size: 24,
-                              ),
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                Clipboard.setData(
-                                  ClipboardData(text: pharmacy.telephone!),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      'Numéro copié',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: FilledButton.icon(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: buttonBgColor,
+                                    foregroundColor: buttonTextColor,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  onPressed: isOffline
+                                      ? null
+                                      : () {
+                                          HapticFeedback.lightImpact();
+                                          if (onDirectionsPressed != null) onDirectionsPressed();
+                                        },
+                                  icon: const Icon(Icons.directions, size: 24),
+                                  label: Text(
+                                    isOffline ? 'Itinéraire (Hors-ligne)' : 'Obtenir l\'itinéraire',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-
-                          // --- CARTE DES HORAIRES (Animée et rétractable) ---
-                          if (pharmacy.horairesOuverture != null &&
-                              pharmacy.horairesOuverture!.isNotEmpty)
-                            _buildMockupCard(
-                              theme: theme,
-                              bgColor: cardBgColor,
-                              icon: Icons.access_time_filled_rounded,
-                              label: 'Horaires',
-                              trailing: Icon(
-                                isHoursExpanded
-                                    ? Icons.keyboard_arrow_up_rounded
-                                    : Icons.keyboard_arrow_down_rounded,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                size: 28,
-                              ),
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                setState(() {
-                                  isHoursExpanded = !isHoursExpanded;
-                                });
-                              },
-                              child: AnimatedSize(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.fastOutSlowIn,
-                                alignment: Alignment.topCenter,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: isHoursExpanded
-                                      ? pharmacy.horairesOuverture!.map((h) {
-                                          final horaire = h is Map ? h : {};
-                                          final jour =
-                                              horaire['jour']?.toString() ??
-                                              h.toString();
-                                          final heure =
-                                              horaire['heure']?.toString() ??
-                                              '';
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 6,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  jour,
-                                                  style: theme
-                                                      .textTheme
-                                                      .titleMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: theme
-                                                            .colorScheme
-                                                            .onSurface,
-                                                      ),
-                                                ),
-                                                Text(
-                                                  heure,
-                                                  style: theme
-                                                      .textTheme
-                                                      .titleMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: theme
-                                                            .colorScheme
-                                                            .onSurface,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList()
-                                      : [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  "Voir les horaires de la semaine",
-                                                  style: theme
-                                                      .textTheme
-                                                      .titleMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: theme
-                                                            .colorScheme
-                                                            .primary, // Texte cliquable visible
-                                                      ),
-                                                  overflow:
-                                                      TextOverflow.visible,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
                                 ),
                               ),
                             ),
-
-                          // Espace supplémentaire transparent pour ne pas être caché par le bouton flottant
-                          const SizedBox(height: 16),
+                          ),
                         ],
                       ),
-
-                      // --- BOUTON DE NAVIGATION FLOTTANT ---
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                sheetBgColor,
-                                sheetBgColor,
-                                sheetBgColor.withOpacity(0.0),
-                              ],
-                              stops: const [0.0, 0.6, 1.0],
-                            ),
-                          ),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 60,
-                            child: FilledButton.icon(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: buttonBgColor,
-                                foregroundColor: buttonTextColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                elevation: 0,
-                              ),
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                if (onDirectionsPressed != null)
-                                  onDirectionsPressed();
-                              },
-                              icon: const Icon(Icons.directions, size: 24),
-                              label: const Text(
-                                'Obtenir l\'itinéraire',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -471,7 +417,6 @@ Widget _buildMockupCard({
   VoidCallback? onTap,
   VoidCallback? onLongPress,
 }) {
-  // En Material 3, on utilise un secondaryContainer pour contraster subtilement.
   final labelBgColor = theme.colorScheme.secondaryContainer;
   final labelTextColor = theme.colorScheme.onSecondaryContainer;
 
@@ -483,8 +428,7 @@ Widget _buildMockupCard({
       borderRadius: BorderRadius.circular(20),
     ),
     child: Material(
-      color: Colors
-          .transparent, // Essentiel pour les animations 'Ink' (ondulation du InkWell)
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
@@ -497,12 +441,8 @@ Widget _buildMockupCard({
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- Étiquette supérieure (Pilule) ---
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: labelBgColor,
                         borderRadius: BorderRadius.circular(16),
@@ -526,13 +466,10 @@ Widget _buildMockupCard({
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // --- Contenu principal de la carte ---
                     child,
                   ],
                 ),
               ),
-              // Élément additionnel optionnel superposé à droite de la ligne
               if (trailing != null) ...[const SizedBox(width: 16), trailing],
             ],
           ),
