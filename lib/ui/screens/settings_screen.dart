@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:pharma_app/services/settings_controller.dart';
+
 class SettingsScreen extends StatefulWidget {
   static const String routeName = '/settings';
+  final SettingsController controller;
 
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, required this.controller});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
   String _selectedLanguage = 'Français';
-  double _searchRadius = 10.0;
 
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -79,16 +80,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${_searchRadius.toInt()} km'),
+              Text('${widget.controller.searchRadius.toInt()} km'),
               Slider(
-                value: _searchRadius,
+                value: widget.controller.searchRadius,
                 min: 1,
                 max: 50,
                 divisions: 49,
-                label: '${_searchRadius.toInt()} km',
+                label: '${widget.controller.searchRadius.toInt()} km',
                 onChanged: (value) {
-                  setDialogState(() => _searchRadius = value);
-                  setState(() => _searchRadius = value);
+                  setDialogState(() => widget.controller.updateSearchRadius(value));
                 },
               ),
             ],
@@ -104,58 +104,94 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showThemeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Apparence'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildThemeOption('Système', ThemeMode.system),
+            _buildThemeOption('Clair', ThemeMode.light),
+            _buildThemeOption('Sombre', ThemeMode.dark),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(String label, ThemeMode mode) {
+    return ListTile(
+      title: Text(label),
+      leading: Radio<ThemeMode>(
+        value: mode,
+        groupValue: widget.controller.themeMode,
+        onChanged: (value) {
+          widget.controller.updateThemeMode(value);
+          Navigator.pop(context);
+        },
+      ),
+      onTap: () {
+        widget.controller.updateThemeMode(mode);
+        Navigator.pop(context);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Paramètres', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildSectionHeader(theme, 'Application'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.dark_mode_outlined,
-            title: 'Apparence',
-            subtitle: 'Mode sombre, thèmes',
-            trailing: Switch(
-              value: isDark,
-              onChanged: (value) {
-                // TODO: Implement theme switching logic with a Provider/Bloc
-              },
-            ),
+    return ListenableBuilder(
+      listenable: widget.controller,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Paramètres', style: TextStyle(fontWeight: FontWeight.bold)),
+            centerTitle: true,
           ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.language_rounded,
-            title: 'Langue',
-            subtitle: _selectedLanguage,
-            onTap: _showLanguageDialog,
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.near_me_rounded,
-            title: 'Rayon de recherche',
-            subtitle: 'Actuellement ${_searchRadius.toInt()} km',
-            onTap: _showRadiusDialog,
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.notifications_none_rounded,
-            title: 'Notifications',
-            subtitle: 'Alertes et rappels',
-            trailing: Switch(
-              value: _notificationsEnabled,
-              onChanged: (value) {
-                setState(() => _notificationsEnabled = value);
-              },
-            ),
-          ),
+          body: ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              _buildSectionHeader(theme, 'Application'),
+              _buildSettingsTile(
+                context,
+                icon: Icons.dark_mode_outlined,
+                title: 'Apparence',
+                subtitle: widget.controller.themeMode == ThemeMode.system
+                    ? 'Système'
+                    : widget.controller.themeMode == ThemeMode.light
+                        ? 'Clair'
+                        : 'Sombre',
+                onTap: _showThemeDialog,
+              ),
+              _buildSettingsTile(
+                context,
+                icon: Icons.language_rounded,
+                title: 'Langue',
+                subtitle: _selectedLanguage,
+                onTap: _showLanguageDialog,
+              ),
+              _buildSettingsTile(
+                context,
+                icon: Icons.near_me_rounded,
+                title: 'Rayon de recherche',
+                subtitle: 'Actuellement ${widget.controller.searchRadius.toInt()} km',
+                onTap: _showRadiusDialog,
+              ),
+              _buildSettingsTile(
+                context,
+                icon: Icons.notifications_none_rounded,
+                title: 'Notifications',
+                subtitle: 'Alertes et rappels',
+                trailing: Switch(
+                  value: widget.controller.notificationsEnabled,
+                  onChanged: (value) {
+                    widget.controller.updateNotificationsEnabled(value);
+                  },
+                ),
+              ),
           const SizedBox(height: 24),
           _buildSectionHeader(theme, 'Support & Feedback'),
           _buildSettingsTile(
@@ -205,8 +241,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 20),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -22,9 +22,13 @@ import 'package:pharma_app/models/route_info.dart';
 import 'package:pharma_app/services/supabase_service.dart';
 import 'package:pharma_app/services/routing_service.dart';
 
+import 'package:pharma_app/services/settings_controller.dart';
+
 class MapScreen extends StatefulWidget {
   static const String routeName = '/map';
-  const MapScreen({super.key});
+  final SettingsController settingsController;
+
+  const MapScreen({super.key, required this.settingsController});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -541,6 +545,7 @@ class _MapScreenState extends State<MapScreen> {
               builder: (context, pharmacies, _) => SearchBottomSheet(
                 pharmacies: pharmacies,
                 userPosition: _userPosition,
+                settingsController: widget.settingsController,
                 onPharmacySelected: (pharmacy) {
                   if (pharmacy.latitude != null && pharmacy.longitude != null) {
                     _mapController.move(

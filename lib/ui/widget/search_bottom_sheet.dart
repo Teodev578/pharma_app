@@ -9,16 +9,20 @@ import 'package:pharma_app/services/supabase_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
 
+import 'package:pharma_app/services/settings_controller.dart';
+
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
   final Function(Pharmacy) onPharmacySelected;
   // Position de l'utilisateur pour le tri par proximité
   final LatLng? userPosition;
+  final SettingsController settingsController;
 
   const SearchBottomSheet({
     super.key,
     required this.pharmacies,
     required this.onPharmacySelected,
+    required this.settingsController,
     this.userPosition,
   });
 
@@ -141,23 +145,34 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
     }
 
     if (_selectedFilter == 'Proches' && userPos != null) {
+      // Rayon défini par l'utilisateur en mètres
+      final radiusMeters = widget.settingsController.searchRadius * 1000;
+
       // Pour l'option "Proches", on ne garde que les pharmacies ouvertes ou de garde
+      // ET situées dans le rayon défini
       results = results.where((p) {
         final s = p.statutActuel?.toLowerCase();
-        return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
+        final isAvailable = s == 'ouverte' || s == 'ouvert' || s == 'de garde';
+        if (!isAvailable) return false;
+
+        if (p.latitude == null || p.longitude == null) return false;
+        
+        final dist = _haversineDistance(
+          userPos.latitude,
+          userPos.longitude,
+          p.latitude!,
+          p.longitude!,
+        );
+        return dist <= radiusMeters;
       }).toList();
 
       results.sort((a, b) {
-        final da = (a.latitude != null && a.longitude != null)
-            ? _haversineDistance(userPos.latitude, userPos.longitude, a.latitude!, a.longitude!)
-            : double.infinity;
-        final db = (b.latitude != null && b.longitude != null)
-            ? _haversineDistance(userPos.latitude, userPos.longitude, b.latitude!, b.longitude!)
-            : double.infinity;
+        final da = _haversineDistance(userPos.latitude, userPos.longitude, a.latitude!, a.longitude!);
+        final db = _haversineDistance(userPos.latitude, userPos.longitude, b.latitude!, b.longitude!);
         return da.compareTo(db);
       });
 
-      // Conservation uniquement des 10 pharmacies les plus proches
+      // Conservation uniquement des 10 pharmacies les plus proches (parmi celles dans le rayon)
       if (results.length > 10) {
         results = results.sublist(0, 10);
       }

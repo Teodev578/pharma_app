@@ -8,6 +8,8 @@ import 'package:pharma_app/ui/screens/map_screen.dart';
 import 'package:pharma_app/ui/screens/settings_screen.dart';
 import 'package:pharma_app/core/config.dart';
 import 'package:pharma_app/ui/widget/global_error_screen.dart';
+import 'package:pharma_app/services/settings_controller.dart';
+import 'package:pharma_app/services/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,12 +30,17 @@ void main() async {
     anonKey: AppConfig.supabaseAnonKey,
   );
 
+  // Initialisation des paramètres
+  final settingsController = SettingsController(SettingsService());
+  await settingsController.loadSettings();
+
   final prefs = await SharedPreferences.getInstance();
   final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
   final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
 
   runApp(
     MainApp(
+      settingsController: settingsController,
       hasSeenOnboarding: hasSeenOnboarding,
       hasSeenWelcome: hasSeenWelcome,
     ),
@@ -41,10 +48,13 @@ void main() async {
 }
 
 class MainApp extends StatelessWidget {
+  final SettingsController settingsController;
   final bool hasSeenOnboarding;
   final bool hasSeenWelcome;
+  
   const MainApp({
     super.key,
+    required this.settingsController,
     required this.hasSeenOnboarding,
     required this.hasSeenWelcome,
   });
@@ -59,37 +69,42 @@ class MainApp extends StatelessWidget {
       ThemeData.dark().textTheme,
     );
 
-    return MaterialApp(
-      showPerformanceOverlay: false,
-      debugShowCheckedModeBanner: false,
-      title: 'Pharma App',
-      themeMode: ThemeMode.system,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: seedColor,
-          brightness: Brightness.light,
-        ),
-        textTheme: lightTextTheme,
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: seedColor,
-          brightness: Brightness.dark,
-        ),
-        textTheme: darkTextTheme,
-        useMaterial3: true,
-      ),
-      initialRoute: !hasSeenOnboarding
-          ? OnboardingScreen.routeName
-          : !hasSeenWelcome
-          ? WelcomeScreen.routeName
-          : MapScreen.routeName,
-      routes: {
-        OnboardingScreen.routeName: (context) => const OnboardingScreen(),
-        WelcomeScreen.routeName: (context) => const WelcomeScreen(),
-        MapScreen.routeName: (context) => const MapScreen(),
-        SettingsScreen.routeName: (context) => const SettingsScreen(),
+    return ListenableBuilder(
+      listenable: settingsController,
+      builder: (BuildContext context, Widget? child) {
+        return MaterialApp(
+          showPerformanceOverlay: false,
+          debugShowCheckedModeBanner: false,
+          title: 'Pharma App',
+          themeMode: settingsController.themeMode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: seedColor,
+              brightness: Brightness.light,
+            ),
+            textTheme: lightTextTheme,
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: seedColor,
+              brightness: Brightness.dark,
+            ),
+            textTheme: darkTextTheme,
+            useMaterial3: true,
+          ),
+          initialRoute: !hasSeenOnboarding
+              ? OnboardingScreen.routeName
+              : !hasSeenWelcome
+              ? WelcomeScreen.routeName
+              : MapScreen.routeName,
+          routes: {
+            OnboardingScreen.routeName: (context) => const OnboardingScreen(),
+            WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+            MapScreen.routeName: (context) => MapScreen(settingsController: settingsController),
+            SettingsScreen.routeName: (context) => SettingsScreen(controller: settingsController),
+          },
+        );
       },
     );
   }
