@@ -70,7 +70,9 @@ class PharmacyMarker {
                 decoration: BoxDecoration(
                   color: markerBgColor,
                   shape: BoxShape.circle,
-                  border: Border.all(
+                  border: scale < 1.0
+                      ? null
+                      : Border.all(
                     color: colorScheme.surface,
                     width: 3.0 * scale,
                   ),

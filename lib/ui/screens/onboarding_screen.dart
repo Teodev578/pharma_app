@@ -245,49 +245,51 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
           // --- CONTENU ---
           SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: _steps.length + 1,
-                    onPageChanged: (index) {
-                      setState(() => _currentIndex = index);
-                    },
-                    itemBuilder: (context, index) {
-                      if (index == _steps.length) {
-                        return _buildPermissionPage(
+            child: RepaintBoundary(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: _steps.length + 1,
+                      onPageChanged: (index) {
+                        setState(() => _currentIndex = index);
+                      },
+                      itemBuilder: (context, index) {
+                        if (index == _steps.length) {
+                          return _buildPermissionPage(
+                            colorScheme,
+                            textTheme,
+                            isLandscape,
+                            primaryColor,
+                          );
+                        }
+                        return _buildOnboardingPage(
+                          _steps[index],
                           colorScheme,
                           textTheme,
                           isLandscape,
+                          index == _currentIndex,
                           primaryColor,
                         );
-                      }
-                      return _buildOnboardingPage(
-                        _steps[index],
-                        colorScheme,
-                        textTheme,
-                        isLandscape,
-                        index == _currentIndex,
-                        primaryColor,
-                      );
-                    },
+                      },
+                    ),
                   ),
-                ),
 
-                // Navigation
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: isLandscape ? 8.0 : 32.0,
+                  // Navigation
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: isLandscape ? 8.0 : 32.0,
+                    ),
+                    child: _buildBottomNavigation(
+                      isLastPage,
+                      colorScheme,
+                      primaryColor,
+                    ),
                   ),
-                  child: _buildBottomNavigation(
-                    isLastPage,
-                    colorScheme,
-                    primaryColor,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
