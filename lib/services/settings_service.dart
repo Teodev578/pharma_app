@@ -5,6 +5,7 @@ class SettingsService {
   static const String _themeModeKey = 'settings_theme_mode';
   static const String _notificationsKey = 'settings_notifications_enabled';
   static const String _searchRadiusKey = 'settings_search_radius';
+  static const String _favoritesKey = 'settings_favorites';
 
   Future<ThemeMode> themeMode() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,5 +37,15 @@ class SettingsService {
   Future<void> updateSearchRadius(double radius) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_searchRadiusKey, radius);
+  }
+
+  Future<List<String>> favorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_favoritesKey) ?? [];
+  }
+
+  Future<void> updateFavorites(List<String> favorites) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_favoritesKey, favorites);
   }
 }

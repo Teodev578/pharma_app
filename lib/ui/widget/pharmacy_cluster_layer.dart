@@ -5,6 +5,7 @@ import 'package:pharma_app/ui/widget/map_cluster_widget.dart';
 import 'package:pharma_app/ui/widget/pharmacy_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/services/settings_controller.dart';
 
 /// Widget dédié à la couche de clusters de pharmacies.
 /// Reconstruit uniquement quand [zoom] franchit un palier OU que [pharmacies] change.
@@ -12,6 +13,7 @@ import 'package:pharma_app/models/pharmacy.dart';
 class PharmacyClusterLayer extends StatelessWidget {
   final List<Pharmacy> pharmacies;
   final MapController mapController;
+  final SettingsController settingsController;
   final double zoom;
   final VoidCallback? Function(Pharmacy pharmacy)? onDirectionsPressedBuilder;
 
@@ -19,6 +21,7 @@ class PharmacyClusterLayer extends StatelessWidget {
     super.key,
     required this.pharmacies,
     required this.mapController,
+    required this.settingsController,
     required this.zoom,
     this.onDirectionsPressedBuilder,
   });
@@ -47,6 +50,7 @@ class PharmacyClusterLayer extends StatelessWidget {
               context: context,
               point: LatLng(p.latitude!, p.longitude!),
               pharmacy: p,
+              settingsController: settingsController,
               showLabel: showLabel,
               scale: scale,
               onDirectionsPressed: onDirectionsPressedBuilder?.call(p),

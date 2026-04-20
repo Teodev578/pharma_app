@@ -144,6 +144,12 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       }).toList();
     }
 
+    if (_selectedFilter == 'Favoris') {
+      results = results.where((p) {
+        return widget.settingsController.isFavorite(p.nom);
+      }).toList();
+    }
+
     if (_selectedFilter == 'Proches' && userPos != null) {
       // Rayon défini par l'utilisateur en mètres
       final radiusMeters = widget.settingsController.searchRadius * 1000;
@@ -315,6 +321,20 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                             _applyFilters();
                                           }
                                         : null,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilterChip(
+                                    label: const Text('Favoris'),
+                                    selected: _selectedFilter == 'Favoris',
+                                    showCheckmark: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    onSelected: (bool selected) {
+                                      setState(() =>
+                                          _selectedFilter = 'Favoris');
+                                      _applyFilters();
+                                    },
                                   ),
                                   const SizedBox(width: 8),
                                   FilterChip(

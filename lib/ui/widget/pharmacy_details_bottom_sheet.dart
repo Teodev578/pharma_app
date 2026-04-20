@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/services/settings_controller.dart';
 
 /// Affiche une BottomSheet présentant les détails d'une pharmacie.
 /// Intègre des comportements premium : retours haptiques, bouton flottant,
@@ -10,6 +11,7 @@ void showPharmacyDetailsBottomSheet(
   BuildContext context,
   Pharmacy pharmacy, {
   VoidCallback? onDirectionsPressed,
+  required SettingsController settingsController,
 }) {
   final status = pharmacy.statutActuel?.toLowerCase();
   final bool isOpen = status == 'ouvert' || status == 'ouverte';
@@ -56,6 +58,8 @@ void showPharmacyDetailsBottomSheet(
           final buttonBgColor = theme.colorScheme.primary;
           final buttonTextColor = theme.colorScheme.onPrimary;
           final sheetBgColor = theme.colorScheme.surfaceContainerLow;
+
+          final bool isFavorite = settingsController.isFavorite(pharmacy.nom);
 
               return DraggableScrollableSheet(
                 initialChildSize: 0.65,
@@ -152,6 +156,38 @@ void showPharmacyDetailsBottomSheet(
                                       ),
                                     ),
 
+                                  IconButton.filledTonal(
+                                    onPressed: () async {
+                                      HapticFeedback.mediumImpact();
+                                      await settingsController.toggleFavorite(pharmacy.nom);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).clearSnackBars();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              isFavorite
+                                                  ? 'Retiré des favoris'
+                                                  : 'Ajouté aux favoris ❤️',
+                                              style: const TextStyle(fontWeight: FontWeight.w600),
+                                            ),
+                                            behavior: SnackBarBehavior.floating,
+                                            duration: const Duration(seconds: 2),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(
+                                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                                      color: isFavorite ? Colors.red : null,
+                                    ),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: theme.colorScheme.secondaryContainer,
+                                      foregroundColor: isFavorite ? Colors.red : theme.colorScheme.onSecondaryContainer,
+                                    ),
+                                  ),
                                   IconButton.filledTonal(
                                     onPressed: () {
                                       HapticFeedback.selectionClick();

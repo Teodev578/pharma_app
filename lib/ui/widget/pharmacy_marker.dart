@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pharma_app/models/pharmacy.dart';
+import 'package:pharma_app/services/settings_controller.dart';
 import 'package:pharma_app/ui/widget/pharmacy_details_bottom_sheet.dart';
 
 class PharmacyMarker {
@@ -15,6 +16,7 @@ class PharmacyMarker {
     required BuildContext context,
     required LatLng point,
     required Pharmacy pharmacy,
+    required SettingsController settingsController,
     VoidCallback? onDirectionsPressed,
     // Si true, affiche le nom sous l'icône (activé seulement à fort zoom)
     bool showLabel = false,
@@ -56,7 +58,8 @@ class PharmacyMarker {
       height: showLabel ? 68 : iconSize,
       child: GestureDetector(
         onTap: () => showPharmacyDetailsBottomSheet(context, pharmacy,
-            onDirectionsPressed: onDirectionsPressed),
+          settingsController: settingsController,
+          onDirectionsPressed: onDirectionsPressed),
         behavior: HitTestBehavior.deferToChild,
         child: RepaintBoundary(
           key: stableKey,

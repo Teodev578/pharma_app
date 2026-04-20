@@ -9,15 +9,18 @@ class SettingsController with ChangeNotifier {
   late ThemeMode _themeMode;
   late bool _notificationsEnabled;
   late double _searchRadius;
+  late List<String> _favorites;
 
   ThemeMode get themeMode => _themeMode;
   bool get notificationsEnabled => _notificationsEnabled;
   double get searchRadius => _searchRadius;
+  List<String> get favorites => _favorites;
 
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
     _notificationsEnabled = await _settingsService.notificationsEnabled();
     _searchRadius = await _settingsService.searchRadius();
+    _favorites = await _settingsService.favorites();
     notifyListeners();
   }
 
@@ -44,5 +47,17 @@ class SettingsController with ChangeNotifier {
     _searchRadius = radius;
     notifyListeners();
     await _settingsService.updateSearchRadius(radius);
+  }
+
+  bool isFavorite(String name) => _favorites.contains(name);
+
+  Future<void> toggleFavorite(String name) async {
+    if (_favorites.contains(name)) {
+      _favorites.remove(name);
+    } else {
+      _favorites.add(name);
+    }
+    notifyListeners();
+    await _settingsService.updateFavorites(_favorites);
   }
 }

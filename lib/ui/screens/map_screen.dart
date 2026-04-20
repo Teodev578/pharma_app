@@ -402,6 +402,7 @@ class _MapScreenState extends State<MapScreen> {
                         builder: (context, zoom, _) => PharmacyClusterLayer(
                           pharmacies: pharmacies,
                           mapController: _mapController,
+                          settingsController: widget.settingsController,
                           zoom: zoom,
                           onDirectionsPressedBuilder: (p) => () {
                             Navigator.pop(context);
@@ -553,6 +554,7 @@ class _MapScreenState extends State<MapScreen> {
                       16.0,
                     );
                     showPharmacyDetailsBottomSheet(context, pharmacy,
+                        settingsController: widget.settingsController,
                         onDirectionsPressed: () {
                       Navigator.pop(context);
                       _fetchAndShowRoute(pharmacy);
