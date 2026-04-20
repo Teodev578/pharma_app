@@ -1,9 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   static const String routeName = '/settings';
 
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _notificationsEnabled = true;
+  String _selectedLanguage = 'Français';
+  double _searchRadius = 10.0;
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
+        );
+      }
+    }
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Choisir la langue'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Français'),
+              leading: Radio<String>(
+                value: 'Français',
+                groupValue: _selectedLanguage,
+                onChanged: (value) {
+                  setState(() => _selectedLanguage = value!);
+                  Navigator.pop(context);
+                },
+              ),
+              onTap: () {
+                setState(() => _selectedLanguage = 'Français');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('English'),
+              leading: Radio<String>(
+                value: 'English',
+                groupValue: _selectedLanguage,
+                onChanged: (value) {
+                  setState(() => _selectedLanguage = value!);
+                  Navigator.pop(context);
+                },
+              ),
+              onTap: () {
+                setState(() => _selectedLanguage = 'English');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRadiusDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Rayon de recherche'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${_searchRadius.toInt()} km'),
+              Slider(
+                value: _searchRadius,
+                min: 1,
+                max: 50,
+                divisions: 49,
+                label: '${_searchRadius.toInt()} km',
+                onChanged: (value) {
+                  setDialogState(() => _searchRadius = value);
+                  setState(() => _searchRadius = value);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +117,6 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildSectionHeader(theme, 'Profil'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.person_outline_rounded,
-            title: 'Mon Profil',
-            subtitle: 'Gérer vos informations personnelles',
-            onTap: () {},
-          ),
-          const SizedBox(height: 24),
           _buildSectionHeader(theme, 'Application'),
           _buildSettingsTile(
             context,
@@ -36,40 +126,85 @@ class SettingsScreen extends StatelessWidget {
             trailing: Switch(
               value: isDark,
               onChanged: (value) {
-                // TODO: Implement theme switching logic
+                // TODO: Implement theme switching logic with a Provider/Bloc
               },
             ),
+          ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.language_rounded,
+            title: 'Langue',
+            subtitle: _selectedLanguage,
+            onTap: _showLanguageDialog,
+          ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.near_me_rounded,
+            title: 'Rayon de recherche',
+            subtitle: 'Actuellement ${_searchRadius.toInt()} km',
+            onTap: _showRadiusDialog,
           ),
           _buildSettingsTile(
             context,
             icon: Icons.notifications_none_rounded,
             title: 'Notifications',
             subtitle: 'Alertes et rappels',
-            onTap: () {},
+            trailing: Switch(
+              value: _notificationsEnabled,
+              onChanged: (value) {
+                setState(() => _notificationsEnabled = value);
+              },
+            ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(theme, 'Assistance'),
+          _buildSectionHeader(theme, 'Support & Feedback'),
+          _buildSettingsTile(
+            context,
+            icon: Icons.bug_report_outlined,
+            title: 'Signaler un bug',
+            subtitle: 'Aidez-nous à nous améliorer',
+            onTap: () => _launchURL('mailto:support@pharmaapp.com?subject=Bug%20Report%20PharmaApp'),
+          ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.mail_outline_rounded,
+            title: 'Nous contacter',
+            subtitle: 'Une question ou une suggestion ?',
+            onTap: () => _launchURL('mailto:contact@pharmaapp.com'),
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader(theme, 'Légal & À propos'),
+          _buildSettingsTile(
+            context,
+            icon: Icons.description_outlined,
+            title: 'Conditions d\'utilisation',
+            subtitle: 'Les règles de l\'application',
+            onTap: () => _launchURL('https://pharmaapp.com/terms'),
+          ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.privacy_tip_outlined,
+            title: 'Politique de confidentialité',
+            subtitle: 'Comment nous traitons vos données',
+            onTap: () => _launchURL('https://pharmaapp.com/privacy'),
+          ),
           _buildSettingsTile(
             context,
             icon: Icons.info_outline_rounded,
             title: 'À propos',
-            subtitle: 'Version 0.1.0',
+            subtitle: 'Version 0.1.0 (Beta)',
             onTap: () {},
           ),
           const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: theme.colorScheme.error,
-                side: BorderSide(color: theme.colorScheme.error),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          Center(
+            child: Text(
+              'Fait avec ❤️ pour votre santé',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.4),
               ),
-              onPressed: () {},
-              child: const Text('Déconnexion', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
