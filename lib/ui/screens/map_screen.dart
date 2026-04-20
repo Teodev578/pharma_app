@@ -415,23 +415,25 @@ class _MapScreenState extends State<MapScreen> {
                     alignment: Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: ValueListenableBuilder<double>(
-                        valueListenable: _rotationNotifier,
-                        builder: (context, rotation, _) => FloatingMapButtons(
-                          mapController: _mapController,
-                          trackingState: _trackingState,
-                          rotation: rotation,
-                          onMyLocationPressed: () {
-                            if (_trackingState == 0) {
-                              setState(() => _trackingState = 1);
-                              _alignController.add(15.0);
-                            } else if (_trackingState == 1) {
-                              setState(() => _trackingState = 2);
-                            } else {
-                              setState(() => _trackingState = 1);
-                              _mapController.rotate(0);
-                            }
-                          },
+                      child: RepaintBoundary(
+                        child: ValueListenableBuilder<double>(
+                          valueListenable: _rotationNotifier,
+                          builder: (context, rotation, _) => FloatingMapButtons(
+                            mapController: _mapController,
+                            trackingState: _trackingState,
+                            rotation: rotation,
+                            onMyLocationPressed: () {
+                              if (_trackingState == 0) {
+                                setState(() => _trackingState = 1);
+                                _alignController.add(15.0);
+                              } else if (_trackingState == 1) {
+                                setState(() => _trackingState = 2);
+                              } else {
+                                setState(() => _trackingState = 1);
+                                _mapController.rotate(0);
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -444,20 +446,22 @@ class _MapScreenState extends State<MapScreen> {
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListenableBuilder(
-                            listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
-                            builder: (context, _) => MapScaleWidget(
-                              zoom: _zoomNotifier.value,
-                              latitude: _centerLatNotifier.value,
+                      child: RepaintBoundary(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListenableBuilder(
+                              listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
+                              builder: (context, _) => MapScaleWidget(
+                                zoom: _zoomNotifier.value,
+                                latitude: _centerLatNotifier.value,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          MapTopLoader(isLoading: _isLoadingPharmacies),
-                        ],
+                            const SizedBox(height: 8),
+                            MapTopLoader(isLoading: _isLoadingPharmacies),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -512,16 +516,18 @@ class _MapScreenState extends State<MapScreen> {
 
                       return Align(
                         alignment: Alignment.topLeft,
-                        child: NavigationBanner(
-                          distance: distanceText,
-                          instruction: instructionText,
-                          directionIcon: icon,
-                          onCancel: () {
-                            setState(() {
-                              _routePoints = [];
-                              _currentRoute = null;
-                            });
-                          },
+                        child: RepaintBoundary(
+                          child: NavigationBanner(
+                            distance: distanceText,
+                            instruction: instructionText,
+                            directionIcon: icon,
+                            onCancel: () {
+                              setState(() {
+                                _routePoints = [];
+                                _currentRoute = null;
+                              });
+                            },
+                          ),
                         ),
                       );
                     }
@@ -552,8 +558,10 @@ class _MapScreenState extends State<MapScreen> {
             ),
 
             if (_isRouting)
-              const Center(
-                child: CircularProgressIndicator(),
+              const RepaintBoundary(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
           ],
         ),

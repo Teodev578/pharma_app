@@ -31,11 +31,13 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
   final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-  
-  runApp(MainApp(
-    hasSeenOnboarding: hasSeenOnboarding,
-    hasSeenWelcome: hasSeenWelcome,
-  ));
+
+  runApp(
+    MainApp(
+      hasSeenOnboarding: hasSeenOnboarding,
+      hasSeenWelcome: hasSeenWelcome,
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -50,10 +52,15 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const seedColor = Color(0xFF10B981); // Emerald green for a premium look
-    final lightTextTheme = GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme);
-    final darkTextTheme = GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme);
+    final lightTextTheme = GoogleFonts.plusJakartaSansTextTheme(
+      ThemeData.light().textTheme,
+    );
+    final darkTextTheme = GoogleFonts.plusJakartaSansTextTheme(
+      ThemeData.dark().textTheme,
+    );
 
     return MaterialApp(
+      showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
       title: 'Pharma App',
       themeMode: ThemeMode.system,
@@ -76,8 +83,8 @@ class MainApp extends StatelessWidget {
       initialRoute: !hasSeenOnboarding
           ? OnboardingScreen.routeName
           : !hasSeenWelcome
-              ? WelcomeScreen.routeName
-              : MapScreen.routeName,
+          ? WelcomeScreen.routeName
+          : MapScreen.routeName,
       routes: {
         OnboardingScreen.routeName: (context) => const OnboardingScreen(),
         WelcomeScreen.routeName: (context) => const WelcomeScreen(),
