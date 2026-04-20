@@ -6,18 +6,32 @@ import 'package:pharma_app/ui/screens/onboarding_screen.dart';
 import 'package:pharma_app/ui/screens/welcome_screen.dart';
 import 'package:pharma_app/ui/screens/map_screen.dart';
 import 'package:pharma_app/ui/screens/settings_screen.dart';
+import 'package:pharma_app/core/config.dart';
+import 'package:pharma_app/ui/widget/global_error_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Gestion des erreurs Flutter (Framework)
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('GlobalError: ${details.exception}');
+  };
+
+  // Gestion des erreurs d'affichage (UI)
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return GlobalErrorScreen(details: details);
+  };
+
   await Supabase.initialize(
-    url: 'https://iquozfjxaiakihplymuv.supabase.co',
-    anonKey: 'sb_publishable_vhL-xeXcEyO9ubrbQM62Ng_inBeVurW',
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
   );
 
   final prefs = await SharedPreferences.getInstance();
   final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
   final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+  
   runApp(MainApp(
     hasSeenOnboarding: hasSeenOnboarding,
     hasSeenWelcome: hasSeenWelcome,
