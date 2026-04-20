@@ -13,18 +13,66 @@ class SupabaseService {
 
   /// Retourne immédiatement les pharmacies depuis le cache si disponible,
   /// puis déclenche un rafraîchissement réseau en arrière-plan.
-  /// Lance une exception si le réseau échoue ET qu'il n'y a pas de cache.
   Future<List<Pharmacy>> getPharmacies() async {
     final cached = await _loadFromCache();
-
     if (cached != null) {
-      // Cache valide : retourner immédiatement et rafraîchir en arrière-plan
       _refreshCache().ignore();
       return cached;
     }
-
-    // Pas de cache : charge obligatoirement depuis le réseau
     return await _fetchFromNetwork();
+  }
+
+  /// Recherche les pharmacies dans un rayon donné (en mètres) autour d'un point GPS.
+  /// Utilise la fonction RPC 'get_pharmacies_in_radius' définie en SQL.
+  Future<List<Pharmacy>> getPharmaciesInRadius({
+    required double latitude,
+    required double longitude,
+    double radiusMeters = 5000,
+  }) async {
+    try {
+      final List<dynamic> response = await supabase.rpc(
+        'get_pharmacies_in_radius',
+        params: {
+          'lat': latitude,
+          'lng': longitude,
+          'radius_meters': radiusMeters,
+        },
+      );
+
+      final pharmacies = response
+          .map((json) => Pharmacy.fromJson(json as Map<String, dynamic>))
+          .toList();
+      return pharmacies;
+    } catch (e) {
+      debugPrint('SupabaseService: erreur rpc radius: $e');
+      return [];
+    }
+  }
+
+  /// Recherche les pharmacies par nom via le backend (Full-Text Search).
+  Future<List<Pharmacy>> searchPharmacies(String query) async {
+    try {
+      if (query.isEmpty) return await getPharmacies();
+
+      final List<Map<String, dynamic>> response = await supabase
+          .from('pharmacies')
+          .select()
+          .textSearch('fts', query, config: 'french', type: TextSearchType.websearch)
+          .order('nom', ascending: true);
+
+      return response.map((json) => Pharmacy.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('SupabaseService: erreur search: $e');
+      return [];
+    }
+  }
+
+  /// Stream en temps réel pour écouter les changements de statut des pharmacies.
+  Stream<List<Pharmacy>> pharmaciesStream() {
+    return supabase
+        .from('pharmacies')
+        .stream(primaryKey: ['nom']) // 'nom' est utilisé comme clé unique ici
+        .map((data) => data.map((json) => Pharmacy.fromJson(json)).toList());
   }
 
   Future<List<Pharmacy>> _fetchFromNetwork() async {

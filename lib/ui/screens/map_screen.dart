@@ -50,8 +50,8 @@ class _MapScreenState extends State<MapScreen> {
   bool _isRouting = false;
   // Debounce timer pour éviter les rebuilds excessifs sur onPositionChanged
   Timer? _centerDebounce;
-  // Rafraîchissement automatique des statuts toutes les 10 minutes
-  Timer? _refreshTimer;
+  // Rafraîchissement automatique des statuts via Realtime
+  StreamSubscription<List<Pharmacy>>? _pharmaciesSubscription;
   // Stream d'arrivée — surveille la position pour stopper le routing auto
   StreamSubscription<Position>? _arrivalSubscription;
 
@@ -66,19 +66,23 @@ class _MapScreenState extends State<MapScreen> {
     _alignController = StreamController<double?>.broadcast();
     _fetchPharmacies();
     _centerOnUserLocation();
-    // Rafraîchissement silencieux des statuts toutes les 10 minutes
-    _refreshTimer = Timer.periodic(const Duration(minutes: 10), (_) => _silentRefresh());
+    // Écoute des mises à jour en temps réel (Realtime)
+    _subscribeToPharmacies();
   }
 
-  /// Met à jour les pharmacies en arrière-plan sans afficher le loader
-  Future<void> _silentRefresh() async {
-    try {
-      final pharmacies = await SupabaseService().getPharmacies();
-      if (mounted) _pharmaciesNotifier.value = pharmacies;
-    } catch (_) {
-      // Silence — une erreur de rafraîchissement ne doit pas déranger l'utilisateur
-    }
+  void _subscribeToPharmacies() {
+    _pharmaciesSubscription?.cancel();
+    _pharmaciesSubscription = SupabaseService().pharmaciesStream().listen((pharmacies) {
+      if (mounted) {
+        _pharmaciesNotifier.value = pharmacies;
+        // On marque le chargement comme terminé dès le premier event du stream
+        if (_isLoadingPharmacies) {
+          setState(() => _isLoadingPharmacies = false);
+        }
+      }
+    });
   }
+
 
   Future<void> _centerOnUserLocation() async {
     try {
@@ -257,7 +261,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     _centerDebounce?.cancel();
-    _refreshTimer?.cancel();
+    _pharmaciesSubscription?.cancel();
     _arrivalSubscription?.cancel();
     _rotationNotifier.dispose();
     _zoomNotifier.dispose();

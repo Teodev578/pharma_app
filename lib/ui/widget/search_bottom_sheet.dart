@@ -5,7 +5,9 @@ import 'package:latlong2/latlong.dart';
 import 'custom_search_bar.dart';
 import 'recent_tile.dart';
 import 'package:pharma_app/services/connectivity_service.dart';
+import 'package:pharma_app/services/supabase_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 
 class SearchBottomSheet extends StatefulWidget {
   final List<Pharmacy> pharmacies;
@@ -30,14 +32,23 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       DraggableScrollableController();
   List<Pharmacy> _filteredPharmacies = [];
   bool _isSearching = false;
+  bool _isLoadingBackend = false;
   String _selectedFilter = 'Toutes';
+  Timer? _searchDebounce;
 
   @override
   void initState() {
     super.initState();
     _filteredPharmacies = widget.pharmacies;
-    _searchController.addListener(_applyFilters);
+    _searchController.addListener(_onSearchChanged);
     _sheetController.addListener(_onSheetScroll);
+  }
+
+  void _onSearchChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+      _applyFilters();
+    });
   }
 
   void _onSheetScroll() {
@@ -48,6 +59,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _sheetController.removeListener(_onSheetScroll);
     _sheetController.dispose();
@@ -93,25 +105,41 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
     return '${(meters / 1000).toStringAsFixed(1)} km';
   }
 
-  void _applyFilters() {
-    final query = _normalize(_searchController.text);
+  Future<void> _applyFilters() async {
+    final query = _searchController.text.trim();
+    final normalizedQuery = _normalize(query);
     final userPos = widget.userPosition;
 
-    List<Pharmacy> results = widget.pharmacies.where((p) {
-      final name = _normalize(p.nom);
-      final address = _normalize(p.adresse ?? '');
-      bool matchesSearch =
-          query.isEmpty || name.contains(query) || address.contains(query);
-      if (!matchesSearch) return false;
+    setState(() {
+      _isSearching = query.isNotEmpty;
+      if (_isSearching) _isLoadingBackend = true;
+    });
 
-      if (_selectedFilter == 'Ouvertes') {
+    List<Pharmacy> results;
+
+    // Tentative de recherche backend si connecté
+    final connectivity = await Connectivity().checkConnectivity();
+    final isOnline = connectivity.isNotEmpty && !connectivity.contains(ConnectivityResult.none);
+
+    if (isOnline && query.length >= 2) {
+      results = await SupabaseService().searchPharmacies(query);
+    } else {
+      // Fallback local
+      results = widget.pharmacies.where((p) {
+        final name = _normalize(p.nom);
+        final address = _normalize(p.adresse ?? '');
+        return normalizedQuery.isEmpty || name.contains(normalizedQuery) || address.contains(normalizedQuery);
+      }).toList();
+    }
+
+    // Appliquer les filtres de statut/proximité sur les résultats (backend ou locaux)
+    if (_selectedFilter == 'Ouvertes') {
+      results = results.where((p) {
         final s = p.statutActuel?.toLowerCase();
         return s == 'ouverte' || s == 'ouvert' || s == 'de garde';
-      }
-      return true;
-    }).toList();
+      }).toList();
+    }
 
-    // Tri par proximité si filtre "Proches" ou si position disponible
     if (_selectedFilter == 'Proches' && userPos != null) {
       results.sort((a, b) {
         final da = (a.latitude != null && a.longitude != null)
@@ -124,10 +152,12 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
       });
     }
 
-    setState(() {
-      _isSearching = query.isNotEmpty;
-      _filteredPharmacies = results;
-    });
+    if (mounted) {
+      setState(() {
+        _filteredPharmacies = results;
+        _isLoadingBackend = false;
+      });
+    }
   }
 
   @override
@@ -282,6 +312,10 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                           ),
                         ),
                       ),
+                      if (_isLoadingBackend)
+                        const SliverToBoxAdapter(
+                          child: LinearProgressIndicator(minHeight: 2),
+                        ),
                       if (isOffline)
                         _buildOfflineState(colorScheme, textTheme)
                       else ...[
