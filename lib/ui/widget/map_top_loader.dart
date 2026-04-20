@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pharma_app/services/connectivity_service.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// Loader et indicateur d'état (chargement / connectivité).
-/// Affiche un shimmer pendant le chargement ou un message si hors-ligne.
+/// Loader simple affichant un shimmer pendant le chargement.
 class MapTopLoader extends StatefulWidget {
   final bool isLoading;
 
@@ -17,7 +14,6 @@ class _MapTopLoaderState extends State<MapTopLoader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _shimmerCtrl;
   late final Animation<double> _shimmerAnim;
-  final ConnectivityService _connectivityService = ConnectivityService();
 
   @override
   void initState() {
@@ -40,32 +36,23 @@ class _MapTopLoaderState extends State<MapTopLoader>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<ConnectivityResult>>(
-      stream: _connectivityService.connectivityStream,
-      builder: (context, snapshot) {
-        final results = snapshot.data ?? [];
-        final isOffline =
-            results.isEmpty || results.contains(ConnectivityResult.none);
+    if (!widget.isLoading) {
+      return const SizedBox.shrink();
+    }
 
-        if (!isOffline && !widget.isLoading) {
-          return const SizedBox.shrink();
-        }
-
-        return AnimatedBuilder(
-          animation: _shimmerAnim,
-          builder: (context, child) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              child: isOffline ? _buildOfflineInfo() : _buildShimmerContent(),
-            );
-          },
+    return AnimatedBuilder(
+      animation: _shimmerAnim,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 4,
+          ),
+          child: _buildShimmerContent(),
         );
       },
     );
@@ -78,24 +65,6 @@ class _MapTopLoaderState extends State<MapTopLoader>
         _ShimmerBox(width: 14, height: 14, radius: 7, anim: _shimmerAnim),
         const SizedBox(width: 12),
         _ShimmerBox(width: 160, height: 12, radius: 6, anim: _shimmerAnim),
-      ],
-    );
-  }
-
-  Widget _buildOfflineInfo() {
-    return const Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.wifi_off_rounded, color: Colors.orangeAccent, size: 14),
-        SizedBox(width: 8),
-        Text(
-          'Vous êtes hors connexion',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ],
     );
   }
