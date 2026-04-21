@@ -220,7 +220,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                       const BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       spreadRadius: 0,
                       blurRadius: 40,
                       offset: const Offset(0, -10),
@@ -253,7 +253,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                 width: 48,
                                 height: 5,
                                 decoration: BoxDecoration(
-                                  color: colorScheme.onSurface.withOpacity(0.2),
+                                  color: colorScheme.onSurface.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),

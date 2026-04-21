@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:pharma_app/models/route_info.dart';
@@ -23,13 +24,15 @@ class RoutingService {
           final route = data['routes'][0];
           final geometry = route['geometry'];
           final coordinates = geometry['coordinates'] as List;
-          
+
           final points = coordinates.map((coord) {
             return LatLng(coord[1].toDouble(), coord[0].toDouble());
           }).toList();
 
-          final double totalDistance = (route['distance'] as num?)?.toDouble() ?? 0.0;
-          final double totalDuration = (route['duration'] as num?)?.toDouble() ?? 0.0;
+          final double totalDistance =
+              (route['distance'] as num?)?.toDouble() ?? 0.0;
+          final double totalDuration =
+              (route['duration'] as num?)?.toDouble() ?? 0.0;
 
           List<RouteStep> steps = [];
           if (route['legs'] != null && route['legs'].isNotEmpty) {
@@ -50,7 +53,7 @@ class RoutingService {
       }
       return null;
     } catch (e) {
-      print('Routing Error: $e');
+      debugPrint('Routing Error: $e');
       return null;
     }
   }

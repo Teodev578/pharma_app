@@ -131,8 +131,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         // Simule l'activation de la permission pour ne pas bloquer l'UI sur Linux Desktop
         if (mounted) {
           setState(() {
-            if (permission == Permission.notification) _notificationsEnabled = true;
-            else if (permission == Permission.locationWhenInUse) _locationEnabled = true;
+            if (permission == Permission.notification) {
+              _notificationsEnabled = true;
+            } else if (permission == Permission.locationWhenInUse) {
+              _locationEnabled = true;
+            }
           });
         }
       } catch (e) {

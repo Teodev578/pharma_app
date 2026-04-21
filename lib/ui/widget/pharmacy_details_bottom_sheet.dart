@@ -72,7 +72,7 @@ void showPharmacyDetailsBottomSheet(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withOpacity(0.15),
+                          color: theme.colorScheme.shadow.withValues(alpha: 0.15),
                           spreadRadius: 0,
                           blurRadius: 40,
                           offset: const Offset(0, -10),
@@ -94,7 +94,7 @@ void showPharmacyDetailsBottomSheet(
                                   height: 4,
                                   margin: const EdgeInsets.only(bottom: 24),
                                   decoration: BoxDecoration(
-                                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -355,7 +355,7 @@ void showPharmacyDetailsBottomSheet(
                                   colors: [
                                     sheetBgColor,
                                     sheetBgColor,
-                                    sheetBgColor.withOpacity(0.0),
+                                    sheetBgColor.withValues(alpha: 0.0),
                                   ],
                                   stops: const [0.0, 0.6, 1.0],
                                 ),

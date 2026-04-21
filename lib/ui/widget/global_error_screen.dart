@@ -36,7 +36,7 @@ class GlobalErrorScreen extends StatelessWidget {
                 "Une erreur inattendue est survenue. Nos développeurs ont été informés.",
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onErrorContainer.withOpacity(0.8),
+                  color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 32),

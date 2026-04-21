@@ -149,7 +149,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Paramètres', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text(
+              'Paramètres',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             centerTitle: true,
           ),
           body: ListView(
@@ -163,8 +166,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: widget.controller.themeMode == ThemeMode.system
                     ? 'Système'
                     : widget.controller.themeMode == ThemeMode.light
-                        ? 'Clair'
-                        : 'Sombre',
+                    ? 'Clair'
+                    : 'Sombre',
                 onTap: _showThemeDialog,
               ),
               _buildSettingsTile(
@@ -178,7 +181,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 context,
                 icon: Icons.near_me_rounded,
                 title: 'Rayon de recherche',
-                subtitle: 'Actuellement ${widget.controller.searchRadius.toInt()} km',
+                subtitle:
+                    'Actuellement ${widget.controller.searchRadius.toInt()} km',
                 onTap: _showRadiusDialog,
               ),
               _buildSettingsTile(
@@ -193,55 +197,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
               ),
-          const SizedBox(height: 24),
-          _buildSectionHeader(theme, 'Support & Feedback'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.bug_report_outlined,
-            title: 'Signaler un bug',
-            subtitle: 'Aidez-nous à nous améliorer',
-            onTap: () => _launchURL('mailto:support@pharmaapp.com?subject=Bug%20Report%20PharmaApp'),
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.mail_outline_rounded,
-            title: 'Nous contacter',
-            subtitle: 'Une question ou une suggestion ?',
-            onTap: () => _launchURL('mailto:contact@pharmaapp.com'),
-          ),
-          const SizedBox(height: 24),
-          _buildSectionHeader(theme, 'Légal & À propos'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.description_outlined,
-            title: 'Conditions d\'utilisation',
-            subtitle: 'Les règles de l\'application',
-            onTap: () => _launchURL('https://pharmaapp.com/terms'),
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.privacy_tip_outlined,
-            title: 'Politique de confidentialité',
-            subtitle: 'Comment nous traitons vos données',
-            onTap: () => _launchURL('https://pharmaapp.com/privacy'),
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.info_outline_rounded,
-            title: 'À propos',
-            subtitle: 'Version 0.1.0 (Beta)',
-            onTap: () {},
-          ),
-          const SizedBox(height: 40),
-          Center(
-            child: Text(
-              'Fait avec ❤️ pour votre santé',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+              const SizedBox(height: 24),
+              _buildSectionHeader(theme, 'Support & Feedback'),
+              _buildSettingsTile(
+                context,
+                icon: Icons.bug_report_outlined,
+                title: 'Signaler un bug',
+                subtitle: 'Aidez-nous à nous améliorer',
+                onTap: () => _launchURL(
+                  'mailto:support@pharmaapp.com?subject=Bug%20Report%20PharmaApp',
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
+              _buildSettingsTile(
+                context,
+                icon: Icons.mail_outline_rounded,
+                title: 'Nous contacter',
+                subtitle: 'Une question ou une suggestion ?',
+                onTap: () => _launchURL('mailto:contact@pharmaapp.com'),
+              ),
+              const SizedBox(height: 24),
+              _buildSectionHeader(theme, 'Légal & À propos'),
+              _buildSettingsTile(
+                context,
+                icon: Icons.description_outlined,
+                title: 'Conditions d\'utilisation',
+                subtitle: 'Les règles de l\'application',
+                onTap: () => _launchURL('https://pharmaapp.com/terms'),
+              ),
+              _buildSettingsTile(
+                context,
+                icon: Icons.privacy_tip_outlined,
+                title: 'Politique de confidentialité',
+                subtitle: 'Comment nous traitons vos données',
+                onTap: () => _launchURL('https://pharmaapp.com/privacy'),
+              ),
+              _buildSettingsTile(
+                context,
+                icon: Icons.info_outline_rounded,
+                title: 'À propos',
+                subtitle: 'Version 0.1.0 (Beta)',
+                onTap: () {},
+              ),
+              const SizedBox(height: 40),
+              Center(
+                child: Text(
+                  'Fait avec ❤️ pour votre santé',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         );
@@ -274,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final theme = Theme.of(context);
     return Card(
       elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -282,16 +288,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(icon, color: theme.colorScheme.primary),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-        subtitle: Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-        )),
-        trailing: trailing ?? Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+        subtitle: Text(
+          subtitle,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        trailing:
+            trailing ??
+            Icon(
+              Icons.chevron_right_rounded,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+            ),
         onTap: onTap,
       ),
     );

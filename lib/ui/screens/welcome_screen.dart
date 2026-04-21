@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.2),
+                        color: colorScheme.primary.withValues(alpha: 0.2),
                         blurRadius: 30,
                         spreadRadius: 5,
                         offset: const Offset(0, 10),
@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                 Text(
                   'Bienvenue sur Pharma App.\nVotre santé, notre priorité.',
                   style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.6),
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
