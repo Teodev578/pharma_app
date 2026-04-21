@@ -5,20 +5,42 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 
 class SupabaseService {
-  static final supabase = Supabase.instance.client;
+  static SupabaseClient? get supabase {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
   static const _cacheKey = 'cached_pharmacies';
   static const _cacheTimestampKey = 'cached_pharmacies_ts';
   // Durée maximale de validité du cache avant rafraîchissement en arrière-plan
   static const Duration _cacheTtl = Duration(hours: 1);
 
   /// Retourne immédiatement les pharmacies depuis le cache si disponible,
-  /// puis déclenche un rafraîchissement réseau en arrière-plan.
+  /// puis déclenche un rafraîchissement réseau en arrière-plan si possible.
   Future<List<Pharmacy>> getPharmacies() async {
+    // Vérification de l'initialisation de Supabase
+    bool isInitialized = true;
+    try {
+      Supabase.instance;
+    } catch (_) {
+      isInitialized = false;
+    }
+
     final cached = await _loadFromCache();
     if (cached != null) {
-      _refreshCache().ignore();
+      if (isInitialized) {
+        _refreshCache().ignore();
+      }
       return cached;
     }
+
+    if (!isInitialized) {
+      debugPrint('SupabaseService: Supabase non initialisé, impossible de récupérer les données réseau.');
+      return [];
+    }
+
     return await _fetchFromNetwork();
   }
 
@@ -30,7 +52,10 @@ class SupabaseService {
     double radiusMeters = 5000,
   }) async {
     try {
-      final List<dynamic> response = await supabase.rpc(
+      final client = supabase;
+      if (client == null) return [];
+
+      final List<dynamic> response = await client.rpc(
         'get_pharmacies_in_radius',
         params: {
           'lat': latitude,
@@ -54,7 +79,10 @@ class SupabaseService {
     try {
       if (query.isEmpty) return await getPharmacies();
 
-      final List<Map<String, dynamic>> response = await supabase
+      final client = supabase;
+      if (client == null) return [];
+
+      final List<Map<String, dynamic>> response = await client
           .from('pharmacies')
           .select()
           .textSearch('fts', query, config: 'french', type: TextSearchType.websearch)
@@ -69,14 +97,20 @@ class SupabaseService {
 
   /// Stream en temps réel pour écouter les changements de statut des pharmacies.
   Stream<List<Pharmacy>> pharmaciesStream() {
-    return supabase
+    final client = supabase;
+    if (client == null) return Stream.value([]);
+    
+    return client
         .from('pharmacies')
         .stream(primaryKey: ['nom']) // 'nom' est utilisé comme clé unique ici
         .map((data) => data.map((json) => Pharmacy.fromJson(json)).toList());
   }
 
   Future<List<Pharmacy>> _fetchFromNetwork() async {
-    final List<Map<String, dynamic>> response = await supabase
+    final client = supabase;
+    if (client == null) return [];
+
+    final List<Map<String, dynamic>> response = await client
         .from('pharmacies')
         .select()
         .order('nom', ascending: true);

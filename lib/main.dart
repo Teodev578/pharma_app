@@ -25,18 +25,28 @@ void main() async {
     return GlobalErrorScreen(details: details);
   };
 
-  await Supabase.initialize(
-    url: AppConfig.supabaseUrl,
-    anonKey: AppConfig.supabaseAnonKey,
-  );
-
-  // Initialisation des paramètres
+  // Initialisation par défaut pour éviter les erreurs de late initialization
   final settingsController = SettingsController(SettingsService());
-  await settingsController.loadSettings();
+  bool hasSeenOnboarding = false;
+  bool hasSeenWelcome = false;
 
-  final prefs = await SharedPreferences.getInstance();
-  final bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
-  final bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+  try {
+    // Initialisation de Supabase (peut échouer ou être lente si hors ligne)
+    await Supabase.initialize(
+      url: AppConfig.supabaseUrl,
+      anonKey: AppConfig.supabaseAnonKey,
+    ).timeout(const Duration(seconds: 2));
+
+    // Initialisation des paramètres
+    await settingsController.loadSettings();
+
+    final prefs = await SharedPreferences.getInstance();
+    hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+  } catch (e) {
+    debugPrint('Erreur lors de l\'initialisation : $e');
+    // On continue quand même pour lancer l'app en mode limité
+  }
 
   runApp(
     MainApp(

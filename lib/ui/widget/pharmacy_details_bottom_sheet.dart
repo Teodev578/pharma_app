@@ -26,9 +26,10 @@ void showPharmacyDetailsBottomSheet(
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.transparent, 
-    isScrollControlled: true, 
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
     useSafeArea: true,
+    showDragHandle: true, // M3 handle natif
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
@@ -53,14 +54,16 @@ void showPharmacyDetailsBottomSheet(
             openIcon = Icons.warning_amber_rounded;
           }
 
-          String displayStatus = isUnknown ? 'Vérifier sur place' : pharmacy.statutActuel!;
+          String displayStatus =
+              isUnknown ? 'Vérifier sur place' : pharmacy.statutActuel!;
           final cardBgColor = theme.colorScheme.surfaceContainerHighest;
           final buttonBgColor = theme.colorScheme.primary;
-          final buttonTextColor = theme.colorScheme.onPrimary;
           final sheetBgColor = theme.colorScheme.surfaceContainerLow;
 
-          final bool isFavorite = settingsController.isFavorite(pharmacy.nom);
-
+          return ListenableBuilder(
+            listenable: settingsController,
+            builder: (context, _) {
+              final bool isFavorite = settingsController.isFavorite(pharmacy.nom);
               return DraggableScrollableSheet(
                 initialChildSize: 0.65,
                 minChildSize: 0.4,
@@ -69,68 +72,50 @@ void showPharmacyDetailsBottomSheet(
                   return Container(
                     decoration: BoxDecoration(
                       color: sheetBgColor,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.colorScheme.shadow.withValues(alpha: 0.15),
-                          spreadRadius: 0,
-                          blurRadius: 40,
-                          offset: const Offset(0, -10),
-                        ),
-                      ],
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)), // M3 radius standard
                     ),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
                       child: Stack(
                         children: [
                           ListView(
                             controller: scrollController,
-                            padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
                             physics: const BouncingScrollPhysics(),
                             children: [
-                              Center(
-                                child: Container(
-                                  width: 48,
-                                  height: 4,
-                                  margin: const EdgeInsets.only(bottom: 24),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-
-
                               Text(
                                 pharmacy.nom,
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.2,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.1,
                                   color: theme.colorScheme.onSurface,
+                                  letterSpacing: -0.5,
                                 ),
                               ),
                               const SizedBox(height: 16),
-
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: openBgColor,
-                                      borderRadius: BorderRadius.circular(20),
+                                      color: openBgColor.withValues(alpha: 0.8),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: openTextColor.withValues(alpha: 0.2),
+                                        width: 1,
+                                      ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(openIcon, size: 18, color: openTextColor),
-                                        const SizedBox(width: 8),
+                                        Icon(openIcon, size: 14, color: openTextColor),
+                                        const SizedBox(width: 6),
                                         Text(
-                                          displayStatus,
-                                          style: TextStyle(
+                                          displayStatus.toUpperCase(),
+                                          style: theme.textTheme.labelSmall?.copyWith(
                                             color: openTextColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: 0.2,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 0.5,
                                           ),
                                         ),
                                       ],
@@ -155,7 +140,6 @@ void showPharmacyDetailsBottomSheet(
                                         foregroundColor: theme.colorScheme.onSecondaryContainer,
                                       ),
                                     ),
-
                                   IconButton.filledTonal(
                                     onPressed: () async {
                                       HapticFeedback.mediumImpact();
@@ -164,16 +148,31 @@ void showPharmacyDetailsBottomSheet(
                                         ScaffoldMessenger.of(context).clearSnackBars();
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text(
-                                              isFavorite
-                                                  ? 'Retiré des favoris'
-                                                  : 'Ajouté aux favoris ❤️',
-                                              style: const TextStyle(fontWeight: FontWeight.w600),
+                                            backgroundColor: theme.colorScheme.secondaryContainer,
+                                            content: Row(
+                                              children: [
+                                                Icon(
+                                                  isFavorite ? Icons.favorite_border : Icons.favorite,
+                                                  color: theme.colorScheme.primary,
+                                                  size: 20,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  isFavorite
+                                                      ? 'Retiré des favoris'
+                                                      : 'Ajouté aux favoris',
+                                                  style: TextStyle(
+                                                    color: theme.colorScheme.onSecondaryContainer,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             behavior: SnackBarBehavior.floating,
                                             duration: const Duration(seconds: 2),
+                                            margin: const EdgeInsets.fromLTRB(24, 0, 24, 100), // Position plus haute
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius: BorderRadius.circular(16),
                                             ),
                                           ),
                                         );
@@ -181,11 +180,13 @@ void showPharmacyDetailsBottomSheet(
                                     },
                                     icon: Icon(
                                       isFavorite ? Icons.favorite : Icons.favorite_border,
-                                      color: isFavorite ? Colors.red : null,
+                                      color: isFavorite ? theme.colorScheme.primary : null,
                                     ),
                                     style: IconButton.styleFrom(
                                       backgroundColor: theme.colorScheme.secondaryContainer,
-                                      foregroundColor: isFavorite ? Colors.red : theme.colorScheme.onSecondaryContainer,
+                                      foregroundColor: isFavorite
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.onSecondaryContainer,
                                     ),
                                   ),
                                   IconButton.filledTonal(
@@ -209,9 +210,7 @@ void showPharmacyDetailsBottomSheet(
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 24),
-
                               if (pharmacy.adresse != null)
                                 _buildMockupCard(
                                   theme: theme,
@@ -227,7 +226,6 @@ void showPharmacyDetailsBottomSheet(
                                     ),
                                   ),
                                 ),
-
                               if (pharmacy.telephone != null)
                                 _buildMockupCard(
                                   theme: theme,
@@ -264,8 +262,8 @@ void showPharmacyDetailsBottomSheet(
                                     );
                                   },
                                 ),
-
-                              if (pharmacy.horairesOuverture != null && pharmacy.horairesOuverture!.isNotEmpty)
+                              if (pharmacy.horairesOuverture != null &&
+                                  pharmacy.horairesOuverture!.isNotEmpty)
                                 _buildMockupCard(
                                   theme: theme,
                                   bgColor: cardBgColor,
@@ -341,7 +339,6 @@ void showPharmacyDetailsBottomSheet(
                               const SizedBox(height: 16),
                             ],
                           ),
-
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -366,9 +363,9 @@ void showPharmacyDetailsBottomSheet(
                                 child: FilledButton.icon(
                                   style: FilledButton.styleFrom(
                                     backgroundColor: buttonBgColor,
-                                    foregroundColor: buttonTextColor,
+                                    foregroundColor: theme.colorScheme.onPrimary,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                     elevation: 0,
                                   ),
@@ -394,6 +391,8 @@ void showPharmacyDetailsBottomSheet(
                   );
                 },
               );
+            },
+          );
         },
       );
     },
@@ -411,62 +410,55 @@ Widget _buildMockupCard({
   VoidCallback? onTap,
   VoidCallback? onLongPress,
 }) {
-  final labelBgColor = theme.colorScheme.secondaryContainer;
-  final labelTextColor = theme.colorScheme.onSecondaryContainer;
-
-  return Container(
+  return Card(
     margin: const EdgeInsets.only(bottom: 16),
-    clipBehavior: Clip.antiAlias,
-    decoration: BoxDecoration(
-      color: bgColor,
-      borderRadius: BorderRadius.circular(20),
+    elevation: 0,
+    color: theme.colorScheme.surfaceContainerLow, // Utilisation de ColorScheme M3
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(24),
+      side: BorderSide(
+        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        width: 1,
+      ),
     ),
-    child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: labelBgColor,
-                        borderRadius: BorderRadius.circular(16),
+    clipBehavior: Clip.antiAlias,
+    child: InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        icon,
+                        size: 20,
+                        color: theme.colorScheme.primary,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(icon, size: 16, color: labelTextColor),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              label,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: labelTextColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 8),
+                      Text(
+                        label.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    child,
-                  ],
-                ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  child,
+                ],
               ),
-              if (trailing != null) ...[const SizedBox(width: 16), trailing],
-            ],
-          ),
+            ),
+            if (trailing != null) ...[const SizedBox(width: 16), trailing],
+          ],
         ),
       ),
     ),
