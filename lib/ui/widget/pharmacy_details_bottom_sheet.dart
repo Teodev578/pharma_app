@@ -48,8 +48,8 @@ void showPharmacyDetailsBottomSheet(
             openTextColor = theme.colorScheme.onErrorContainer;
             openIcon = Icons.access_time_filled_rounded;
           } else {
-            openBgColor = const Color(0xFFFFE0B2);
-            openTextColor = const Color(0xFFE65100);
+            openBgColor = theme.colorScheme.tertiaryContainer;
+            openTextColor = theme.colorScheme.onTertiaryContainer;
             openIcon = Icons.warning_amber_rounded;
           }
 
@@ -57,8 +57,6 @@ void showPharmacyDetailsBottomSheet(
               ? 'Vérifier sur place'
               : pharmacy.statutActuel!;
           final cardBgColor = theme.colorScheme.surfaceContainerHighest;
-          final buttonBgColor = theme.colorScheme.primary;
-          final buttonTextColor = theme.colorScheme.onPrimary;
           final sheetBgColor = theme.colorScheme.surfaceContainerLow;
 
           final bool isFavorite = settingsController.isFavorite(pharmacy.nom);
@@ -72,7 +70,7 @@ void showPharmacyDetailsBottomSheet(
                 decoration: BoxDecoration(
                   color: sheetBgColor,
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
+                    top: Radius.circular(28), // M3 ExtraLarge top
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -85,7 +83,7 @@ void showPharmacyDetailsBottomSheet(
                 ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
+                    top: Radius.circular(28), // M3 ExtraLarge top
                   ),
                   child: Stack(
                     children: [
@@ -102,7 +100,7 @@ void showPharmacyDetailsBottomSheet(
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.onSurfaceVariant
                                     .withValues(alpha: 0.4),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(8), // Handle
                               ),
                             ),
                           ),
@@ -126,7 +124,7 @@ void showPharmacyDetailsBottomSheet(
                                 ),
                                 decoration: BoxDecoration(
                                   color: openBgColor,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(12), // M3 Small
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -190,17 +188,15 @@ void showPharmacyDetailsBottomSheet(
                                           isFavorite
                                               ? 'Retiré des favoris'
                                               : 'Ajouté aux favoris ❤️',
-                                          style: const TextStyle(
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            color: theme.colorScheme.onInverseSurface,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
+                                        backgroundColor: theme.colorScheme.inverseSurface,
                                         behavior: SnackBarBehavior.floating,
                                         duration: const Duration(seconds: 2),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
+                                        shape: const StadiumBorder(),
                                       ),
                                     );
                                   }
@@ -209,14 +205,13 @@ void showPharmacyDetailsBottomSheet(
                                   isFavorite
                                       ? Icons.favorite
                                       : Icons.favorite_border,
-                                  color: isFavorite ? Colors.red : null,
+                                  color: isFavorite 
+                                      ? theme.colorScheme.primary 
+                                      : theme.colorScheme.onSecondaryContainer,
                                 ),
                                 style: IconButton.styleFrom(
                                   backgroundColor:
                                       theme.colorScheme.secondaryContainer,
-                                  foregroundColor: isFavorite
-                                      ? Colors.red
-                                      : theme.colorScheme.onSecondaryContainer,
                                 ),
                               ),
                               IconButton.filledTonal(
@@ -224,13 +219,16 @@ void showPharmacyDetailsBottomSheet(
                                   HapticFeedback.selectionClick();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text(
+                                      content: Text(
                                         'Lien de la pharmacie copié (Simulé)',
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onInverseSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
+                                      backgroundColor: theme.colorScheme.inverseSurface,
                                       behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                                      shape: const StadiumBorder(),
                                     ),
                                   );
                                 },
@@ -289,16 +287,16 @@ void showPharmacyDetailsBottomSheet(
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text(
+                                    content: Text(
                                       'Numéro copié',
-                                      style: TextStyle(
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onInverseSurface,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
+                                    backgroundColor: theme.colorScheme.inverseSurface,
                                     behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    shape: const StadiumBorder(),
                                   ),
                                 );
                               },
@@ -434,10 +432,10 @@ void showPharmacyDetailsBottomSheet(
                             height: 60,
                             child: FilledButton.icon(
                               style: FilledButton.styleFrom(
-                                backgroundColor: buttonBgColor,
-                                foregroundColor: buttonTextColor,
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
+                                  borderRadius: BorderRadius.circular(16), // M3 Large button
                                 ),
                                 elevation: 0,
                               ),
@@ -488,8 +486,8 @@ Widget _buildMockupCard({
     margin: const EdgeInsets.only(bottom: 16),
     clipBehavior: Clip.antiAlias,
     decoration: BoxDecoration(
-      color: bgColor,
-      borderRadius: BorderRadius.circular(20),
+      color: theme.colorScheme.surfaceContainer,
+      borderRadius: BorderRadius.circular(16), // M3 Medium
     ),
     child: Material(
       color: Colors.transparent,
