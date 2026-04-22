@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class NavigationBanner extends StatelessWidget {
   final VoidCallback onCancel;
@@ -16,77 +17,76 @@ class NavigationBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 100.0, top: 48.0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E), // Dark background
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Direction Icon
-              Icon(
-                directionIcon,
-                color: Colors.white,
-                size: 36,
-              ),
-              const SizedBox(width: 12),
-              // Direction Text
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      distance,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      instruction,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Close Button
-              GestureDetector(
-                onTap: onCancel,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  padding: const EdgeInsets.all(6),
-                  child: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 24,
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Direction Icon
+          Icon(
+            directionIcon,
+            color: theme.colorScheme.primary,
+            size: 36,
+          ),
+          const SizedBox(width: 12),
+          // Direction Text
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  distance,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ],
+                Text(
+                  instruction,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          // Close Button
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onCancel();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: theme.colorScheme.outline, width: 1.5),
+              ),
+              padding: const EdgeInsets.all(6),
+              child: Icon(
+                Icons.close,
+                color: theme.colorScheme.outline,
+                size: 24,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

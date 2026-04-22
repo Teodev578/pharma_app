@@ -66,8 +66,8 @@ class _MapTopLoaderState extends State<MapTopLoader>
       return Container(
         key: const ValueKey('message'),
         decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -83,14 +83,14 @@ class _MapTopLoaderState extends State<MapTopLoader>
             Icon(
               Icons.info_outline_rounded,
               size: 20,
-              color: theme.colorScheme.onSecondaryContainer,
+              color: theme.colorScheme.onPrimaryContainer,
             ),
             const SizedBox(width: 10),
             Flexible(
               child: Text(
                 widget.message!,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSecondaryContainer,
+                  color: theme.colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -105,7 +105,7 @@ class _MapTopLoaderState extends State<MapTopLoader>
         key: const ValueKey('shimmer'),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: AnimatedBuilder(

@@ -72,8 +72,8 @@ class _MapScaleWidgetState extends State<MapScaleWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(4),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -81,22 +81,18 @@ class _MapScaleWidgetState extends State<MapScaleWidget> {
         children: [
           Text(
             _label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              shadows: [Shadow(color: Colors.black, blurRadius: 2)],
             ),
           ),
           const SizedBox(height: 2),
           Container(
             width: _barWidth,
             height: 2,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(color: Colors.black26, blurRadius: 1, offset: Offset(0, 1)),
-              ],
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],

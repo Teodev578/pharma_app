@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pharma_app/models/pharmacy.dart';
 import 'package:latlong2/latlong.dart';
 import 'custom_search_bar.dart';
@@ -217,7 +218,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(32)),
+                      const BorderRadius.vertical(top: Radius.circular(28)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.15),
@@ -229,7 +230,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                 ),
                 child: ClipRRect(
                   borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(32)),
+                      const BorderRadius.vertical(top: Radius.circular(28)),
                   child: CustomScrollView(
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
@@ -300,6 +301,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                     ),
                                     onSelected: !isOffline
                                         ? (bool selected) {
+                                            HapticFeedback.selectionClick();
                                             setState(() =>
                                                 _selectedFilter = 'Toutes');
                                             _applyFilters();
@@ -316,6 +318,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                     ),
                                     onSelected: !isOffline
                                         ? (bool selected) {
+                                            HapticFeedback.selectionClick();
                                             setState(() =>
                                                 _selectedFilter = 'Ouvertes');
                                             _applyFilters();
@@ -332,6 +335,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                     ),
                                     onSelected: !isOffline
                                         ? (bool selected) {
+                                            HapticFeedback.selectionClick();
                                             setState(() =>
                                                 _selectedFilter = 'Proches');
                                             _applyFilters();
@@ -347,6 +351,7 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     onSelected: (bool selected) {
+                                      HapticFeedback.selectionClick();
                                       setState(() =>
                                           _selectedFilter = 'Favoris');
                                       _applyFilters();
@@ -491,18 +496,19 @@ class _SearchBottomSheetState extends State<SearchBottomSheet> {
               ),
               const SizedBox(height: 24),
               Text(
-                "Vous êtes hors-ligne",
+                "Vous êtes actuellement hors-ligne",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
-                "La recherche nécessite une connexion internet pour accéder aux données en temps réel.",
+                "La recherche nécessite une connexion internet pour actualiser les statuts et trouver les pharmacies de garde.",
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
+                  height: 1.5,
                 ),
               ),
             ],

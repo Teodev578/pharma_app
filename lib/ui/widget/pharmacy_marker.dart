@@ -25,7 +25,7 @@ class PharmacyMarker {
     // Calcul des dimensions fixes
     final double iconSize = 44.0 * scale;
     final double markerWidth = showLabel ? 200 : iconSize;
-    final double markerHeight = showLabel ? 68 : iconSize;
+    final double markerHeight = showLabel ? 72 : iconSize;
 
     return Marker(
       point: point,

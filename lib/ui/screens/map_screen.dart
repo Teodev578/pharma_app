@@ -127,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
     } catch (e) {
       debugPrint('GPS error: $e');
       if (mounted) {
-        _showMessage('Impossible d\'obtenir la position GPS.');
+        _showMessage('Oups ! Nous n\'avons pas pu localiser votre position.');
       }
     }
   }
@@ -145,8 +145,8 @@ class _MapScreenState extends State<MapScreen> {
   void _showGpsPermissionDeniedSnackBar({required bool permanent}) {
     _showMessage(
       permanent
-          ? 'Localisation bloquée. Autorisez-la dans les paramètres.'
-          : 'Permission de localisation refusée.',
+          ? 'La localisation est désactivée. Veuillez l\'autoriser dans les réglages de votre téléphone.'
+          : 'L\'accès à la localisation a été refusé.',
     );
   }
 
@@ -161,7 +161,7 @@ class _MapScreenState extends State<MapScreen> {
       debugPrint('Supabase error: $e');
       if (mounted) {
         setState(() => _isLoadingPharmacies = false);
-        _showMessage('Impossible de charger les pharmacies.');
+        _showMessage('Nous n\'avons pas pu charger les pharmacies. Vérifiez votre connexion.');
       }
     }
   }
@@ -173,7 +173,7 @@ class _MapScreenState extends State<MapScreen> {
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity.isEmpty || connectivity.contains(ConnectivityResult.none)) {
       if (mounted) {
-        _showMessage('Impossible de calculer l\'itinéraire hors-ligne.');
+        _showMessage('Le calcul d\'itinéraire nécessite une connexion internet.');
       }
       return;
     }
@@ -251,6 +251,7 @@ class _MapScreenState extends State<MapScreen> {
     _routePointsNotifier.dispose();
     _currentRouteNotifier.dispose();
     _isRoutingNotifier.dispose();
+    _pharmaciesNotifier.dispose();
     _alignController.close();
     super.dispose();
   }
@@ -289,11 +290,11 @@ class _MapScreenState extends State<MapScreen> {
                   initialCenter: _userPositionNotifier.value ?? _initialCenter,
                   initialZoom: 15.0,
                   maxZoom: 20.0,
-                  minZoom: 6.0,
+                  minZoom: 4.0,
                   cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds(
-                      const LatLng(6.0, -0.2), // Sud-Ouest
-                      const LatLng(11.2, 2.1), // Nord-Est
+                      const LatLng(4.0, -5.0), // Elargi Sud-Ouest (Golfe de Guinée / Côte d'Ivoire)
+                      const LatLng(14.0, 5.0), // Elargi Nord-Est (Burkina / Bénin / Niger)
                     ),
                   ),
                   interactionOptions: const InteractionOptions(
@@ -397,17 +398,7 @@ class _MapScreenState extends State<MapScreen> {
                 ],
               ),
             ),
-
-            // Navigation Banner
-            ValueListenableBuilder<RouteInfo?>(
-              valueListenable: _currentRouteNotifier,
-              builder: (context, route, _) {
-                if (route == null || route.steps.isEmpty) return const SizedBox.shrink();
-                return _buildNavigationBanner(route);
-              },
-            ),
-
-            // Top Left Info (Scale & Loader)
+            // Top Left Stacked Overlay (Banner, Scale, Loader)
             SafeArea(
               child: Align(
                 alignment: Alignment.topLeft,
@@ -418,6 +409,68 @@ class _MapScreenState extends State<MapScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Navigation Banner
+                        ValueListenableBuilder<RouteInfo?>(
+                          valueListenable: _currentRouteNotifier,
+                          builder: (context, route, _) {
+                            if (route == null || route.steps.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            
+                            final steps = route.steps;
+                            String distanceText = '0 m';
+                            String instructionText = 'Arrivée';
+                            IconData icon = Icons.check_circle_outline;
+
+                            if (steps.length > 1) {
+                              double dist = steps[0].distance;
+                              if (dist > 1000) {
+                                distanceText = '${(dist / 1000).toStringAsFixed(1)} km';
+                              } else {
+                                distanceText = '${dist.round()} m';
+                              }
+                              instructionText = steps[1].instruction;
+
+                              switch (steps[1].modifier) {
+                                case 'left':
+                                case 'sharp left':
+                                  icon = Icons.turn_left;
+                                  break;
+                                case 'slight left':
+                                  icon = Icons.turn_slight_left;
+                                  break;
+                                case 'right':
+                                case 'sharp right':
+                                  icon = Icons.turn_right;
+                                  break;
+                                case 'slight right':
+                                  icon = Icons.turn_slight_right;
+                                  break;
+                                case 'uturn':
+                                  icon = Icons.u_turn_left;
+                                  break;
+                                case 'straight':
+                                  icon = Icons.straight;
+                                  break;
+                                default:
+                                  icon = Icons.turn_right;
+                              }
+                            }
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              constraints: const BoxConstraints(maxWidth: 300),
+                              child: NavigationBanner(
+                                distance: distanceText,
+                                instruction: instructionText,
+                                directionIcon: icon,
+                                onCancel: _clearRoute,
+                              ),
+                            );
+                          },
+                        ),
+
+                        // Map Scale
                         ListenableBuilder(
                           listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
                           builder: (context, _) => MapScaleWidget(
@@ -425,7 +478,10 @@ class _MapScreenState extends State<MapScreen> {
                             latitude: _centerLatNotifier.value,
                           ),
                         ),
+                        
                         const SizedBox(height: 8),
+
+                        // Loader / Message
                         ValueListenableBuilder<String?>(
                           valueListenable: _messageNotifier,
                           builder: (context, message, _) => MapTopLoader(
@@ -454,6 +510,7 @@ class _MapScreenState extends State<MapScreen> {
                         trackingState: _trackingStateNotifier.value,
                         rotation: _rotationNotifier.value,
                         onMyLocationPressed: () {
+                          HapticFeedback.mediumImpact();
                           final currentState = _trackingStateNotifier.value;
                           if (currentState == 0) {
                             _trackingStateNotifier.value = 1;
@@ -521,57 +578,4 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildNavigationBanner(RouteInfo route) {
-    final steps = route.steps;
-    String distanceText = '0 m';
-    String instructionText = 'Arrivée';
-    IconData icon = Icons.check_circle_outline;
-
-    if (steps.length > 1) {
-      double dist = steps[0].distance;
-      if (dist > 1000) {
-        distanceText = '${(dist / 1000).toStringAsFixed(1)} km';
-      } else {
-        distanceText = '${dist.round()} m';
-      }
-      instructionText = steps[1].instruction;
-
-      switch (steps[1].modifier) {
-        case 'left':
-        case 'sharp left':
-          icon = Icons.turn_left;
-          break;
-        case 'slight left':
-          icon = Icons.turn_slight_left;
-          break;
-        case 'right':
-        case 'sharp right':
-          icon = Icons.turn_right;
-          break;
-        case 'slight right':
-          icon = Icons.turn_slight_right;
-          break;
-        case 'uturn':
-          icon = Icons.u_turn_left;
-          break;
-        case 'straight':
-          icon = Icons.straight;
-          break;
-        default:
-          icon = Icons.turn_right;
-      }
-    }
-
-    return Align(
-      alignment: Alignment.topLeft,
-      child: RepaintBoundary(
-        child: NavigationBanner(
-          distance: distanceText,
-          instruction: instructionText,
-          directionIcon: icon,
-          onCancel: _clearRoute,
-        ),
-      ),
-    );
-  }
 }

@@ -75,8 +75,8 @@ class RecentTile extends StatelessWidget {
       statusTextColor = colorScheme.onErrorContainer;
       statusIcon = Icons.access_time_filled_rounded;
     } else {
-      statusBgColor = const Color(0xFFFFE0B2);
-      statusTextColor = const Color(0xFFE65100);
+      statusBgColor = colorScheme.tertiaryContainer;
+      statusTextColor = colorScheme.onTertiaryContainer;
       statusIcon = Icons.warning_amber_rounded;
     }
 
@@ -87,7 +87,7 @@ class RecentTile extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Material(
         color: Colors.transparent,
