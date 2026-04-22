@@ -8,7 +8,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
-
 import 'package:pharma_app/ui/widget/floating_map_buttons.dart';
 import 'package:pharma_app/ui/widget/search_bottom_sheet.dart';
 import 'package:pharma_app/ui/widget/pharmacy_details_bottom_sheet.dart';
@@ -39,19 +38,21 @@ class _MapScreenState extends State<MapScreen> {
   final MapController _mapController = MapController();
 
   bool _isLoadingPharmacies = true;
-  // ValueNotifier évite que SearchBottomSheet rebuild quand _trackingState ou la route changent
+  // State Isolated via ValueNotifiers
   final ValueNotifier<List<Pharmacy>> _pharmaciesNotifier = ValueNotifier([]);
-  LatLng? _userPosition;
+  final ValueNotifier<LatLng?> _userPositionNotifier = ValueNotifier(null);
+  final ValueNotifier<int> _trackingStateNotifier = ValueNotifier(0); // 0: disabled, 1: position, 2: heading
+  final ValueNotifier<List<LatLng>> _routePointsNotifier = ValueNotifier([]);
+  final ValueNotifier<RouteInfo?> _currentRouteNotifier = ValueNotifier(null);
+  final ValueNotifier<bool> _isRoutingNotifier = ValueNotifier(false);
+
   LatLng? _pendingMove;
   bool _mapReady = false;
-  int _trackingState = 0; // 0: tracking disabled, 1: position, 2: heading
+  
   late final ValueNotifier<double> _rotationNotifier;
-  // Zoom discret arrondi à 0.5 pour limiter les rebuilds de la couche marqueurs
   late final ValueNotifier<double> _zoomNotifier;
   late final ValueNotifier<double> _centerLatNotifier;
-  List<LatLng> _routePoints = [];
-  RouteInfo? _currentRoute;
-  bool _isRouting = false;
+
   // Debounce timer pour éviter les rebuilds excessifs sur onPositionChanged
   Timer? _centerDebounce;
   // Rafraîchissement automatique des statuts via Realtime
@@ -78,7 +79,9 @@ class _MapScreenState extends State<MapScreen> {
 
   void _subscribeToPharmacies() {
     _pharmaciesSubscription?.cancel();
-    _pharmaciesSubscription = SupabaseService().pharmaciesStream().listen((pharmacies) {
+    _pharmaciesSubscription = SupabaseService().pharmaciesStream().listen((
+      pharmacies,
+    ) {
       if (mounted) {
         _pharmaciesNotifier.value = pharmacies;
         // On marque le chargement comme terminé dès le premier event du stream
@@ -88,7 +91,6 @@ class _MapScreenState extends State<MapScreen> {
       }
     });
   }
-
 
   Future<void> _centerOnUserLocation() async {
     try {
@@ -113,14 +115,13 @@ class _MapScreenState extends State<MapScreen> {
       );
       if (mounted) {
         final userLatLng = LatLng(position.latitude, position.longitude);
-        setState(() {
-          _userPosition = userLatLng;
-          _trackingState = 1;
-        });
+        _userPositionNotifier.value = userLatLng;
+        _trackingStateNotifier.value = 1;
+
         if (_mapReady) {
           _mapController.move(userLatLng, 15.0);
         } else {
-          setState(() => _pendingMove = userLatLng);
+          _pendingMove = userLatLng;
         }
       }
     } catch (e) {
@@ -166,7 +167,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _fetchAndShowRoute(Pharmacy pharmacy) async {
-    if (_userPosition == null) return;
+    if (_userPositionNotifier.value == null) return;
     if (pharmacy.latitude == null || pharmacy.longitude == null) return;
 
     final connectivity = await Connectivity().checkConnectivity();
@@ -177,25 +178,21 @@ class _MapScreenState extends State<MapScreen> {
       return;
     }
 
-    setState(() {
-      _isRouting = true;
-      _routePoints = []; // Clear previous route
-      _currentRoute = null;
-    });
+    _isRoutingNotifier.value = true;
+    _routePointsNotifier.value = []; // Clear previous route
+    _currentRouteNotifier.value = null;
 
     final dest = LatLng(pharmacy.latitude!, pharmacy.longitude!);
-    final routeInfo = await RoutingService().getRoute(_userPosition!, dest);
+    final routeInfo = await RoutingService().getRoute(_userPositionNotifier.value!, dest);
 
     if (mounted) {
-      setState(() {
-        _currentRoute = routeInfo;
-        _routePoints = routeInfo?.points ?? [];
-        _isRouting = false;
-      });
+      _currentRouteNotifier.value = routeInfo;
+      _routePointsNotifier.value = routeInfo?.points ?? [];
+      _isRoutingNotifier.value = false;
 
-      if (_routePoints.isNotEmpty) {
+      if (_routePointsNotifier.value.isNotEmpty) {
         // Fit bounds to show the whole route
-        final bounds = LatLngBounds.fromPoints(_routePoints);
+        final bounds = LatLngBounds.fromPoints(_routePointsNotifier.value);
         _mapController.fitCamera(
           CameraFit.bounds(
             bounds: bounds,
@@ -211,30 +208,32 @@ class _MapScreenState extends State<MapScreen> {
   /// Démarre un stream Geolocator pour détecter l'arrivée (<50m)
   void _startArrivalDetection(LatLng destination) {
     _arrivalSubscription?.cancel();
-    _arrivalSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // ne déclenche que si l'utilisateur bouge de +10m
-      ),
-    ).listen((pos) {
-      final distanceM = Geolocator.distanceBetween(
-        pos.latitude, pos.longitude,
-        destination.latitude, destination.longitude,
-      );
-      if (distanceM < 50 && mounted) {
-        _clearRoute();
-        _showMessage('Vous êtes arrivé à destination ✅');
-      }
-    });
+    _arrivalSubscription =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter:
+                10, // ne déclenche que si l'utilisateur bouge de +10m
+          ),
+        ).listen((pos) {
+          final distanceM = Geolocator.distanceBetween(
+            pos.latitude,
+            pos.longitude,
+            destination.latitude,
+            destination.longitude,
+          );
+          if (distanceM < 50 && mounted) {
+            _clearRoute();
+            _showMessage('Vous êtes arrivé à destination ✅');
+          }
+        });
   }
 
   void _clearRoute() {
     _arrivalSubscription?.cancel();
     _arrivalSubscription = null;
-    setState(() {
-      _routePoints = [];
-      _currentRoute = null;
-    });
+    _routePointsNotifier.value = [];
+    _currentRouteNotifier.value = null;
   }
 
   @override
@@ -247,6 +246,11 @@ class _MapScreenState extends State<MapScreen> {
     _centerLatNotifier.dispose();
     _messageTimer?.cancel();
     _messageNotifier.dispose();
+    _trackingStateNotifier.dispose();
+    _userPositionNotifier.dispose();
+    _routePointsNotifier.dispose();
+    _currentRouteNotifier.dispose();
+    _isRoutingNotifier.dispose();
     _alignController.close();
     super.dispose();
   }
@@ -277,67 +281,59 @@ class _MapScreenState extends State<MapScreen> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                backgroundColor: bgColor,
-                initialCenter: _userPosition ?? _initialCenter,
-                initialZoom: 15.0,
-                maxZoom: 20.0,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all,
-                  // Nécessite un geste de rotation d'au moins 20° avant de pivoter la carte
-                  // Évite la rotation accidentelle lors d'un pinch-zoom légèrement de travers
-                  rotationThreshold: 20.0,
-                ),
-                onPositionChanged: (position, hasGesture) {
-                  // Rotation — mise à jour directe
-                  if (position.rotation != _rotationNotifier.value) {
-                    _rotationNotifier.value = position.rotation;
-                  }
-                  // Zoom discret (arrondi à 0.5) pour limiter les rebuilds marqueurs
-                  final double discreteZoom = (position.zoom * 2).roundToDouble() / 2;
-                  if (discreteZoom != _zoomNotifier.value) {
-                    _zoomNotifier.value = discreteZoom;
-                  }
-                  // Latitude avec debounce 150ms pour éviter des rebuilds excessifs
-                  _centerDebounce?.cancel();
-                  _centerDebounce = Timer(const Duration(milliseconds: 150), () {
-                    if (position.center.latitude != _centerLatNotifier.value) {
-                      _centerLatNotifier.value = position.center.latitude;
+            RepaintBoundary(
+              child: FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  backgroundColor: bgColor,
+                  initialCenter: _userPositionNotifier.value ?? _initialCenter,
+                  initialZoom: 15.0,
+                  maxZoom: 20.0,
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all,
+                    rotationThreshold: 20.0,
+                  ),
+                  onPositionChanged: (position, hasGesture) {
+                    if (position.rotation != _rotationNotifier.value) {
+                      _rotationNotifier.value = position.rotation;
                     }
-                  });
-                  if (hasGesture && _trackingState != 0) {
-                    setState(() => _trackingState = 0);
-                  }
-                },
-                onMapReady: () {
-                  _mapReady = true;
-                  if (_pendingMove != null) {
-                    _mapController.move(_pendingMove!, 15.0);
-                    _pendingMove = null;
-                  }
-                },
-              ),
-              children: [
-                // COUCHE 1 : Fond de carte raster CartoDB
-                TileLayer(
-                  urlTemplate: tileUrl,
-                  subdomains: const ['a', 'b', 'c', 'd'],
-                  userAgentPackageName: 'com.example.pharma_app',
-                  maxNativeZoom: 19,
-                  // Annule les requêtes de tuiles hors-viewport pour économiser la bande passante
-                  tileProvider: CancellableNetworkTileProvider(),
-                  // Fondu d'apparition des tuiles (remplace le flash blanc)
-                  tileDisplay: TileDisplay.fadeIn(),
+                    final double discreteZoom = (position.zoom * 2).roundToDouble() / 2;
+                    if (discreteZoom != _zoomNotifier.value) {
+                      _zoomNotifier.value = discreteZoom;
+                    }
+                    _centerDebounce?.cancel();
+                    _centerDebounce = Timer(const Duration(milliseconds: 150), () {
+                      if (position.center.latitude != _centerLatNotifier.value) {
+                        _centerLatNotifier.value = position.center.latitude;
+                      }
+                    });
+                    if (hasGesture && _trackingStateNotifier.value != 0) {
+                      _trackingStateNotifier.value = 0;
+                    }
+                  },
+                  onMapReady: () {
+                    _mapReady = true;
+                    if (_pendingMove != null) {
+                      _mapController.move(_pendingMove!, 15.0);
+                      _pendingMove = null;
+                    }
+                  },
                 ),
+                children: [
+                  TileLayer(
+                    urlTemplate: tileUrl,
+                    subdomains: const ['a', 'b', 'c', 'd'],
+                    userAgentPackageName: 'com.example.pharma_app',
+                    maxNativeZoom: 19,
+                    tileProvider: CancellableNetworkTileProvider(),
+                    tileDisplay: const TileDisplay.fadeIn(),
+                  ),
 
-                // COUCHE 2 : Position utilisateur
-                Builder(
-                  builder: (context) {
-                    return CurrentLocationLayer(
+                  ValueListenableBuilder<int>(
+                    valueListenable: _trackingStateNotifier,
+                    builder: (context, trackingState, _) => CurrentLocationLayer(
                       alignPositionStream: _alignController.stream,
-                      alignDirectionOnUpdate: _trackingState == 2
+                      alignDirectionOnUpdate: trackingState == 2
                           ? AlignOnUpdate.always
                           : AlignOnUpdate.never,
                       style: LocationMarkerStyle(
@@ -346,223 +342,229 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                         markerSize: const Size(20, 20),
                       ),
-                    );
-                  },
-                ),
-
-                // COUCHE : Itinéraire (Polyline)
-                if (_routePoints.isNotEmpty)
-                  PolylineLayer(
-                    polylines: [
-                      Polyline(
-                        points: _routePoints,
-                        color: theme.colorScheme.primary,
-                        strokeWidth: 8,
-                        borderColor: Colors.white,
-                        borderStrokeWidth: 5,
-                      ),
-                    ],
+                    ),
                   ),
 
-                // COUCHE 3 : Clusters de pharmacies (zoom-adaptatif)
-                ValueListenableBuilder<List<Pharmacy>>(
-                  valueListenable: _pharmaciesNotifier,
-                  builder: (context, pharmacies, _) {
-                    if (_isLoadingPharmacies || pharmacies.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return RepaintBoundary(
-                      child: ValueListenableBuilder<double>(
-                        valueListenable: _zoomNotifier,
-                        builder: (context, zoom, _) => PharmacyClusterLayer(
-                          pharmacies: pharmacies,
-                          mapController: _mapController,
-                          settingsController: widget.settingsController,
-                          zoom: zoom,
-                          onDirectionsPressedBuilder: (p) => () {
-                            Navigator.pop(context);
-                            _fetchAndShowRoute(p);
-                          },
-                          onMessage: _showMessage,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // COUCHE 4 : Boutons flottants
-                SafeArea(
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: RepaintBoundary(
-                        child: ValueListenableBuilder<double>(
-                          valueListenable: _rotationNotifier,
-                          builder: (context, rotation, _) => FloatingMapButtons(
-                            mapController: _mapController,
-                            trackingState: _trackingState,
-                            rotation: rotation,
-                            onMyLocationPressed: () {
-                              if (_trackingState == 0) {
-                                setState(() => _trackingState = 1);
-                                _alignController.add(15.0);
-                              } else if (_trackingState == 1) {
-                                setState(() => _trackingState = 2);
-                              } else {
-                                setState(() => _trackingState = 1);
-                                _mapController.rotate(0);
-                              }
-                            },
+                  ValueListenableBuilder<List<LatLng>>(
+                    valueListenable: _routePointsNotifier,
+                    builder: (context, points, _) {
+                      if (points.isEmpty) return const SizedBox.shrink();
+                      return PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: points,
+                            color: theme.colorScheme.primary,
+                            strokeWidth: 8,
+                            borderColor: Colors.white,
+                            borderStrokeWidth: 5,
                           ),
-                        ),
-                      ),
-                    ),
+                        ],
+                      );
+                    },
                   ),
-                ),
 
-                // UI Supérieure : Échelle et Indicateur de statut (Loader / Connectivité)
-                SafeArea(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: RepaintBoundary(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListenableBuilder(
-                              listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
-                              builder: (context, _) => MapScaleWidget(
-                                zoom: _zoomNotifier.value,
-                                latitude: _centerLatNotifier.value,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ValueListenableBuilder<String?>(
-                              valueListenable: _messageNotifier,
-                              builder: (context, message, _) => MapTopLoader(
-                                isLoading: _isLoadingPharmacies,
-                                message: message,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Panneau de navigation
-                if (_routePoints.isNotEmpty && _currentRoute != null && _currentRoute!.steps.isNotEmpty)
-                  Builder(
-                    builder: (context) {
-                      final steps = _currentRoute!.steps;
-                      String distanceText = '0 m';
-                      String instructionText = 'Arrivée';
-                      IconData icon = Icons.check_circle_outline;
-
-                      // Use distance of step 0 (distance to reach maneuver 1)
-                      // and instruction of step 1
-                      if (steps.length > 1) {
-                        double dist = steps[0].distance;
-                        if (dist > 1000) {
-                          distanceText = '${(dist / 1000).toStringAsFixed(1)} km';
-                        } else {
-                          distanceText = '${dist.round()} m';
-                        }
-                        instructionText = steps[1].instruction;
-                        
-                        // Map modifier to Icon
-                        switch (steps[1].modifier) {
-                          case 'left':
-                          case 'sharp left':
-                            icon = Icons.turn_left;
-                            break;
-                          case 'slight left':
-                            icon = Icons.turn_slight_left;
-                            break;
-                          case 'right':
-                          case 'sharp right':
-                            icon = Icons.turn_right;
-                            break;
-                          case 'slight right':
-                            icon = Icons.turn_slight_right;
-                            break;
-                          case 'uturn':
-                            icon = Icons.u_turn_left;
-                            break;
-                          case 'straight':
-                            icon = Icons.straight;
-                            break;
-                          default:
-                            icon = Icons.turn_right;
-                        }
+                  ValueListenableBuilder<List<Pharmacy>>(
+                    valueListenable: _pharmaciesNotifier,
+                    builder: (context, pharmacies, _) {
+                      if (_isLoadingPharmacies || pharmacies.isEmpty) {
+                        return const SizedBox.shrink();
                       }
-
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: RepaintBoundary(
-                          child: NavigationBanner(
-                            distance: distanceText,
-                            instruction: instructionText,
-                            directionIcon: icon,
-                            onCancel: () {
-                              setState(() {
-                                _routePoints = [];
-                                _currentRoute = null;
-                              });
+                      return RepaintBoundary(
+                        child: ValueListenableBuilder<double>(
+                          valueListenable: _zoomNotifier,
+                          builder: (context, zoom, _) => PharmacyClusterLayer(
+                            pharmacies: pharmacies,
+                            mapController: _mapController,
+                            settingsController: widget.settingsController,
+                            zoom: zoom,
+                            onDirectionsPressedBuilder: (p) => () {
+                              Navigator.pop(context);
+                              _fetchAndShowRoute(p);
                             },
+                            onMessage: _showMessage,
                           ),
                         ),
                       );
-                    }
+                    },
                   ),
-              ],
-            ),
-
-            // Barre de recherche
-            ValueListenableBuilder<List<Pharmacy>>(
-              valueListenable: _pharmaciesNotifier,
-              builder: (context, pharmacies, _) => SearchBottomSheet(
-                pharmacies: pharmacies,
-                userPosition: _userPosition,
-                settingsController: widget.settingsController,
-                onPharmacySelected: (pharmacy) {
-                  if (pharmacy.latitude != null && pharmacy.longitude != null) {
-                    _mapController.move(
-                      LatLng(pharmacy.latitude!, pharmacy.longitude!),
-                      16.0,
-                    );
-                    showPharmacyDetailsBottomSheet(
-                      context,
-                      pharmacy,
-                      settingsController: widget.settingsController,
-                      onMessage: _showMessage,
-                      onDirectionsPressed: () {
-                        Navigator.pop(context);
-                        _fetchAndShowRoute(pharmacy);
-                      },
-                    );
-                  }
-                },
+                ],
               ),
             ),
 
-            if (_isRouting)
-              const RepaintBoundary(
-                child: Center(
-                  child: CircularProgressIndicator(),
+            // Navigation Banner
+            ValueListenableBuilder<RouteInfo?>(
+              valueListenable: _currentRouteNotifier,
+              builder: (context, route, _) {
+                if (route == null || route.steps.isEmpty) return const SizedBox.shrink();
+                return _buildNavigationBanner(route);
+              },
+            ),
+
+            // Top Left Info (Scale & Loader)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: RepaintBoundary(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListenableBuilder(
+                          listenable: Listenable.merge([_zoomNotifier, _centerLatNotifier]),
+                          builder: (context, _) => MapScaleWidget(
+                            zoom: _zoomNotifier.value,
+                            latitude: _centerLatNotifier.value,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ValueListenableBuilder<String?>(
+                          valueListenable: _messageNotifier,
+                          builder: (context, message, _) => MapTopLoader(
+                            isLoading: _isLoadingPharmacies,
+                            message: message,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
+            ),
+
+            // Floating Buttons
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: RepaintBoundary(
+                    child: ListenableBuilder(
+                      listenable: Listenable.merge([_rotationNotifier, _trackingStateNotifier]),
+                      builder: (context, _) => FloatingMapButtons(
+                        mapController: _mapController,
+                        trackingState: _trackingStateNotifier.value,
+                        rotation: _rotationNotifier.value,
+                        onMyLocationPressed: () {
+                          final currentState = _trackingStateNotifier.value;
+                          if (currentState == 0) {
+                            _trackingStateNotifier.value = 1;
+                            _alignController.add(15.0);
+                          } else if (currentState == 1) {
+                            _trackingStateNotifier.value = 2;
+                          } else {
+                            _trackingStateNotifier.value = 1;
+                            _mapController.rotate(0);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Search Bar
+            ValueListenableBuilder<List<Pharmacy>>(
+              valueListenable: _pharmaciesNotifier,
+              builder: (context, pharmacies, _) => ValueListenableBuilder<LatLng?>(
+                valueListenable: _userPositionNotifier,
+                builder: (context, userPos, _) => SearchBottomSheet(
+                  pharmacies: pharmacies,
+                  userPosition: userPos,
+                  settingsController: widget.settingsController,
+                  onPharmacySelected: (pharmacy) {
+                    if (pharmacy.latitude != null && pharmacy.longitude != null) {
+                      _mapController.move(
+                        LatLng(pharmacy.latitude!, pharmacy.longitude!),
+                        16.0,
+                      );
+                      showPharmacyDetailsBottomSheet(
+                        context,
+                        pharmacy,
+                        settingsController: widget.settingsController,
+                        onMessage: _showMessage,
+                        onDirectionsPressed: () {
+                          Navigator.pop(context);
+                          _fetchAndShowRoute(pharmacy);
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+
+            // Routing Loader
+            ValueListenableBuilder<bool>(
+              valueListenable: _isRoutingNotifier,
+              builder: (context, isRouting, _) {
+                if (!isRouting) return const SizedBox.shrink();
+                return const RepaintBoundary(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildNavigationBanner(RouteInfo route) {
+    final steps = route.steps;
+    String distanceText = '0 m';
+    String instructionText = 'Arrivée';
+    IconData icon = Icons.check_circle_outline;
 
+    if (steps.length > 1) {
+      double dist = steps[0].distance;
+      if (dist > 1000) {
+        distanceText = '${(dist / 1000).toStringAsFixed(1)} km';
+      } else {
+        distanceText = '${dist.round()} m';
+      }
+      instructionText = steps[1].instruction;
 
+      switch (steps[1].modifier) {
+        case 'left':
+        case 'sharp left':
+          icon = Icons.turn_left;
+          break;
+        case 'slight left':
+          icon = Icons.turn_slight_left;
+          break;
+        case 'right':
+        case 'sharp right':
+          icon = Icons.turn_right;
+          break;
+        case 'slight right':
+          icon = Icons.turn_slight_right;
+          break;
+        case 'uturn':
+          icon = Icons.u_turn_left;
+          break;
+        case 'straight':
+          icon = Icons.straight;
+          break;
+        default:
+          icon = Icons.turn_right;
+      }
+    }
 
+    return Align(
+      alignment: Alignment.topLeft,
+      child: RepaintBoundary(
+        child: NavigationBanner(
+          distance: distanceText,
+          instruction: instructionText,
+          directionIcon: icon,
+          onCancel: _clearRoute,
+        ),
+      ),
+    );
+  }
 }
