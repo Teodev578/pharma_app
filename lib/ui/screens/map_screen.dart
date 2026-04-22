@@ -60,6 +60,8 @@ class _MapScreenState extends State<MapScreen> {
   StreamSubscription<Position>? _arrivalSubscription;
 
   late final StreamController<double?> _alignController;
+  final ValueNotifier<String?> _messageNotifier = ValueNotifier(null);
+  Timer? _messageTimer;
 
   @override
   void initState() {
@@ -124,30 +126,26 @@ class _MapScreenState extends State<MapScreen> {
     } catch (e) {
       debugPrint('GPS error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossible d\'obtenir la position GPS.')),
-        );
+        _showMessage('Impossible d\'obtenir la position GPS.');
       }
     }
   }
 
+  void _showMessage(String message) {
+    _messageTimer?.cancel();
+    _messageNotifier.value = message;
+    _messageTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        _messageNotifier.value = null;
+      }
+    });
+  }
+
   void _showGpsPermissionDeniedSnackBar({required bool permanent}) {
-    final action = permanent
-        ? SnackBarAction(
-            label: 'Paramètres',
-            onPressed: () => Geolocator.openAppSettings(),
-          )
-        : null;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          permanent
-              ? 'Localisation bloquée. Autorisez-la dans les paramètres.'
-              : 'Permission de localisation refusée.',
-        ),
-        action: action,
-        behavior: SnackBarBehavior.floating,
-      ),
+    _showMessage(
+      permanent
+          ? 'Localisation bloquée. Autorisez-la dans les paramètres.'
+          : 'Permission de localisation refusée.',
     );
   }
 
@@ -162,19 +160,7 @@ class _MapScreenState extends State<MapScreen> {
       debugPrint('Supabase error: $e');
       if (mounted) {
         setState(() => _isLoadingPharmacies = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Impossible de charger les pharmacies.'),
-            behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(
-              label: 'Réessayer',
-              onPressed: () {
-                setState(() => _isLoadingPharmacies = true);
-                _fetchPharmacies();
-              },
-            ),
-          ),
-        );
+        _showMessage('Impossible de charger les pharmacies.');
       }
     }
   }
@@ -186,12 +172,7 @@ class _MapScreenState extends State<MapScreen> {
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity.isEmpty || connectivity.contains(ConnectivityResult.none)) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Impossible de calculer l\'itinéraire hors-ligne.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        _showMessage('Impossible de calculer l\'itinéraire hors-ligne.');
       }
       return;
     }
@@ -242,13 +223,7 @@ class _MapScreenState extends State<MapScreen> {
       );
       if (distanceM < 50 && mounted) {
         _clearRoute();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Vous êtes arrivé à destination ✅'),
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 4),
-          ),
-        );
+        _showMessage('Vous êtes arrivé à destination ✅');
       }
     });
   }
@@ -270,8 +245,8 @@ class _MapScreenState extends State<MapScreen> {
     _rotationNotifier.dispose();
     _zoomNotifier.dispose();
     _centerLatNotifier.dispose();
-    _pharmaciesNotifier.dispose();
-    _mapController.dispose();
+    _messageTimer?.cancel();
+    _messageNotifier.dispose();
     _alignController.close();
     super.dispose();
   }
@@ -408,6 +383,7 @@ class _MapScreenState extends State<MapScreen> {
                             Navigator.pop(context);
                             _fetchAndShowRoute(p);
                           },
+                          onMessage: _showMessage,
                         ),
                       ),
                     );
@@ -464,7 +440,13 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            MapTopLoader(isLoading: _isLoadingPharmacies),
+                            ValueListenableBuilder<String?>(
+                              valueListenable: _messageNotifier,
+                              builder: (context, message, _) => MapTopLoader(
+                                isLoading: _isLoadingPharmacies,
+                                message: message,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -553,12 +535,16 @@ class _MapScreenState extends State<MapScreen> {
                       LatLng(pharmacy.latitude!, pharmacy.longitude!),
                       16.0,
                     );
-                    showPharmacyDetailsBottomSheet(context, pharmacy,
-                        settingsController: widget.settingsController,
-                        onDirectionsPressed: () {
-                      Navigator.pop(context);
-                      _fetchAndShowRoute(pharmacy);
-                    });
+                    showPharmacyDetailsBottomSheet(
+                      context,
+                      pharmacy,
+                      settingsController: widget.settingsController,
+                      onMessage: _showMessage,
+                      onDirectionsPressed: () {
+                        Navigator.pop(context);
+                        _fetchAndShowRoute(pharmacy);
+                      },
+                    );
                   }
                 },
               ),

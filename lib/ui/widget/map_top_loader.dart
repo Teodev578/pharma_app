@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Loader simple affichant un shimmer pendant le chargement.
+/// Loader centralisant les retours utilisateurs et le chargement.
+/// Utilisé en haut de la carte pour éviter de masquer le bas de l'écran.
 class MapTopLoader extends StatefulWidget {
   final bool isLoading;
+  final String? message;
 
-  const MapTopLoader({super.key, this.isLoading = false});
+  const MapTopLoader({
+    super.key,
+    this.isLoading = false,
+    this.message,
+  });
 
   @override
   State<MapTopLoader> createState() => _MapTopLoaderState();
@@ -19,13 +25,12 @@ class _MapTopLoaderState extends State<MapTopLoader>
   void initState() {
     super.initState();
     _shimmerCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
-    _shimmerAnim = Tween<double>(
-      begin: -1.5,
-      end: 1.5,
-    ).animate(CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut));
+        vsync: this, duration: const Duration(milliseconds: 1200))
+      ..repeat();
+
+    _shimmerAnim = Tween<double>(begin: -1.5, end: 1.5).animate(
+      CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -36,35 +41,102 @@ class _MapTopLoaderState extends State<MapTopLoader>
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.isLoading) {
-      return const SizedBox.shrink();
-    }
+    final theme = Theme.of(context);
 
-    return AnimatedBuilder(
-      animation: _shimmerAnim,
-      builder: (context, child) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(4),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -0.2),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 4,
-          ),
-          child: _buildShimmerContent(),
         );
       },
+      child: _buildContent(theme),
     );
   }
 
-  Widget _buildShimmerContent() {
+  Widget _buildContent(ThemeData theme) {
+    if (widget.message != null) {
+      return Container(
+        key: const ValueKey('message'),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              size: 20,
+              color: theme.colorScheme.onSecondaryContainer,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                widget.message!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSecondaryContainer,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (widget.isLoading) {
+      return Container(
+        key: const ValueKey('shimmer'),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: AnimatedBuilder(
+          animation: _shimmerAnim,
+          builder: (context, child) => _buildShimmerContent(theme),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink(key: ValueKey('empty'));
+  }
+
+  Widget _buildShimmerContent(ThemeData theme) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _ShimmerBox(width: 14, height: 14, radius: 7, anim: _shimmerAnim),
+        _ShimmerBox(
+          width: 16,
+          height: 16,
+          radius: 8,
+          anim: _shimmerAnim,
+          theme: theme,
+        ),
         const SizedBox(width: 12),
-        _ShimmerBox(width: 160, height: 12, radius: 6, anim: _shimmerAnim),
+        _ShimmerBox(
+          width: 140,
+          height: 12,
+          radius: 6,
+          anim: _shimmerAnim,
+          theme: theme,
+        ),
       ],
     );
   }
@@ -75,18 +147,21 @@ class _ShimmerBox extends StatelessWidget {
   final double height;
   final double radius;
   final Animation<double> anim;
+  final ThemeData theme;
 
   const _ShimmerBox({
     required this.width,
     required this.height,
     required this.radius,
     required this.anim,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Colors.white.withValues(alpha: 0.1);
-    final highlightColor = Colors.white.withValues(alpha: 0.3);
+    final baseColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.1);
+    final highlightColor =
+        theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),

@@ -12,6 +12,7 @@ void showPharmacyDetailsBottomSheet(
   Pharmacy pharmacy, {
   VoidCallback? onDirectionsPressed,
   required SettingsController settingsController,
+  void Function(String)? onMessage,
 }) {
   final status = pharmacy.statutActuel?.toLowerCase();
   final bool isOpen = status == 'ouvert' || status == 'ouverte';
@@ -34,23 +35,23 @@ void showPharmacyDetailsBottomSheet(
         builder: (context, setState) {
           final theme = Theme.of(context);
 
-          // Statut (Ouvert = succès via primary, Fermé = erreur, Inconnu = Orange)
-          final Color openBgColor;
-          final Color openTextColor;
-          final IconData openIcon;
+          // Statut Material 3 Tokens
+          final Color statusBgColor;
+          final Color statusTextColor;
+          final IconData statusIcon;
 
           if (isOpen || isDeGarde) {
-            openBgColor = theme.colorScheme.primaryContainer;
-            openTextColor = theme.colorScheme.onPrimaryContainer;
-            openIcon = Icons.check_circle;
+            statusBgColor = theme.colorScheme.primaryContainer;
+            statusTextColor = theme.colorScheme.onPrimaryContainer;
+            statusIcon = Icons.check_circle;
           } else if (isClosed) {
-            openBgColor = theme.colorScheme.errorContainer;
-            openTextColor = theme.colorScheme.onErrorContainer;
-            openIcon = Icons.access_time_filled_rounded;
+            statusBgColor = theme.colorScheme.errorContainer;
+            statusTextColor = theme.colorScheme.onErrorContainer;
+            statusIcon = Icons.access_time_filled_rounded;
           } else {
-            openBgColor = theme.colorScheme.tertiaryContainer;
-            openTextColor = theme.colorScheme.onTertiaryContainer;
-            openIcon = Icons.warning_amber_rounded;
+            statusBgColor = theme.colorScheme.tertiaryContainer;
+            statusTextColor = theme.colorScheme.onTertiaryContainer;
+            statusIcon = Icons.warning_amber_rounded;
           }
 
           String displayStatus = isUnknown
@@ -117,37 +118,46 @@ void showPharmacyDetailsBottomSheet(
 
                           Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: openBgColor,
-                                  borderRadius: BorderRadius.circular(12), // M3 Small
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      openIcon,
-                                      size: 18,
-                                      color: openTextColor,
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      displayStatus,
-                                      style: TextStyle(
-                                        color: openTextColor,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.2,
-                                      ),
+                                    decoration: BoxDecoration(
+                                      color: statusBgColor,
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                  ],
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          statusIcon,
+                                          size: 18,
+                                          color: statusTextColor,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Text(
+                                            displayStatus,
+                                            style: TextStyle(
+                                              color: statusTextColor,
+                                              fontSize: 14, // Slightly smaller to help
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: 0.2,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const Spacer(),
+                              const SizedBox(width: 8),
                               if (pharmacy.telephone != null)
                                 IconButton.filledTonal(
                                   onPressed: () async {
@@ -178,35 +188,18 @@ void showPharmacyDetailsBottomSheet(
                                   await settingsController.toggleFavorite(
                                     pharmacy.nom,
                                   );
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).clearSnackBars();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          isFavorite
-                                              ? 'Retiré des favoris'
-                                              : 'Ajouté aux favoris ❤️',
-                                          style: theme.textTheme.bodyMedium?.copyWith(
-                                            color: theme.colorScheme.onInverseSurface,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        backgroundColor: theme.colorScheme.inverseSurface,
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: const Duration(seconds: 2),
-                                        shape: const StadiumBorder(),
-                                      ),
-                                    );
-                                  }
+                                  onMessage?.call(
+                                    isFavorite
+                                        ? 'Retiré des favoris'
+                                        : 'Ajouté aux favoris ❤️',
+                                  );
                                 },
                                 icon: Icon(
                                   isFavorite
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                   color: isFavorite 
-                                      ? theme.colorScheme.primary 
+                                      ? theme.colorScheme.tertiary 
                                       : theme.colorScheme.onSecondaryContainer,
                                 ),
                                 style: IconButton.styleFrom(
@@ -217,20 +210,7 @@ void showPharmacyDetailsBottomSheet(
                               IconButton.filledTonal(
                                 onPressed: () {
                                   HapticFeedback.selectionClick();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Lien de la pharmacie copié (Simulé)',
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: theme.colorScheme.onInverseSurface,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      backgroundColor: theme.colorScheme.inverseSurface,
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: const StadiumBorder(),
-                                    ),
-                                  );
+                                  onMessage?.call('Lien de la pharmacie copié (Simulé)');
                                 },
                                 icon: const Icon(Icons.share_rounded),
                                 style: IconButton.styleFrom(
@@ -285,20 +265,7 @@ void showPharmacyDetailsBottomSheet(
                                 Clipboard.setData(
                                   ClipboardData(text: pharmacy.telephone!),
                                 );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Numéro copié',
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: theme.colorScheme.onInverseSurface,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    backgroundColor: theme.colorScheme.inverseSurface,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: const StadiumBorder(),
-                                  ),
-                                );
+                                onMessage?.call('Numéro copié');
                               },
                             ),
 

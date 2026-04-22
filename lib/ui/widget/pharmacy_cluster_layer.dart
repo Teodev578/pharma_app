@@ -16,6 +16,7 @@ class PharmacyClusterLayer extends StatelessWidget {
   final SettingsController settingsController;
   final double zoom;
   final VoidCallback? Function(Pharmacy pharmacy)? onDirectionsPressedBuilder;
+  final void Function(String)? onMessage;
 
   const PharmacyClusterLayer({
     super.key,
@@ -24,6 +25,7 @@ class PharmacyClusterLayer extends StatelessWidget {
     required this.settingsController,
     required this.zoom,
     this.onDirectionsPressedBuilder,
+    this.onMessage,
   });
 
   /// Rayon de clustering adapté au zoom courant.
@@ -54,6 +56,7 @@ class PharmacyClusterLayer extends StatelessWidget {
               showLabel: showLabel,
               scale: scale,
               onDirectionsPressed: onDirectionsPressedBuilder?.call(p),
+              onMessage: onMessage,
             ))
         .toList();
 
