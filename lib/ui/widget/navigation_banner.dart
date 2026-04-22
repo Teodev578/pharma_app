@@ -6,6 +6,7 @@ class NavigationBanner extends StatelessWidget {
   final String distance;
   final String instruction;
   final IconData directionIcon;
+  final String? totalDistance;
 
   const NavigationBanner({
     super.key,
@@ -13,6 +14,7 @@ class NavigationBanner extends StatelessWidget {
     this.distance = '50 m',
     this.instruction = 'A droite',
     this.directionIcon = Icons.turn_right,
+    this.totalDistance,
   });
 
   @override
@@ -47,13 +49,30 @@ class NavigationBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  distance,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      distance,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (totalDistance != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        '($totalDistance total)',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 Text(
                   instruction,

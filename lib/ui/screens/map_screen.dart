@@ -420,7 +420,15 @@ class _MapScreenState extends State<MapScreen> {
                             final steps = route.steps;
                             String distanceText = '0 m';
                             String instructionText = 'Arrivée';
+                            String? totalDistanceText;
                             IconData icon = Icons.check_circle_outline;
+
+                            // Format total distance
+                            if (route.distance > 1000) {
+                              totalDistanceText = '${(route.distance / 1000).toStringAsFixed(1)} km';
+                            } else {
+                              totalDistanceText = '${route.distance.round()} m';
+                            }
 
                             if (steps.length > 1) {
                               double dist = steps[0].distance;
@@ -464,6 +472,7 @@ class _MapScreenState extends State<MapScreen> {
                                 distance: distanceText,
                                 instruction: instructionText,
                                 directionIcon: icon,
+                                totalDistance: totalDistanceText,
                                 onCancel: _clearRoute,
                               ),
                             );
