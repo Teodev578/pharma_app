@@ -49,7 +49,6 @@ class PharmacyClusterLayer extends StatelessWidget {
     final List<Marker> markers = pharmacies
         .where((p) => p.latitude != null && p.longitude != null)
         .map((p) => PharmacyMarker.build(
-              context: context,
               point: LatLng(p.latitude!, p.longitude!),
               pharmacy: p,
               settingsController: settingsController,
