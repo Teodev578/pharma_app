@@ -289,6 +289,13 @@ class _MapScreenState extends State<MapScreen> {
                   initialCenter: _userPositionNotifier.value ?? _initialCenter,
                   initialZoom: 15.0,
                   maxZoom: 20.0,
+                  minZoom: 6.0,
+                  cameraConstraint: CameraConstraint.contain(
+                    bounds: LatLngBounds(
+                      const LatLng(6.0, -0.2), // Sud-Ouest
+                      const LatLng(11.2, 2.1), // Nord-Est
+                    ),
+                  ),
                   interactionOptions: const InteractionOptions(
                     flags: InteractiveFlag.all,
                     rotationThreshold: 20.0,
